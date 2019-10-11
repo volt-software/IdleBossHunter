@@ -1,0 +1,43 @@
+[submodule "server/external/spdlog"]
+	path = server/external/spdlog
+	url = https://github.com/gabime/spdlog.git
+	branch = v1.x
+[submodule "server/external/rapidjson"]
+	path = server/external/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "server/external/libpqxx"]
+	path = server/external/libpqxx
+	url = https://github.com/jtv/libpqxx.git
+[submodule "server/external/range-v3"]
+	path = server/external/range-v3
+	url = https://github.com/ericniebler/range-v3.git
+[submodule "server/external/Catch2"]
+	path = server/external/Catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "server/external/libsodium"]
+	path = server/external/libsodium
+	url = https://github.com/jedisct1/libsodium.git
+[submodule "server/external/xxHash"]
+	path = server/external/xxHash
+	url = https://github.com/Cyan4973/xxHash.git
+[submodule "server/external/robin-hood-hashing"]
+	path = server/external/robin-hood-hashing
+	url = https://github.com/oipo/robin-hood-hashing.git
+[submodule "server/external/entt"]
+	path = server/external/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "server/external/pcg-cpp"]
+	path = server/external/pcg-cpp
+	url = https://github.com/imneme/pcg-cpp.git
+[submodule "server/external/websocketpp"]
+	path = server/external/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "server/external/asio"]
+	path = server/external/asio
+	url = https://github.com/chriskohlhoff/asio.git
+[submodule "server/external/concurrentqueue"]
+	path = server/external/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git
+[submodule "server/assets"]
+	path = server/assets
+	url = https://github.com/RealmOfAesir/assets.git

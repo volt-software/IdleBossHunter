@@ -1,0 +1,15 @@
+.idea/
+cmake-build-debug
+cmake-build-release
+cmake-build-relwithdebinfo
+bin/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+freshprinceofbijlmer.cbp
+node_modules/
+package-lock.json
+*.js
+.scannerwork
+bw_output
