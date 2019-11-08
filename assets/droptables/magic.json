@@ -1,0 +1,11 @@
+{
+  "name": "magic",
+  "weapons": {
+    "chance": 1,
+    "multiplier": 90
+  },
+  "spells": {
+    "chance": 9,
+    "multiplier": 100
+  }
+}

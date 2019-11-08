@@ -1,0 +1,11 @@
+{
+  "name": "general",
+  "weapons": {
+    "chance": 10,
+    "multiplier": 100
+  },
+  "spells": {
+    "chance": 0,
+    "multiplier": 0
+  }
+}

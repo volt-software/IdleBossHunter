@@ -1,0 +1,16 @@
+{
+  "name": "tyrant",
+  "multipliers": {
+    "xp": 3,
+    "gold": 3,
+    "item": 3,
+    "hp": 2,
+    "mp": 2,
+    "strength": 2,
+    "agility": 2,
+    "psi": 2,
+    "vitality": 2,
+    "speed": 2
+  },
+  "teleport_when_beat": false
+}
