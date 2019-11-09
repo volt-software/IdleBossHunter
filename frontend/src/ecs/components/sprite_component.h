@@ -1,6 +1,6 @@
 /*
-    Realm of Aesir
-    Copyright (C) 2019 Michael de Lang
+    IdleBossHunter
+    Copyright (C) 2018 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <string>
-#include <optional>
+class sprite;
 
-using namespace std;
-
-namespace lotr {
-    string get_selfpath();
-    void set_cwd(string const &path);
-    optional<string> read_whole_file(string const &path);
+namespace fresh {
+    struct sprite_component {
+        explicit sprite_component(sprite *_sprite) : sprite_(_sprite) {}
+        sprite *sprite_;
+    };
 }
+

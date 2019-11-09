@@ -1,5 +1,5 @@
 /*
-    Realm of Aesir client
+    IdleBossHunter client
     Copyright (C) 2016  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -34,10 +34,10 @@
 #include <rendering/imgui/imgui.h>
 #include <rendering/imgui/imgui_impl_sdl.h>
 #include <rendering/imgui/imgui_impl_opengl3.h>
-//#include <ecs/ecs.h>
-//#include <ecs/systems/rendering_system.h>
-//#include <ecs/components/atlas_component.h>
-//#include <ecs/systems/scene_system.h>
+#include <ecs/ecs.h>
+#include <ecs/systems/rendering_system.h>
+#include <ecs/components/atlas_component.h>
+#include <ecs/systems/scene_system.h>
 #include <thread>
 #include <numeric>
 
@@ -68,7 +68,7 @@ ImGuiIO& init_imgui() {
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("assets/fonts/Independent Modern 8x8 Monospaced.ttf", 12);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/TheanoDidot-Regular.ttf", 12);
 
     ImGui::StyleColorsDark();
 
@@ -130,15 +130,24 @@ void set_working_dir() noexcept {
     }
 
 }
+
+std::function<void()> loop;
+void main_loop() { if(loop) loop(); }
+
 #ifdef WINDOWS
-extern "C" int main(int argc, char* argv[])
+extern "C" int main(int argc, char* argv[]) {
 #else
-int main() {
+int main(int argc, char* argv[]) {
 #endif
     set_working_dir();
 
-    config config;
+    config config{};
 #ifdef __EMSCRIPTEN__
+    config.debug_level = "trace";
+    config.tick_length = 50;
+    config.log_fps = true;
+    config.screen_width = 1024;
+    config.screen_height = 768;
 #else
     try {
         auto config_opt = parse_env_file();
@@ -166,6 +175,11 @@ int main() {
 
     reconfigure_logger(config);
 #endif
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(main_loop, 0, 0);
+#endif
+
     init_sdl(config);
     init_sdl_image();
     init_sdl_mixer();
@@ -176,11 +190,10 @@ int main() {
 
     SDL_Event e;
 
-    timer<microseconds> fps_timer;
-    timer<microseconds> render_timer;
-    timer<microseconds> tick_timer;
-    timer<microseconds> bench_timer;
-    vector<uint64_t> frame_times;
+    timer<microseconds> fps_timer{};
+    timer<microseconds> tick_timer{};
+    timer<microseconds> bench_timer{};
+    vector<uint64_t> frame_times{};
     frame_times.reserve(config.refresh_rate);
     int counted_frames = 0;
     //ThreadPool thread_pool(config.threads);
@@ -194,84 +207,75 @@ int main() {
 
     auto map = fresh::map::load_from_file("./assets/maps/");
 
-#ifdef SPRITE_TEST
-    vector<shared_ptr<sprite>> sprites;
-    shared_ptr<texture_atlas> atlas;
-
-    atlas = make_shared<texture_atlas>("assets/sprites/dg_armor32.gif.png", "shaders/triangle_vertex.shader",
-        "shaders/triangle_fragment.shader", projection, 16);
-
-    for(int i = 0; i < 2'000; i++) {
-        sprites.push_back(make_shared<sprite>(atlas, glm::vec4(i%2 == 0? 0.f : 500.f, 320.0f, 320.0f, 320.0f), optional<glm::vec4>{}));
-    }
-#endif
-
     fps_timer.start();
-    render_timer.start();
     tick_timer.start();
 
-//    EntityManager es;
-//    rendering_system rs(config, window);
-//    scene_system ss(config);
-//    ss.init_main_menu();
+    entt::registry es{};
+    rendering_system rs(config, window);
+    scene_system ss(config);
+    ss.init_main_menu();
 
-#ifdef SPRITE_TEST
-    auto atlas_entity = es.create();
-    es.assign<atlas_component>(atlas_entity, atlas.get());
-#endif
-
-    while(!quit) {
-        while(SDL_PollEvent(&e) != 0) {
+    loop = [&] {
+        while (SDL_PollEvent(&e) != 0) {
             ImGui_ImplSDL2_ProcessEvent(&e);
-            if(e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
+            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
                 quit = true;
             }
 
-            if(io.WantCaptureKeyboard) {
+            if (io.WantCaptureKeyboard) {
                 continue;
             }
 
-            if(e.type == SDL_TEXTINPUT) {
-                int x = 0;
-                int y = 0;
-                SDL_GetMouseState(&x, &y);
-            } else if(e.type == SDL_KEYDOWN) {
-                if(e.key.keysym.sym == SDLK_1) {
-                    Mix_PlayChannel(-1, sfx1, 0);
-                } else if(e.key.keysym.sym == SDLK_2) {
-                    Mix_PlayChannel(-1, sfx2, 0);
-                } else if(e.key.keysym.sym == SDLK_3) {
-                    Mix_PlayChannel(-1, sfx3, 0);
-                } else if(e.key.keysym.sym == SDLK_p) {
-                    if(Mix_PlayingMusic()) {
-                        if(Mix_PausedMusic()) {
-                            Mix_ResumeMusic();
+            switch(e.type) {
+                case SDL_TEXTINPUT: {
+                    int x = 0;
+                    int y = 0;
+                    SDL_GetMouseState(&x, &y);
+                    break;
+                }
+                case SDL_KEYDOWN: {
+                    if (e.key.keysym.sym == SDLK_1) {
+                        Mix_PlayChannel(-1, sfx1, 0);
+                    } else if (e.key.keysym.sym == SDLK_2) {
+                        Mix_PlayChannel(-1, sfx2, 0);
+                    } else if (e.key.keysym.sym == SDLK_3) {
+                        Mix_PlayChannel(-1, sfx3, 0);
+                    } else if (e.key.keysym.sym == SDLK_p) {
+                        if (Mix_PlayingMusic()) {
+                            if (Mix_PausedMusic()) {
+                                Mix_ResumeMusic();
+                            } else {
+                                Mix_PauseMusic();
+                            }
                         } else {
-                            Mix_PauseMusic();
+                            Mix_PlayMusic(mus1, 0);
                         }
-                    } else {
-                        Mix_PlayMusic(mus1, 0);
                     }
+                    break;
+                }
+                case SDL_WINDOWEVENT_SIZE_CHANGED: {
+                    config.screen_width = e.window.data1;
+                    config.screen_height = e.window.data2;
+                    spdlog::info("Resize to {}x{}", config.screen_width, config.screen_height);
+                    projection = glm::ortho(0.0f, (float) config.screen_width, (float) config.screen_height, 0.0f, -1.0f, 1.0f);
+                    break;
                 }
             }
         }
 
-        if(render_timer.get_ticks() > 1'000'000/config.refresh_rate) {
-            bench_timer.start();
-//            rs.update(es, 0);
-//            ss.update(es, 0);
-//            rs.end_rendering();
+        bench_timer.start();
+        rs.update(es, 1);
+        ss.update(es, 1);
+        rs.end_rendering();
 
-            if(config.log_fps) {
-                frame_times.push_back(bench_timer.get_ticks());
-            }
-
-            ++counted_frames;
-            render_timer.start();
+        if (config.log_fps) {
+            frame_times.push_back(bench_timer.get_ticks());
         }
 
+        ++counted_frames;
+
         auto fps_ticks = fps_timer.get_ticks();
-        if(config.log_fps && fps_ticks > 1'000'000) {
+        if (config.log_fps && fps_ticks > 1'000'000) {
             spdlog::info("[main] FPS {}-{} - frame times max/avg/min: {} / {} / {} µs", counted_frames, counted_frames / (fps_ticks / 1'000'000.f),
                          *max_element(begin(frame_times), end(frame_times)), accumulate(begin(frame_times), end(frame_times), 0ul) / frame_times.size(),
                          *min_element(begin(frame_times), end(frame_times)));
@@ -279,21 +283,16 @@ int main() {
             frame_times.clear();
             counted_frames = 0;
         }
+    };
 
-#ifdef SPRITE_TEST
-        if(tick_timer.get_ticks() > config.tick_length) {
-            for(auto& sprite : sprites) {
-                auto position = sprite->get_position();
-                position.x += 1;
-                if (position.x + position.w > config.screen_width) {
-                    position.x = 0;
-                }
-                sprite->set_position(position);
-            }
-            tick_timer.start();
-        }
+#ifdef __EMSCRIPTEN__
+    emscripten_cancel_main_loop();
+    emscripten_set_main_loop(main_loop, 0, 1);
+#else
+    while (1) main_loop();
 #endif
-    }
+
+    spdlog::info("quitting");
 
     Mix_FreeChunk(sfx1);
     Mix_FreeChunk(sfx2);
@@ -301,11 +300,7 @@ int main() {
 
     Mix_FreeMusic(mus1);
 
-#ifdef SPRITE_TEST
-    sprites.clear();
-    atlas = nullptr;
-#endif
-
     close();
+
     return 0;
 }

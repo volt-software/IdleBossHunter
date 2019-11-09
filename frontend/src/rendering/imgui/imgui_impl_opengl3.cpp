@@ -101,6 +101,8 @@
 #endif
 #endif
 
+#include <spdlog/spdlog.h>
+
 // OpenGL Data
 static char         g_GlslVersionString[32] = "";
 static GLuint       g_FontTexture = 0;
@@ -369,13 +371,14 @@ static bool CheckShader(GLuint handle, const char* desc)
     glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
     glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
     if ((GLboolean)status == GL_FALSE)
-        fprintf(stderr, "ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to compile %s!\n", desc);
+        spdlog::error("ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to compile {}!", desc);
     if (log_length > 0)
     {
         ImVector<char> buf;
         buf.resize((int)(log_length + 1));
-        glGetShaderInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
-        fprintf(stderr, "%s\n", buf.begin());
+        GLint strlen;
+        glGetShaderInfoLog(handle, log_length, &strlen, (GLchar*)buf.begin());
+        spdlog::error("glGetShaderInfoLog {} {}", strlen, buf.begin());
     }
     return (GLboolean)status == GL_TRUE;
 }
@@ -387,13 +390,14 @@ static bool CheckProgram(GLuint handle, const char* desc)
     glGetProgramiv(handle, GL_LINK_STATUS, &status);
     glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
     if ((GLboolean)status == GL_FALSE)
-        fprintf(stderr, "ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to link %s! (with GLSL '%s')\n", desc, g_GlslVersionString);
+        spdlog::error("ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to link {}! (with GLSL '{}')", desc, g_GlslVersionString);
     if (log_length > 0)
     {
         ImVector<char> buf;
         buf.resize((int)(log_length + 1));
-        glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
-        fprintf(stderr, "%s\n", buf.begin());
+        GLint strlen;
+        glGetProgramInfoLog(handle, log_length, &strlen, (GLchar*)buf.begin());
+        spdlog::error("glGetProgramInfoLog {} {}", strlen, buf.begin());
     }
     return (GLboolean)status == GL_TRUE;
 }

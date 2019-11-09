@@ -1,5 +1,5 @@
 /*
-    Realm of Aesir
+    IdleBossHunter
     Copyright (C) 2019 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -19,21 +19,12 @@
 #pragma once
 
 #include <string>
-#include <locale>
-#include <codecvt>
+#include <optional>
 
 using namespace std;
 
 namespace lotr {
-    [[nodiscard]]
-    u32string To_UTF32(const string &s);
-    void string_tolower(string &str);
-    [[nodiscard]]
-    string string_tolower_copy(string str);
-
-    [[nodiscard]]
-    string utf_to_upper_copy(string const &str);
-
-    [[nodiscard]]
-    string utf_to_lower_copy(string const &str);
+    string get_selfpath();
+    void set_cwd(string const &path);
+    optional<string> read_whole_file(string const &path);
 }

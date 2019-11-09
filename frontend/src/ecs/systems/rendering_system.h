@@ -1,6 +1,6 @@
 /*
-    Realm of Aesir
-    Copyright (C) 2019 Michael de Lang
+    IdleBossHunter
+    Copyright (C) 2018 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -16,29 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <pcg_random.hpp>
+#include <SDL_video.h>
+#include "../../config.h"
+#include "ecs_system.h"
 
-namespace lotr {
-    class random_helper {
+namespace fresh {
+    class rendering_system : public ecs_system  {
     public:
-        random_helper();
+        explicit rendering_system(config config, SDL_Window *window)
+        : _config(std::move(config)), _window(window) {}
 
-        uint64_t generate_single_fast(uint64_t end);
-        uint32_t generate_single_fast(uint32_t end);
+        ~rendering_system() override = default;
 
-        uint64_t generate_single(uint64_t from, uint64_t end);
-        uint64_t generate_single_uint64();
-        int64_t generate_single(int64_t from, int64_t end);
-        int64_t generate_single_int64();
-        float generate_single(float from, float end);
-        double generate_single(double from, double end);
-        bool one_in_x(uint32_t x);
+        void update(entt::registry &es, TimeDelta dt) override;
+        void end_rendering();
     private:
-        pcg64 _rng64;
-        pcg32 _rng32;
+        config _config;
+        SDL_Window *_window;
     };
-
-    extern thread_local random_helper random;
 }

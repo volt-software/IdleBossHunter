@@ -1,5 +1,5 @@
 /*
-    Realm of Aesir client
+    IdleBossHunter client
     Copyright (C) 2016  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify

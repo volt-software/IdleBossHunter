@@ -1,5 +1,5 @@
 /*
-    RealmOfAesirWorld
+    IdleBossHunter
     Copyright (C) 2017  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify

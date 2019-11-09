@@ -1,5 +1,5 @@
 /*
-    Realm of Aesir client
+    IdleBossHunter client
     Copyright (C) 2024  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -84,6 +84,7 @@ texture_atlas::~texture_atlas() noexcept {
 
 void texture_atlas::render() const noexcept {
     if(!_allocated_at_least_one) {
+        spdlog::info("!_allocated_at_least_one for {}", _image);
         return;
     }
 

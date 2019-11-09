@@ -54,7 +54,6 @@
 
 // Data
 static SDL_Window*  g_Window = NULL;
-static Uint64       g_Time = 0;
 static bool         g_MousePressed[3] = { false, false, false };
 static SDL_Cursor*  g_MouseCursors[ImGuiMouseCursor_COUNT] = { 0 };
 static char*        g_ClipboardTextData = NULL;
@@ -266,7 +265,9 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
     }
 }
 
-void ImGui_ImplSDL2_NewFrame(SDL_Window* window)
+#include <spdlog/spdlog.h>
+
+void ImGui_ImplSDL2_NewFrame(SDL_Window* window, unsigned int deltatime)
 {
     ImGuiIO& io = ImGui::GetIO();
     IM_ASSERT(io.Fonts->IsBuilt() && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame() function? e.g. ImGui_ImplOpenGL3_NewFrame().");
@@ -280,11 +281,7 @@ void ImGui_ImplSDL2_NewFrame(SDL_Window* window)
     if (w > 0 && h > 0)
         io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
 
-    // Setup time step (we don't use SDL_GetTicks() because it is using millisecond resolution)
-    static Uint64 frequency = SDL_GetPerformanceFrequency();
-    Uint64 current_time = SDL_GetPerformanceCounter();
-    io.DeltaTime = g_Time > 0 ? (float)((double)(current_time - g_Time) / frequency) : (float)(1.0f / 60.0f);
-    g_Time = current_time;
+    io.DeltaTime = deltatime/1000.f;
 
     ImGui_ImplSDL2_UpdateMousePosAndButtons();
     ImGui_ImplSDL2_UpdateMouseCursor();

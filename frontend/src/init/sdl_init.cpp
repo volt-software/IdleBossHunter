@@ -1,5 +1,5 @@
 /*
-    freshprinceofbijlmer
+    IdleBossHunter
     Copyright (C) 2019 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -96,20 +96,18 @@ void fresh::init_sdl(config &config) noexcept {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 #endif
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    config.screen_width = 800;
-    config.screen_height = 600;
     if (config.auto_fullscreen) {
-        window = SDL_CreateWindow("Realm of Aesir", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        window = SDL_CreateWindow("IdleBossHunter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                   0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
     } else {
-        window = SDL_CreateWindow("Realm of Aesir", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        window = SDL_CreateWindow("IdleBossHunter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                   config.screen_width, config.screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     }
     if (window == nullptr) {
@@ -163,8 +161,13 @@ void fresh::init_sdl(config &config) noexcept {
     }
 
     if (current.refresh_rate == 0) {
+#ifdef __EMSCRIPTEN__
+        spdlog::warn("[main] Refresh rate unknown. Setting to 0 Hz.");
+        config.refresh_rate = 0;
+#else
         spdlog::warn("[main] Refresh rate unknown. Setting to 60 Hz.");
         config.refresh_rate = 60;
+#endif
     } else {
         config.refresh_rate = (uint32_t) current.refresh_rate;
     }
