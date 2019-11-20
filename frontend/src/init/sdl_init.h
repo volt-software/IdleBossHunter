@@ -23,7 +23,7 @@
 #include <glm/ext.hpp>
 #include "../config.h"
 
-namespace fresh {
+namespace ibh {
     extern SDL_Window *window;
     extern SDL_GLContext context;
     extern glm::mat4 projection;

@@ -20,10 +20,11 @@
 
 #include <string>
 
-namespace fresh {
+namespace ibh {
     struct config {
         // to be filled by .env
         std::string debug_level;
+        std::string server_url;
         bool debug_roa_library;
         uint32_t tick_length;
         bool log_fps;
@@ -35,5 +36,8 @@ namespace fresh {
 
         //to be filled by code
         uint32_t refresh_rate;
+        uint32_t user_event_type;
+        uint32_t music_to_play;
+        bool show_demo_window;
     };
 }

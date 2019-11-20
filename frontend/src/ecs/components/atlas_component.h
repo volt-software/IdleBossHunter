@@ -21,7 +21,7 @@
 
 class texture_atlas;
 
-namespace fresh {
+namespace ibh {
     struct atlas_component {
         texture_atlas *atlas;
     };

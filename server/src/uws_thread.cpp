@@ -70,36 +70,33 @@ enum tls_mode {
     MOZILLA_MODERN = 2
 };
 
-context_ptr on_tls_init(tls_mode mode, websocketpp::connection_hdl hdl) {
+string get_password(config& config, size_t max_len, asio::ssl::context::password_purpose purpose) {
+    return config.certificate_password;
+}
+
+//bool verify_certificate(bool preverified, asio::ssl::verify_context& ssl_verify_ctx) {
+//    std::string errstr(X509_verify_cert_error_string(X509_STORE_CTX_get_error(ssl_verify_ctx.native_handle())));
+//    spdlog::debug("[{}] {} {}", __FUNCTION__, preverified, errstr);
+//    return true;
+//}
+
+context_ptr on_tls_init(config& config, websocketpp::connection_hdl hdl) {
     namespace asio = websocketpp::lib::asio;
 
-    context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
+    context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::tlsv12);
 
     try {
-        if (mode == MOZILLA_MODERN) {
-            // Modern disables TLSv1
-            ctx->set_options(asio::ssl::context::default_workarounds |
-                             asio::ssl::context::no_sslv2 |
-                             asio::ssl::context::no_sslv3 |
-                             asio::ssl::context::no_tlsv1 |
-                             asio::ssl::context::single_dh_use);
-        } else {
-            ctx->set_options(asio::ssl::context::default_workarounds |
-                             asio::ssl::context::no_sslv2 |
-                             asio::ssl::context::no_sslv3 |
-                             asio::ssl::context::single_dh_use);
-        }
-        //ctx->set_password_callback(bind(&get_password));
-        ctx->use_certificate_chain_file("cert.pem");
-        ctx->use_private_key_file("key.pem", asio::ssl::context::pem);
+        ctx->set_options(asio::ssl::context::default_workarounds |
+                         asio::ssl::context::no_sslv2 |
+                         asio::ssl::context::no_sslv3 |
+                         asio::ssl::context::no_tlsv1 |
+                         asio::ssl::context::no_tlsv1_1 |
+                         asio::ssl::context::single_dh_use);
+        ctx->set_password_callback(bind(&get_password, config, ::_1, ::_2));
+        ctx->use_certificate_chain_file(config.certificate_file);
+        ctx->use_private_key_file(config.private_key_file, asio::ssl::context::pem);
 
-        std::string ciphers;
-
-        if (mode == MOZILLA_MODERN) {
-            ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK";
-        } else {
-            ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
-        }
+        std::string ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK";;
 
         if (SSL_CTX_set_cipher_list(ctx->native_handle() , ciphers.c_str()) != 1) {
             spdlog::error("[{}] error setting cipher list", __FUNCTION__);
@@ -150,7 +147,6 @@ void on_message(shared_ptr<database_pool> pool, message_router_type &message_rou
     }
 
     spdlog::trace("[{}] conn {} message {}", __FUNCTION__, id_map_it->second, message);
-
 
     per_socket_data<websocketpp::connection_hdl>* user_data = nullptr;
     {
@@ -285,7 +281,7 @@ thread lotr::run_uws(config const &config, shared_ptr<database_pool> pool, serve
             roa_server.set_fail_handler(bind(&on_fail, &roa_server, ::_1));
             roa_server.set_open_handler(bind(&on_open, cref(quit), ::_1));
             roa_server.set_close_handler(bind(&on_close, &roa_server, ::_1));
-            roa_server.set_tls_init_handler(bind(&on_tls_init,MOZILLA_INTERMEDIATE,::_1));
+            roa_server.set_tls_init_handler(bind(&on_tls_init,config,::_1));
             roa_server.set_pong_timeout(2500);
             roa_server.set_open_handshake_timeout(2500);
             roa_server.set_close_handshake_timeout(2500);
@@ -311,7 +307,7 @@ thread lotr::run_uws(config const &config, shared_ptr<database_pool> pool, serve
         }
 
         init_done = true;
-        spdlog::warn("[{}] done", __FUNCTION__);
+        spdlog::warn("[websocket++] done");
     });
 
     while(!init_done) {}

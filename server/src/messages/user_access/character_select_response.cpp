@@ -196,7 +196,7 @@ optional<character_select_response> character_select_response::deserialize(rapid
                         return nullopt;
                     }
 
-                    class_items.emplace_back(0, 0, 0, race_items_array[i2]["name"].GetString(), "", "", vector<stat_component>{});
+                    class_items.emplace_back(0, race_items_array[i2]["name"].GetString(), "", "", vector<stat_component>{});
                 }
             }
 

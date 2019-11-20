@@ -24,7 +24,7 @@
 
 using namespace std;
 //using json = nlohmann::json;
-using namespace fresh;
+using namespace ibh;
 
 std::optional<tileset> tileset::load_from_file(const std::string &file, uint32_t firstgid) {
 //    spdlog::debug(R"([tileset] Loading tileset "{}" firstgid {})", file, firstgid);

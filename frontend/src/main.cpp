@@ -18,6 +18,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/websocket.h>
 #endif
 
 #include <SDL2/SDL.h>
@@ -52,9 +53,9 @@
 #include "init/sdl_init.h"
 
 using namespace std;
-using namespace fresh;
+using namespace ibh;
 
-namespace fresh {
+namespace ibh {
     SDL_Window *window = nullptr;
     SDL_GLContext context = nullptr;
     glm::mat4 projection;
@@ -68,7 +69,7 @@ ImGuiIO& init_imgui() {
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("assets/fonts/TheanoDidot-Regular.ttf", 12);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/TheanoDidot-Regular.ttf", 20);
 
     ImGui::StyleColorsDark();
 
@@ -101,6 +102,7 @@ void set_threads_config(config& config) {
 
 void close() noexcept
 {
+    emscripten_cancel_main_loop();
     SDL_StopTextInput();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -131,14 +133,68 @@ void set_working_dir() noexcept {
 
 }
 
-std::function<void()> loop;
-void main_loop() { if(loop) loop(); }
+EM_BOOL WebSocketOpen(int eventType, const EmscriptenWebSocketOpenEvent *e, void *userData)
+{
+    spdlog::debug("open(eventType={})\n", eventType);
 
-#ifdef WINDOWS
-extern "C" int main(int argc, char* argv[]) {
-#else
-int main(int argc, char* argv[]) {
+    emscripten_websocket_send_utf8_text(e->socket, "hello on the other side");
+
+    return 0;
+}
+
+EM_BOOL WebSocketClose(int eventType, const EmscriptenWebSocketCloseEvent *e, void *userData)
+{
+    spdlog::debug("close(eventType={}, wasClean={}, code={}, reason=%s)\n", eventType, e->wasClean, e->code, e->reason);
+    return 0;
+}
+
+EM_BOOL WebSocketError(int eventType, const EmscriptenWebSocketErrorEvent *e, void *userData)
+{
+    spdlog::debug("error(eventType={})", eventType);
+    return 0;
+}
+
+EM_BOOL WebSocketMessage(int eventType, const EmscriptenWebSocketMessageEvent *e, void *userData)
+{
+    spdlog::debug("message(eventType={}, numBytes={}, isText={})", eventType, e->numBytes, e->isText);
+    if (e->isText) {
+        spdlog::debug("text data: {}", (char *) e->data);
+    } else {
+        spdlog::debug("binary data");
+    }
+    return 0;
+}
+
+void init_net(config& config) {
+#ifdef __EMSCRIPTEN__
+    if (!emscripten_websocket_is_supported()) {
+        spdlog::error("[{}] Websocket not supported", __FUNCTION__);
+        exit(1);
+    }
+
+    EmscriptenWebSocketCreateAttributes attr;
+    emscripten_websocket_init_create_attributes(&attr);
+    attr.url = config.server_url.c_str();
+
+    EMSCRIPTEN_WEBSOCKET_T socket = emscripten_websocket_new(&attr);
+    if (socket <= 0)
+    {
+        spdlog::error("[{}] Websocket creation failed, code {}", __FUNCTION__, socket);
+        exit(1);
+    }
+
+    emscripten_websocket_set_onopen_callback(socket, nullptr, WebSocketOpen);
+    emscripten_websocket_set_onclose_callback(socket, nullptr, WebSocketClose);
+    emscripten_websocket_set_onerror_callback(socket, nullptr, WebSocketError);
+    emscripten_websocket_set_onmessage_callback(socket, nullptr, WebSocketMessage);
 #endif
+
+}
+
+std::function<void()> loop;
+void main_loop() { loop(); }
+
+int main(int argc, char* argv[]) {
     set_working_dir();
 
     config config{};
@@ -146,8 +202,9 @@ int main(int argc, char* argv[]) {
     config.debug_level = "trace";
     config.tick_length = 50;
     config.log_fps = true;
-    config.screen_width = 1024;
-    config.screen_height = 768;
+    config.screen_width = 1600;
+    config.screen_height = 900;
+    config.server_url = "wss://www.realmofaesir.com:8080/";
 #else
     try {
         auto config_opt = parse_env_file();
@@ -172,23 +229,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-
     reconfigure_logger(config);
 #endif
+    config.music_to_play = 1;
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(main_loop, 0, 0);
+    emscripten_set_main_loop([]{}, 0, 0);
 #endif
 
     init_sdl(config);
+    init_net(config);
     init_sdl_image();
     init_sdl_mixer();
     set_threads_config(config);
     auto& io = init_imgui();
-
-    bool quit = false;
-
-    SDL_Event e;
 
     timer<microseconds> fps_timer{};
     timer<microseconds> tick_timer{};
@@ -198,49 +252,44 @@ int main(int argc, char* argv[]) {
     int counted_frames = 0;
     //ThreadPool thread_pool(config.threads);
 
-    Mix_Chunk *sfx1 = Mix_LoadWAV("assets/sfx/Slash01.wav");
-    Mix_Chunk *sfx2 = Mix_LoadWAV("assets/sfx/Slash02.wav");
-    Mix_Chunk *sfx3 = Mix_LoadWAV("assets/sfx/Slash03.wav");
+    Mix_Music *mus1 = Mix_LoadMUS("assets/music/8bit Stage1 Intro.ogg");
+    if(mus1 == nullptr) {
+        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+        close();
+        return -1;
+    }
 
-    Mix_Music *mus1 = Mix_LoadMUS("assets/music/8bit Stage1 Loop.wav");
-    //Mix_PlayMusic(mus1, 0);
+    Mix_Music *mus2 = Mix_LoadMUS("assets/music/8bit Stage1 Loop.ogg");
+    if(mus2 == nullptr) {
+        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+        close();
+        return -1;
+    }
+    Mix_PlayMusic(mus1, 0);
 
-    auto map = fresh::map::load_from_file("./assets/maps/");
+    //auto map = ibh::map::load_from_file("./assets/maps/");
 
     fps_timer.start();
     tick_timer.start();
 
     entt::registry es{};
-    rendering_system rs(config, window);
-    scene_system ss(config);
+    rendering_system rs(&config, window);
+    scene_system ss(&config);
     ss.init_main_menu();
 
     loop = [&] {
+        SDL_Event e;
+
         while (SDL_PollEvent(&e) != 0) {
             ImGui_ImplSDL2_ProcessEvent(&e);
-            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
-                quit = true;
-            }
 
-            if (io.WantCaptureKeyboard) {
+            /*if (io.WantCaptureKeyboard) {
                 continue;
-            }
+            }*/
 
             switch(e.type) {
-                case SDL_TEXTINPUT: {
-                    int x = 0;
-                    int y = 0;
-                    SDL_GetMouseState(&x, &y);
-                    break;
-                }
                 case SDL_KEYDOWN: {
-                    if (e.key.keysym.sym == SDLK_1) {
-                        Mix_PlayChannel(-1, sfx1, 0);
-                    } else if (e.key.keysym.sym == SDLK_2) {
-                        Mix_PlayChannel(-1, sfx2, 0);
-                    } else if (e.key.keysym.sym == SDLK_3) {
-                        Mix_PlayChannel(-1, sfx3, 0);
-                    } else if (e.key.keysym.sym == SDLK_p) {
+                    if (e.key.keysym.sym == SDLK_p) {
                         if (Mix_PlayingMusic()) {
                             if (Mix_PausedMusic()) {
                                 Mix_ResumeMusic();
@@ -253,14 +302,65 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 }
-                case SDL_WINDOWEVENT_SIZE_CHANGED: {
-                    config.screen_width = e.window.data1;
-                    config.screen_height = e.window.data2;
-                    spdlog::info("Resize to {}x{}", config.screen_width, config.screen_height);
-                    projection = glm::ortho(0.0f, (float) config.screen_width, (float) config.screen_height, 0.0f, -1.0f, 1.0f);
+                case SDL_WINDOWEVENT: {
+                    if(e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                        config.screen_width = e.window.data1;
+                        config.screen_height = e.window.data2;
+                        spdlog::info("Resize to {}x{}", config.screen_width, config.screen_height);
+                        projection = glm::ortho(0.0f, (float) config.screen_width, (float) config.screen_height, 0.0f, -1.0f, 1.0f);
+                    }
+                    break;
+                }
+                default: {
+                    if(e.type == config.user_event_type || e.type == SDL_USEREVENT) {
+                        spdlog::info("userevent {}", e.user.code);
+                        switch (e.user.code) {
+                            case 0: {
+                                projection = glm::ortho(0.0f, 1280.f, 720.f, 0.0f, -1.0f, 1.0f);
+                                SDL_SetWindowSize(window, 1280, 720);
+                                break;
+                            }
+                            case 1: {
+                                projection = glm::ortho(0.0f, 1600.f, 900.f, 0.0f, -1.0f, 1.0f);
+                                SDL_SetWindowSize(window, 1600, 900);
+                                break;
+                            }
+                            case 2: {
+                                projection = glm::ortho(0.0f, 1920.f, 1080.f, 0.0f, -1.0f, 1.0f);
+                                SDL_SetWindowSize(window, 1920, 1080);
+                                break;
+                            }
+                            case 3: {
+                                Mix_HaltMusic();
+                                Mix_FreeMusic(mus1);
+                                Mix_FreeMusic(mus2);
+
+                                int *val = static_cast<int*>(e.user.data1);
+
+                                mus1 = Mix_LoadMUS(fmt::format("assets/music/8bit Stage{} Intro.ogg", *val).c_str());
+                                if(mus1 == nullptr) {
+                                    spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+                                    close();
+                                }
+
+                                mus2 = Mix_LoadMUS(fmt::format("assets/music/8bit Stage{} Loop.ogg", *val).c_str());
+                                if(mus2 == nullptr) {
+                                    spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+                                    close();
+                                }
+                                Mix_PlayMusic(mus1, 0);
+                                config.music_to_play = *val;
+                                delete val;
+                            }
+                        }
+                    }
                     break;
                 }
             }
+        }
+
+        if(Mix_PlayingMusic() == 0) {
+            Mix_PlayMusic(mus2, -1);
         }
 
         bench_timer.start();
@@ -294,11 +394,8 @@ int main(int argc, char* argv[]) {
 
     spdlog::info("quitting");
 
-    Mix_FreeChunk(sfx1);
-    Mix_FreeChunk(sfx2);
-    Mix_FreeChunk(sfx3);
-
     Mix_FreeMusic(mus1);
+    Mix_FreeMusic(mus2);
 
     close();
 

@@ -94,7 +94,7 @@ int main() {
     entt::registry registry;
 
     load_assets(registry, quit);
-    auto char_sel = load_character_select("assets/core/charselect.json");
+    auto char_sel = load_character_select("assets/charselect.json");
 
     if(!char_sel) {
         exit(1);

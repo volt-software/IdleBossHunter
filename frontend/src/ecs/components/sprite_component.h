@@ -21,7 +21,7 @@
 
 class sprite;
 
-namespace fresh {
+namespace ibh {
     struct sprite_component {
         explicit sprite_component(sprite *_sprite) : sprite_(_sprite) {}
         sprite *sprite_;

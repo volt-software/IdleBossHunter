@@ -21,7 +21,7 @@
 #include "spdlog/spdlog.h"
 
 using namespace std;
-using namespace fresh;
+using namespace ibh;
 
 void alpha_window_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
     if(!_closed) {

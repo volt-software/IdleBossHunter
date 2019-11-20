@@ -26,7 +26,7 @@
 #include <string>
 #include "../ecs.h"
 
-namespace fresh {
+namespace ibh {
     struct layer_component {
         layer_component(std::vector<uint64_t> tiles, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
                 : tiles(std::move(tiles)), x(x), y(y), width(width), height(height) {}

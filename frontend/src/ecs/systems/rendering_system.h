@@ -23,18 +23,18 @@
 #include "../../config.h"
 #include "ecs_system.h"
 
-namespace fresh {
+namespace ibh {
     class rendering_system : public ecs_system  {
     public:
-        explicit rendering_system(config config, SDL_Window *window)
-        : _config(std::move(config)), _window(window) {}
+        explicit rendering_system(config *config, SDL_Window *window)
+        : _config(config), _window(window) {}
 
         ~rendering_system() override = default;
 
         void update(entt::registry &es, TimeDelta dt) override;
         void end_rendering();
     private:
-        config _config;
+        config *_config;
         SDL_Window *_window;
     };
 }

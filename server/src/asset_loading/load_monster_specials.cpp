@@ -30,7 +30,7 @@ optional<monster_special_definition_component> lotr::load_monster_specials(strin
     auto env_contents = read_whole_file(file);
 
     if(!env_contents) {
-        spdlog::trace("[{}] couldn't load monster special!", __FUNCTION__);
+        spdlog::trace("[{}] couldn't load file {}", __FUNCTION__, file);
         return {};
     }
 
@@ -38,7 +38,7 @@ optional<monster_special_definition_component> lotr::load_monster_specials(strin
     d.Parse(env_contents->c_str(), env_contents->size());
 
     if(!d.IsObject() || !d.HasMember("name") || !d.HasMember("stats") || !d.HasMember("teleport_when_beat")) {
-        spdlog::trace("[{}] couldn't load monster!", __FUNCTION__);
+        spdlog::trace("[{}] couldn't load, missing members file {}", __FUNCTION__, file);
         return {};
     }
 

@@ -25,11 +25,11 @@
 #include "ecs_system.h"
 #include "../../scenes/scene_manager.h"
 
-namespace fresh {
+namespace ibh {
     class scene_system : public ecs_system, iscene_manager  {
     public:
-        explicit scene_system(config config)
-                : _config(std::move(config)), _scenes(), _scenes_to_erase(), _scenes_to_add(), _id_counter(0) {}
+        explicit scene_system(config *config)
+                : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _id_counter(0) {}
 
         ~scene_system() override = default;
 
@@ -40,11 +40,12 @@ namespace fresh {
         void remove(scene *old_scene) override;
         void add(scene *scene) override;
         void force_goto_scene(scene *new_scene) override;
+        config * get_config() override;
 
         // scene_system
         void init_main_menu();
     private:
-        config _config;
+        config *_config;
         std::vector<std::unique_ptr<scene>> _scenes;
         std::vector<unsigned int> _scenes_to_erase;
         std::vector<std::unique_ptr<scene>> _scenes_to_add;

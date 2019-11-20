@@ -45,7 +45,7 @@ void read_items(Value const &item_array, vector<item_object> &items) {
 
     for(SizeType i = 0; i < item_array.Size(); i++) {
         if(!read_item_object_into_vector(item_array[i], items)) {
-            spdlog::warn("[{}] deserialize failed", __FUNCTION__);
+            spdlog::warn("[{}] deserialize failed {}", __FUNCTION__, i);
             continue;
         }
     }
@@ -59,7 +59,7 @@ void read_skills(Value const &skill_array, vector<skill_object> &skills) {
 
     for(SizeType i = 0; i < skill_array.Size(); i++) {
         if(!read_skill_object_into_vector(skill_array[i], skills)) {
-            spdlog::warn("[{}] deserialize failed", __FUNCTION__);
+            spdlog::warn("[{}] deserialize failed {}", __FUNCTION__, i);
             continue;
         }
     }

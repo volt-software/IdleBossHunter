@@ -21,7 +21,7 @@
 #include "spdlog/spdlog.h"
 #include "load_monsters.h"
 #include "load_monster_specials.h"
-#include <game_logic/random_helper.h>
+#include <random_helper.h>
 #include <game_logic/logic_helpers.h>
 
 using namespace std;

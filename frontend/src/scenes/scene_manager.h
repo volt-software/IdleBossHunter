@@ -18,7 +18,9 @@
 
 #pragma once
 
-namespace fresh {
+#include <config.h>
+
+namespace ibh {
     class scene;
 
     class iscene_manager {
@@ -28,5 +30,6 @@ namespace fresh {
         virtual void remove(scene *scene) = 0;
         virtual void add(scene *scene) = 0;
         virtual void force_goto_scene(scene *new_scene) = 0;
+        virtual config * get_config() = 0;
     };
 }

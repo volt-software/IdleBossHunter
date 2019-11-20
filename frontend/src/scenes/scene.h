@@ -21,14 +21,15 @@
 #include "../ecs/ecs.h"
 #include "scene_manager.h"
 
-namespace fresh {
+namespace ibh {
     class scene {
     public:
-        scene() : _id(0) {}
+        scene() : _id(0), _closed(false) {}
         virtual ~scene() = default;
 
         virtual void update(iscene_manager *manager, entt::registry &es, TimeDelta dt) = 0;
 
         unsigned int _id;
+        bool _closed;
     };
 }

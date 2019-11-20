@@ -22,7 +22,7 @@
 #include <vector>
 #include "tileset.h"
 
-namespace fresh {
+namespace ibh {
     class map {
     public:
         //map();

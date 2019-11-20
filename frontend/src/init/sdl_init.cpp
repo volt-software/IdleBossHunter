@@ -34,47 +34,47 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
         return;
     }
 
-    spdlog::debug("[opengl] message: {}", message);
+    spdlog::debug("[{}] message: {}", __FUNCTION__, message);
 
     switch(type) {
         case GL_DEBUG_TYPE_ERROR:
-            spdlog::debug("[opengl] type: ERROR");
+            spdlog::debug("[{}] type: ERROR", __FUNCTION__);
             break;
         case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-            spdlog::debug("[opengl] type: DEPRECATED_BEHAVIOUR");
+            spdlog::debug("[{}] type: DEPRECATED_BEHAVIOUR", __FUNCTION__);
             break;
         case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-            spdlog::debug("[opengl] type: UNDEFINED_BEHAVIOR");
+            spdlog::debug("[{}] type: UNDEFINED_BEHAVIOR", __FUNCTION__);
             break;
         case GL_DEBUG_TYPE_PORTABILITY:
-            spdlog::debug("[opengl] type: PORTABILITY");
+            spdlog::debug("[{}] type: PORTABILITY", __FUNCTION__);
             break;
         case GL_DEBUG_TYPE_PERFORMANCE:
-            spdlog::debug("[opengl] type: PERFORMANCE");
+            spdlog::debug("[{}] type: PERFORMANCE", __FUNCTION__);
             break;
         case GL_DEBUG_TYPE_OTHER:
-            spdlog::debug("[opengl] type: OTHER");
+            spdlog::debug("[{}] type: OTHER", __FUNCTION__);
         default:
             break;
     }
 
-    spdlog::debug("[opengl] id: {}", id);
+    spdlog::debug("[{}] id: {}", __FUNCTION__, id);
     switch (severity) {
         case GL_DEBUG_SEVERITY_LOW:
-            spdlog::debug("[opengl] severity: LOW");
+            spdlog::debug("[{}] severity: LOW", __FUNCTION__);
             break;
         case GL_DEBUG_SEVERITY_MEDIUM:
-            spdlog::debug("[opengl] severity: MEDIUM");
+            spdlog::debug("[{}] severity: MEDIUM", __FUNCTION__);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            spdlog::debug("[opengl] severity: HIGH");
+            spdlog::debug("[{}] severity: HIGH", __FUNCTION__);
             break;
         default:
-            spdlog::debug("[opengl] severity: UNKNOWN {}", severity);
+            spdlog::debug("[{}] severity: UNKNOWN {}", __FUNCTION__, severity);
     }
 }
 
-void fresh::init_sdl(config &config) noexcept {
+void ibh::init_sdl(config &config) noexcept {
 #ifdef WINDOWS
     // see https://nlguillemot.wordpress.com/2016/12/11/high-dpi-rendering/
     HRESULT hr = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
@@ -85,8 +85,12 @@ void fresh::init_sdl(config &config) noexcept {
     }
 #endif
 
+#ifdef __EMSCRIPTEN__
+    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
+#endif
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
-        spdlog::error("[main] SDL Init went wrong: {}", SDL_GetError());
+        spdlog::error("[{}] SDL Init went wrong: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
@@ -111,7 +115,7 @@ void fresh::init_sdl(config &config) noexcept {
                                   config.screen_width, config.screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     }
     if (window == nullptr) {
-        spdlog::error("[main] Couldn't initialize window: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't initialize window: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
@@ -119,60 +123,60 @@ void fresh::init_sdl(config &config) noexcept {
     SDL_GetWindowSize(window, &w, &h);
     config.screen_width = w;
     config.screen_height = h;
-    spdlog::info("[main] Screen {}x{}", w, h);
+    spdlog::info("[{}] Screen {}x{}", __FUNCTION__, w, h);
 
     SDL_GL_GetDrawableSize(window, &draw_w, &draw_h);
-    spdlog::info("[main] Drawable {}x{}", draw_w, draw_h);
+    spdlog::info("[{}] Drawable {}x{}", __FUNCTION__, draw_w, draw_h);
 
 
     context = SDL_GL_CreateContext(window);
     if (context == nullptr) {
-        spdlog::error("[main] Couldn't initialize context: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't initialize context: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
     if (glewError != GLEW_OK) {
-        spdlog::error("[main] Error initializing GLEW! {}", glewGetErrorString(glewError));
+        spdlog::error("[{}] Error initializing GLEW! {}", __FUNCTION__, glewGetErrorString(glewError));
         exit(1);
     }
 
     if (SDL_GL_SetSwapInterval(config.disable_vsync ? 0 : 1) < 0) {
-        spdlog::error("[main] Couldn't set vsync: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't set vsync: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
     if (SDL_GL_MakeCurrent(window, context) < 0) {
-        spdlog::error("[main] Couldn't make OpenGL context current: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't make OpenGL context current: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
     int display_index = SDL_GetWindowDisplayIndex(window);
     if (display_index < 0) {
-        spdlog::error("[main] Couldn't get current display index: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't get current display index: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
     SDL_DisplayMode current;
     if (SDL_GetCurrentDisplayMode(display_index, &current) < 0) {
-        spdlog::error("[main] Couldn't get current display: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't get current display: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 
     if (current.refresh_rate == 0) {
 #ifdef __EMSCRIPTEN__
-        spdlog::warn("[main] Refresh rate unknown. Setting to 0 Hz.");
+        spdlog::warn("[{}] Refresh rate unknown. Setting to 0 Hz.", __FUNCTION__);
         config.refresh_rate = 0;
 #else
-        spdlog::warn("[main] Refresh rate unknown. Setting to 60 Hz.");
+        spdlog::warn("[{}] Refresh rate unknown. Setting to 60 Hz.", __FUNCTION__);
         config.refresh_rate = 60;
 #endif
     } else {
         config.refresh_rate = (uint32_t) current.refresh_rate;
     }
 
-    spdlog::info("[main] display properties: {}x{}@{}", current.w, current.h, current.refresh_rate);
+    spdlog::info("[{}] display properties: {}x{}@{}", __FUNCTION__, current.w, current.h, current.refresh_rate);
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
@@ -186,7 +190,7 @@ void fresh::init_sdl(config &config) noexcept {
 
 #ifndef __EMSCRIPTEN__
     if (glDebugMessageCallback) {
-        spdlog::debug("[main] Register OpenGL debug callback");
+        spdlog::debug("[{}] Register OpenGL debug callback");
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(openglCallbackFunction, nullptr);
         GLuint unusedIds = 0;
@@ -197,28 +201,41 @@ void fresh::init_sdl(config &config) noexcept {
                               &unusedIds,
                               true);
     } else {
-        spdlog::error("[main] glDebugMessageCallback not available");
+        spdlog::error("[{}] glDebugMessageCallback not available");
     }
 #else
-    spdlog::error("[main] glDebugMessageCallback not available");
+    spdlog::error("[{}] glDebugMessageCallback not available", __FUNCTION__);
 #endif
 
     SDL_StartTextInput();
 
     projection = glm::ortho(0.0f, (float) config.screen_width, (float) config.screen_height, 0.0f, -1.0f, 1.0f);
+
+    config.user_event_type = SDL_RegisterEvents(1);
+    if(config.user_event_type == std::numeric_limits<uint32_t>::max()){
+        spdlog::error("[{}] Couldn't register event", __FUNCTION__);
+        exit(1);
+    }
+
+    spdlog::info("[{}] Registered user event {}", __FUNCTION__, config.user_event_type);
 }
 
-void fresh::init_sdl_image() noexcept {
+void ibh::init_sdl_image() noexcept {
     int initted = IMG_Init(IMG_INIT_PNG);
     if ((initted & IMG_INIT_PNG) != IMG_INIT_PNG) {
-        spdlog::error("[main] SDL image init went wrong: {}", IMG_GetError());
+        spdlog::error("[{}] SDL image init went wrong: {}", __FUNCTION__, IMG_GetError());
         exit(1);
     }
 }
 
-void fresh::init_sdl_mixer() noexcept {
+void ibh::init_sdl_mixer() noexcept {
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        spdlog::error("[main] Couldn't open audio: {}", SDL_GetError());
+        spdlog::error("[{}] Couldn't open audio: {}", __FUNCTION__, SDL_GetError());
+        exit(1);
+    }
+
+    if(Mix_Init(MIX_INIT_OGG) <= 0) {
+        spdlog::error("[{}] Couldn't init ogg audio: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
 }

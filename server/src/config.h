@@ -28,6 +28,9 @@ namespace lotr {
         uint16_t port;
         string debug_level;
         string connection_string;
+        string certificate_file;
+        string private_key_file;
+        string certificate_password;
         uint32_t tick_length;
         bool log_tick_times;
     };

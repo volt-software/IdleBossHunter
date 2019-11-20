@@ -19,18 +19,12 @@
 #include "item_object.h"
 #include <ecs/components.h>
 
-lotr::item_object::item_object(uint32_t tier, uint32_t value, uint32_t sprite, string name, string description, string item_type, vector<stat_component> stats) noexcept :
-tier(tier), value(value), sprite(sprite), name(move(name)), description(move(description)), item_type(move(item_type)), stats(move(stats)) {}
+lotr::item_object::item_object(uint32_t value, string name, string description, string item_type, vector<stat_component> stats) noexcept :
+value(value), name(move(name)), description(move(description)), item_type(move(item_type)), stats(move(stats)) {}
 
 void lotr::write_item_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, item_object const &obj) {
-    writer.String(KEY_STRING("tier"));
-    writer.Uint(obj.tier);
-
     writer.String(KEY_STRING("value"));
     writer.Uint(obj.value);
-
-    writer.String(KEY_STRING("sprite"));
-    writer.Uint(obj.sprite);
 
     writer.String(KEY_STRING("name"));
     writer.String(obj.name.c_str(), obj.name.size());
@@ -56,10 +50,9 @@ void lotr::write_item_object(rapidjson::Writer<rapidjson::StringBuffer> &writer,
 }
 
 bool lotr::read_item_object_into_vector(rapidjson::Value const &value, vector<item_object> &objs) {
-    if(!value.IsObject() || !value.HasMember("tier") || !value.HasMember("value") ||
-            !value.HasMember("sprite") || !value.HasMember("name") ||
-            !value.HasMember("description") || !value.HasMember("item_type") ||
-            !value.HasMember("stats")) {
+    if(!value.IsObject() || !value.HasMember("value") ||
+            !value.HasMember("name") || !value.HasMember("stats") ||
+            !value.HasMember("description") || !value.HasMember("item_type")) {
         return false;
     }
 
@@ -77,7 +70,7 @@ bool lotr::read_item_object_into_vector(rapidjson::Value const &value, vector<it
         stats.emplace_back(stats_array[i]["name"].GetString(), stats_array[i]["value"].GetUint());
     }
 
-    objs.emplace_back(value["tier"].GetUint(), value["value"].GetUint(), value["sprite"].GetUint(), value["name"].GetString(), value["description"].GetString(),
+    objs.emplace_back(value["value"].GetUint(), value["name"].GetString(), value["description"].GetString(),
             value["item_type"].GetString(), move(stats));
     return true;
 }

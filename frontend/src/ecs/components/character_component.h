@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace fresh {
+namespace ibh {
     struct character_component {
         character_component(uint64_t map_id) : map_id(map_id) {}
 

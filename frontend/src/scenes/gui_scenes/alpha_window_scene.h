@@ -21,16 +21,12 @@
 
 #include "../scene.h"
 
-namespace fresh {
+namespace ibh {
     class alpha_window_scene : public scene  {
     public:
-        explicit alpha_window_scene()
-        : _closed(false) {}
-
+        alpha_window_scene() = default;
         ~alpha_window_scene() override = default;
 
         void update(iscene_manager *manager, entt::registry &es, TimeDelta dt) override;
-    private:
-        bool _closed;
     };
 }

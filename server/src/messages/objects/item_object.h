@@ -28,16 +28,14 @@ using namespace std;
 namespace lotr {
     struct stat_component;
     struct item_object {
-        uint32_t tier;
         uint32_t value;
-        uint32_t sprite;
         string name;
         string description;
         string item_type;
         vector<stat_component> stats;
 
 
-        item_object(uint32_t tier, uint32_t value, uint32_t sprite, string name, string description, string item_type, vector<stat_component> stats) noexcept;
+        item_object(uint32_t value, string name, string description, string item_type, vector<stat_component> stats) noexcept;
     };
 
     void write_item_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, item_object const &obj);

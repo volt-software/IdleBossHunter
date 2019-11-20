@@ -22,11 +22,14 @@
 #include <scenes/gui_scenes/main_menu_scene.h>
 
 using namespace std;
-using namespace fresh;
+using namespace ibh;
 
 void scene_system::update(entt::registry &es, TimeDelta dt) {
     for(auto& scene : _scenes) {
         scene->update(this, es, dt);
+        if(scene->_closed) {
+            remove(scene.get());
+        }
     }
 
     if(_force_goto_scene) {
@@ -67,6 +70,10 @@ void scene_system::force_goto_scene(scene *new_scene) {
     }
 
     _force_goto_scene.reset(new_scene);
+}
+
+config * scene_system::get_config() {
+    return _config;
 }
 
 void scene_system::init_main_menu() {

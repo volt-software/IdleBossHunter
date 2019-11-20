@@ -72,11 +72,29 @@ optional<config> lotr::parse_env_file() {
         return {};
     }
 
+    if(!d.HasMember("CERTIFICATE_PASSWORD")) {
+        spdlog::error("[{}] deserialize config.json missing CERTIFICATE_PASSWORD", __FUNCTION__);
+        return {};
+    }
+
+    if(!d.HasMember("CERTIFICATE_FILE")) {
+        spdlog::error("[{}] deserialize config.json missing CERTIFICATE_FILE", __FUNCTION__);
+        return {};
+    }
+
+    if(!d.HasMember("PRIVATE_KEY_FILE")) {
+        spdlog::error("[{}] deserialize config.json missing PRIVATE_KEY_FILE", __FUNCTION__);
+        return {};
+    }
+
     config config;
     config.debug_level = d["DEBUG_LEVEL"].GetString();
     config.address = d["ADDRESS"].GetString();
     config.port = d["PORT"].GetUint();
     config.connection_string = d["CONNECTION_STRING"].GetString();
+    config.certificate_password = d["CERTIFICATE_PASSWORD"].GetString();
+    config.certificate_file = d["CERTIFICATE_FILE"].GetString();
+    config.private_key_file = d["PRIVATE_KEY_FILE"].GetString();
     config.tick_length = d["TICK_LENGTH"].GetUint();
     config.log_tick_times = d["LOG_TICK_TIMES"].GetBool();
 

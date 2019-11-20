@@ -27,7 +27,7 @@
 using namespace std;
 //using json = nlohmann::json;
 
-optional<fresh::map> fresh::map::load_from_file(const string &file) {
+optional<ibh::map> ibh::map::load_from_file(const string &file) {
 //    spdlog::debug(R"([map] Loading map "{}")", file);
 //    string env_contents;
 //    ifstream env(file);
@@ -125,7 +125,7 @@ optional<fresh::map> fresh::map::load_from_file(const string &file) {
 //
 //        }
 //
-//        return make_optional<fresh::map>();
+//        return make_optional<ibh::map>();
 //    } catch (const exception& e) {
 //        spdlog::error(R"([map] Couldn't read map because "{}" for file "{}")", e.what(), file);
 //        return {};

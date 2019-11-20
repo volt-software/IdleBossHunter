@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace fresh {
+namespace ibh {
     struct tile_component {
         tile_component(uint64_t map_id, uint16_t tile_id) : map_id(map_id), tile_id(tile_id) {}
 

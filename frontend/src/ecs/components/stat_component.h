@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace fresh {
+namespace ibh {
     struct stat {
         stat(std::string name, uint64_t static_value, uint32_t dice, uint32_t die_face, bool is_growth)
                 : name(move(name)), static_value(static_value), dice(dice), die_face(die_face), is_growth(is_growth) {}

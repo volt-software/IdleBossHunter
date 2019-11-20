@@ -28,7 +28,7 @@
 #include "../../rendering/texture_atlas.h"
 
 using namespace std;
-using namespace fresh;
+using namespace ibh;
 
 void rendering_system::update(entt::registry &es, TimeDelta dt) {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -42,6 +42,9 @@ void rendering_system::update(entt::registry &es, TimeDelta dt) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(_window, dt);
     ImGui::NewFrame();
+    if(_config->show_demo_window) {
+        ImGui::ShowDemoWindow();
+    }
 }
 
 void rendering_system::end_rendering() {

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(ibh_backend)
-#set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE CXX STANDARD REQUIRED ON)
-#set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE CXX STANDARD REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Debug CACHE STRING
@@ -17,27 +17,27 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external/)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-# only support linux/g++ for now
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE -Wall -Wextra -Wno-unused-variable -Wno-long-long -Wno-unused-parameter -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -pedantic -std=c++17 ") #-fsanitize=undefined -fsanitize=thread -fstack-protector-strong -fno-omit-frame-pointer ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE -Wall -Wextra -Wno-unused-variable -Wno-long-long -Wno-unused-parameter -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -pedantic ") #-fsanitize=undefined -fsanitize=thread -fstack-protector-strong -fno-omit-frame-pointer ")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -ggdb -mavx")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -mavx")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -ggdb -Og -mavx")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -mavx")
 
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE COMMON_SOURCES ${TOP_DIR}/common/src/*.cpp)
 file(GLOB SPDLOG_SOURCE ${EXTERNAL_DIR}/spdlog/src/*.cpp)
-add_executable(ibh_backend ${SPDLOG_SOURCE} ${PROJECT_SOURCES})
+add_executable(ibh_backend ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES})
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
 file(GLOB_RECURSE PROJECT_TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-add_executable(ibh_test ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${PROJECT_TEST_SOURCES})
+add_executable(ibh_test ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_TEST_SOURCES})
 add_test(NAME MyTest COMMAND ibh_test)
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
 file(GLOB PROJECT_BENCHMARK_SOURCES ${PROJECT_SOURCE_DIR}/benchmark/*.cpp ${PROJECT_SOURCE_DIR}/benchmark/benchmark_helpers/*.cpp)
-add_executable(ibh_benchmark ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${PROJECT_BENCHMARK_SOURCES})
+add_executable(ibh_benchmark ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_BENCHMARK_SOURCES})
 
 target_compile_definitions(ibh_test PRIVATE TEST_CODE=1)
 
@@ -60,7 +60,8 @@ endif()
 find_package(ZLIB REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-include_directories("${TOP_DIR}/src")
+include_directories("${TOP_DIR}/common/src")
+include_directories("${TOP_DIR}/server/src")
 include_directories("${EXTERNAL_DIR}/spdlog/include")
 include_directories("${EXTERNAL_DIR}/rapidjson/include")
 include_directories("${EXTERNAL_DIR}/websocketpp")

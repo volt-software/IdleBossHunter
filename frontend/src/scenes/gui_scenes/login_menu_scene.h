@@ -1,6 +1,6 @@
 /*
     IdleBossHunter
-    Copyright (C) 2019  Michael de Lang
+    Copyright (C) 2019 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -16,12 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-namespace ibh {
-    struct effect_component {
-        effect_component(uint64_t user_id) : user_id(user_id) {}
+#include "../scene.h"
 
-        uint64_t user_id;
+namespace ibh {
+    class login_menu_scene : public scene  {
+    public:
+        login_menu_scene() = default;
+        ~login_menu_scene() override = default;
+
+        void update(iscene_manager *manager, entt::registry &es, TimeDelta dt) override;
     };
 }

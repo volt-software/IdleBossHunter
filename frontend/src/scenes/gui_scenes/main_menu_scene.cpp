@@ -17,36 +17,24 @@
 */
 
 #include "main_menu_scene.h"
+#include "settings_menu_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
 #include <SDL.h>
 
 using namespace std;
-using namespace fresh;
+using namespace ibh;
 
 void main_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
-    if(!_closed) {
-        if(ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoTitleBar)) {
-            if (ImGui::Button("New game")) {
-                _closed = true;
-            }
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::MenuItem("Login")) {
 
-            if (ImGui::Button("Load game")) {
-                _closed = true;
-            }
-
-            if (ImGui::Button("Options")) {
-                _closed = true;
-            }
-
-            if (ImGui::Button("Quit")) {
-                SDL_Event event;
-                SDL_zero(event);
-                event.type = SDL_QUIT;
-                SDL_PushEvent(&event);
-                _closed = true;
-            }
         }
-        ImGui::End();
+
+        if (ImGui::MenuItem("Settings")) {
+            manager->add(new settings_menu_scene());
+        }
+
+        ImGui::EndMainMenuBar();
     }
 }

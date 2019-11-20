@@ -21,16 +21,12 @@
 
 #include "../scene.h"
 
-namespace fresh {
+namespace ibh {
     class main_menu_scene : public scene  {
     public:
-        explicit main_menu_scene()
-                : _closed(false) {}
-
+        main_menu_scene() = default;
         ~main_menu_scene() override = default;
 
         void update(iscene_manager *manager, entt::registry &es, TimeDelta dt) override;
-    private:
-        bool _closed;
     };
 }

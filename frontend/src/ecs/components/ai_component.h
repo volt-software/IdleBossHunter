@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace fresh {
+namespace ibh {
     struct ai_component {
         ai_component(uint64_t user_id) : user_id(user_id) {}
 

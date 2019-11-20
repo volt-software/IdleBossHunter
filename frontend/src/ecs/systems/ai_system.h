@@ -19,7 +19,7 @@
 
 #pragma once
 
-namespace fresh {
+namespace ibh {
     class ai_system {
 
     };

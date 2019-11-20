@@ -20,7 +20,7 @@
 
 #include "../ecs.h"
 
-namespace fresh {
+namespace ibh {
     class ecs_system {
     public:
         ecs_system() = default;

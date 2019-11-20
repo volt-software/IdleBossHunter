@@ -44,8 +44,8 @@ texture create_texture_from_image(string const & image) {
 
     SDL_Surface *surface = IMG_Load(image.c_str());
     if(!surface) {
-        spdlog::error("[texture_manager] surface load failed: {}", IMG_GetError());
-        throw runtime_error("[texture_manager] surface load failed");
+        spdlog::error("[{}] surface load failed: {}", __FUNCTION__, IMG_GetError());
+        throw runtime_error("surface load failed");
     }
 
     GLenum texture_format = 0;
@@ -53,40 +53,40 @@ texture create_texture_from_image(string const & image) {
     GLenum texture_type = 0;
 
     if(surface->format->BytesPerPixel == 4) {
-        spdlog::info("[texture_manager] 4 byte image");
+        spdlog::info("[{}] 4 byte image", __FUNCTION__);
         if (surface->format->Rmask == 0x000000ff) {
             texture_format = GL_RGBA;
             texture_type = GL_UNSIGNED_INT_8_8_8_8_REV;
         } else {
             texture_format = GL_BGRA;
             texture_type = GL_UNSIGNED_INT_8_8_8_8;
-            spdlog::info("[texture_manager] GL_BGRA");
+            spdlog::info("[{}] GL_BGRA", __FUNCTION__);
         }
         internal_format = GL_RGBA8;
     } else if(surface->format->BytesPerPixel == 3) {
-        spdlog::info("[texture_manager] 3 byte image");
+        spdlog::info("[{}] 3 byte image", __FUNCTION__);
         if (surface->format->Rmask == 0x000000ff) {
             texture_format = GL_RGB;
             texture_type = GL_UNSIGNED_BYTE;
         } else {
             texture_format = GL_BGR;
             texture_type = GL_UNSIGNED_BYTE;
-            spdlog::info("[texture_manager] GL_BGR");
+            spdlog::info("[{}] GL_BGR", __FUNCTION__);
         }
         internal_format = GL_RGB8;
     } else {
-        spdlog::error("[texture_manager] image {} unknown BPP {}", image, (int)surface->format->BytesPerPixel);
-        throw runtime_error("[texture_manager] image unknown BPP");
+        spdlog::error("[{}] image {} unknown BPP {}", __FUNCTION__, image, (int)surface->format->BytesPerPixel);
+        throw runtime_error("image unknown BPP");
     }
 
-    spdlog::info("[texture_manager] size {}x{}", surface->w, surface->h);
+    spdlog::info("[{}] size {}x{}", __FUNCTION__, surface->w, surface->h);
 
     uint32_t alignment = 8;
-    spdlog::info("[texture_manager] surface->pitch {}x{}", surface->pitch);
+    spdlog::info("[{}] surface->pitch {}x{}", __FUNCTION__, surface->pitch);
     while (surface->pitch % alignment) { // x%1==0 for any x
         alignment >>= 1;
     }
-    spdlog::info("[texture_manager] alignment {}", alignment);
+    spdlog::info("[{}] alignment {}", __FUNCTION__, alignment);
     glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
 
     GLuint texture_id;
@@ -110,11 +110,11 @@ texture create_texture_from_image(string const & image) {
     auto succeeded = texture_cache.emplace(image, tex).second;
 
     if(!succeeded) {
-        spdlog::error("[texture_manager] Couldn't insert texture into cache {}", image);
-        throw runtime_error("[texture_manager] Couldn't insert texture into cache");
+        spdlog::error("[{}] Couldn't insert texture into cache {}", __FUNCTION__, image);
+        throw runtime_error("Couldn't insert texture into cache");
     }
 
-    spdlog::info("[texture_manager] created texture {}", texture_id);
+    spdlog::info("[{}] created texture {}", __FUNCTION__, texture_id);
 
     return tex;
 }
@@ -124,16 +124,16 @@ GLuint create_shader_program(string const & vertex_shader, string const & fragme
 
     auto vertexShaderMaybe = load_shader_from_file(vertex_shader, GL_VERTEX_SHADER);
     if(!vertexShaderMaybe) {
-        spdlog::error("[texture_manager] Couldn't load vertex shader file {}", vertex_shader);
-        throw runtime_error("[texture_manager] Couldn't load vertex shader file");
+        spdlog::error("[{}] Couldn't load vertex shader file {}", __FUNCTION__, vertex_shader);
+        throw runtime_error("Couldn't load vertex shader file");
     }
 
     glAttachShader(program_id, vertexShaderMaybe.value());
 
     auto fragmentShaderMaybe = load_shader_from_file(fragment_shader, GL_FRAGMENT_SHADER);
     if(!fragmentShaderMaybe) {
-        spdlog::error("[texture_manager] Couldn't load fragment shader file {}", fragment_shader);
-        throw runtime_error("[texture_manager] Couldn't load fragment shader file");
+        spdlog::error("[{}] Couldn't load fragment shader file {}", __FUNCTION__, fragment_shader);
+        throw runtime_error("Couldn't load fragment shader file");
     }
 
     glAttachShader(program_id, fragmentShaderMaybe.value());
@@ -146,12 +146,12 @@ GLuint create_shader_program(string const & vertex_shader, string const & fragme
     GLint programSucces = GL_TRUE;
     glGetProgramiv(program_id, GL_LINK_STATUS, &programSucces);
     if(programSucces != GL_TRUE) {
-        spdlog::error("[texture_manager] Couldn't link program {}", program_id);
+        spdlog::error("[{}] Couldn't link program {}", __FUNCTION__, program_id);
         print_program_log(program_id);
-        throw runtime_error("[texture_manager] Couldn't link program");
+        throw runtime_error("Couldn't link program");
     }
 
-    spdlog::info("[texture_manager] Created shader program {}", program_id);
+    spdlog::info("[{}] Created shader program {}", __FUNCTION__, program_id);
 
     return program_id;
 }
@@ -163,12 +163,12 @@ void delete_texture(std::string const & image) {
         found_texture->second._reference_count--;
 
         if(found_texture->second._reference_count == 0) {
-            spdlog::info("[texture_manager] deleting texture {}", found_texture->second._texture_id);
+            spdlog::info("[{}] deleting texture {}", __FUNCTION__, found_texture->second._texture_id);
             glDeleteTextures(1, &found_texture->second._texture_id);
             texture_cache.erase(image);
         }
     } else {
-        spdlog::error("[sprite] couldn't delete texture {}", image);
-        throw runtime_error("[sprite] couldn't delete texture");
+        spdlog::error("[{}] couldn't delete texture {}", __FUNCTION__, image);
+        throw runtime_error("couldn't delete texture");
     }
 }

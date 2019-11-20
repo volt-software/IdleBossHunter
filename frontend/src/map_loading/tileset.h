@@ -22,7 +22,7 @@
 #include <optional>
 #include <string>
 
-namespace fresh {
+namespace ibh {
     class tileset {
     public:
         tileset(std::string filename, uint32_t firstgid) : filename(move(filename)), firstgid(firstgid) {}

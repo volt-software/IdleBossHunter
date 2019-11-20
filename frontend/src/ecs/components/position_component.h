@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace fresh {
+namespace ibh {
     struct position_component {
         position_component(uint32_t x, uint32_t y, uint64_t map_id) : x(x), y(y), map_id(map_id) {}
 

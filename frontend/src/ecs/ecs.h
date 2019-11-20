@@ -28,6 +28,6 @@
 #include "components/stat_component.h"
 #include "components/tile_component.h"
 
-namespace fresh {
+namespace ibh {
     using TimeDelta = uint32_t;
 }
