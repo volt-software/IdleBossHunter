@@ -17,11 +17,15 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external/)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE -Wall -Wextra -Wno-unused-variable -Wno-long-long -Wno-unused-parameter -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -pedantic ") #-fsanitize=undefined -fsanitize=thread -fstack-protector-strong -fno-omit-frame-pointer ")
-set(CMAKE_CXX_FLAGS_DEBUG "-g3 -ggdb -mavx")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -mavx")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -ggdb -Og -mavx")
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -mavx")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-variable -Wno-long-long -Wno-unused-parameter -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -pedantic -Wformat -Wformat-security ") #-fsanitize=undefined -fsanitize=thread ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -maes -mpclmul -mpopcnt -msse4.1 -msse4.2 -mrdrnd -mf16c -mfsgsbase -mfxsr -mxsave -mxsaveopt -fstack-protector-strong -fstack-clash-protection -fcf-protection -fPIE")
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -ggdb -Og")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG")
+
+SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-O1 -Wl,-z,defs -Wl,-z,now -Wl,-z,relro -Wl,-pie -Wl,-z,noexecstack")
 
 # define targets
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -44,7 +48,6 @@ target_compile_definitions(ibh_test PRIVATE TEST_CODE=1)
 
 find_library(PQXX_LIBRARY pqxx HINTS ${EXTERNAL_DIR}/libpqxx/src/.libs)
 find_library(SODIUM_LIBRARY sodium HINTS ${EXTERNAL_DIR}/libsodium/src/libsodium/.libs)
-find_library(XXHASH_LIBRARY xxhash HINTS ${EXTERNAL_DIR}/xxHash)
 
 if(NOT PQXX_LIBRARY)
     message(FATAL_ERROR "libpqxx not found")
@@ -52,10 +55,6 @@ endif()
 
 if(NOT SODIUM_LIBRARY)
     message(FATAL_ERROR "libsodium not found")
-endif()
-
-if(NOT XXHASH_LIBRARY)
-    message(FATAL_ERROR "libxxhash not found")
 endif()
 
 find_package(ZLIB REQUIRED)
@@ -86,7 +85,6 @@ target_link_libraries(ibh_backend PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_backend PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_backend PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_backend PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_backend PUBLIC ${XXHASH_LIBRARY})
 target_link_libraries(ibh_backend PUBLIC -static-libgcc -static-libstdc++)
 
 target_link_libraries(ibh_test PUBLIC ${PQXX_LIBRARY} -lpq)
@@ -94,7 +92,6 @@ target_link_libraries(ibh_test PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_test PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_test PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_test PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_test PUBLIC ${XXHASH_LIBRARY})
 target_link_libraries(ibh_test PUBLIC -static-libgcc -static-libstdc++)
 
 target_link_libraries(ibh_benchmark PUBLIC ${PQXX_LIBRARY} -lpq)
@@ -102,7 +99,6 @@ target_link_libraries(ibh_benchmark PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_benchmark PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_benchmark PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_benchmark PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_benchmark PUBLIC ${XXHASH_LIBRARY})
 target_link_libraries(ibh_benchmark PUBLIC -static-libgcc -static-libstdc++)
 
 add_custom_command(

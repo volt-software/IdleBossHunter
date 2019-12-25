@@ -23,7 +23,7 @@
 using namespace std;
 using namespace ibh;
 
-void settings_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
+void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(_closed) {
         return;
     }
@@ -66,6 +66,6 @@ void settings_menu_scene::update(iscene_manager *manager, entt::registry &es, Ti
     ImGui::End();
 }
 
-void settings_menu_scene::handle_message(uint32_t type, message *msg) {
+void settings_menu_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
 
 }

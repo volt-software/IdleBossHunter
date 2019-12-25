@@ -33,12 +33,6 @@ add_test(NAME MyTest COMMAND ibh_common_test)
 
 target_compile_definitions(ibh_common_test PRIVATE TEST_CODE=1)
 
-find_library(XXHASH_LIBRARY xxhash HINTS ${EXTERNAL_DIR}/xxHash)
-
-if(NOT XXHASH_LIBRARY)
-    message(FATAL_ERROR "XXHASH_LIBRARY not found")
-endif()
-
 find_package(ZLIB REQUIRED)
 find_package(OpenSSL REQUIRED)
 
@@ -61,5 +55,4 @@ target_link_libraries(ibh_common_test PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_common_test PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_common_test PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_common_test PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_common_test PUBLIC ${XXHASH_LIBRARY})
 target_link_libraries(ibh_common_test PUBLIC -static-libgcc -static-libstdc++)

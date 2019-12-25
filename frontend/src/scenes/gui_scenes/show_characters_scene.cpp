@@ -18,6 +18,8 @@
 
 #include "show_characters_scene.h"
 #include "messages/user_access/play_character_request.h"
+#include "messages/user_access/character_select_request.h"
+#include "messages/user_access/character_select_response.h"
 #include "messages/generic_error_response.h"
 #include "messages/update_response.h"
 #include <rendering/imgui/imgui.h>
@@ -27,16 +29,27 @@
 using namespace std;
 using namespace ibh;
 
-show_characters_scene::show_characters_scene(vector<character_object> characters) : _characters(move(characters)), _show_create(false), _error() {
-
+show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true), _error() {
+    character_select_request req{};
+#ifdef __EMSCRIPTEN__
+    emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
+#endif
 }
 
-void show_characters_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
+void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(_closed) {
         return;
     }
 
-    if(ImGui::Begin("Characters Menu", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if(_waiting_for_select) {
+        if(ImGui::Begin("Waiting for server", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+
+        }
+        ImGui::End();
+        return;
+    }
+
+    if(ImGui::Begin("Characters List", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         if(_error.size() > 0) {
             ImGui::Text("%s", _error.c_str());
         }
@@ -55,7 +68,7 @@ void show_characters_scene::update(iscene_manager *manager, entt::registry &es, 
         }
 
         if (ImGui::Button("Play")) {
-            send_message<play_character_request>(es, static_cast<uint32_t>(selected_char_slot));
+            send_message<play_character_request>(manager, static_cast<uint32_t>(selected_char_slot));
         }
     }
     ImGui::End();
@@ -64,13 +77,15 @@ void show_characters_scene::update(iscene_manager *manager, entt::registry &es, 
         return;
     }
 
-    if(ImGui::Begin("Characters Menu", nullptr, ImGuiWindowFlags_NoTitleBar)) {
-
+    if(ImGui::Begin("Create Character", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+        if(_error.size() > 0) {
+            ImGui::Text("%s", _error.c_str());
+        }
     }
     ImGui::End();
 }
 
-void show_characters_scene::handle_message(uint32_t type, message *msg) {
+void show_characters_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
     switch (type) {
         case update_response::type: {
             auto resp_msg = dynamic_cast<update_response*>(msg);
@@ -79,8 +94,18 @@ void show_characters_scene::handle_message(uint32_t type, message *msg) {
                 return;
             }
 
-            _waiting_for_reply = false;
             _closed = true;
+        }
+        case character_select_response::type: {
+            auto resp_msg = dynamic_cast<character_select_response*>(msg);
+
+            if(!resp_msg) {
+                return;
+            }
+
+            _races = resp_msg->races;
+            _classes = resp_msg->classes;
+            _waiting_for_select = false;
         }
         case generic_error_response::type: {
             auto resp_msg = dynamic_cast<generic_error_response*>(msg);
@@ -89,7 +114,7 @@ void show_characters_scene::handle_message(uint32_t type, message *msg) {
                 return;
             }
 
-            _waiting_for_reply = false;
+            _waiting_for_select = false;
             _error = resp_msg->error;
         }
     }

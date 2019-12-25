@@ -23,7 +23,7 @@
 using namespace std;
 using namespace ibh;
 
-void alpha_window_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
+void alpha_window_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(_closed) {
         return;
     }
@@ -38,6 +38,6 @@ void alpha_window_scene::update(iscene_manager *manager, entt::registry &es, Tim
     ImGui::End();
 }
 
-void alpha_window_scene::handle_message(uint32_t type, message *msg) {
+void alpha_window_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
 
 }

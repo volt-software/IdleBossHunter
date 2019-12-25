@@ -306,10 +306,10 @@ int main(int argc, char **argv) {
 //        return 1;
 //    }
 
-//    bench_censor_sensor();
+    bench_censor_sensor();
 //    bench_fov(m.value());
-//    bench_hashing();
-//    bench_hash_verify();
+    bench_hashing();
+    bench_hash_verify();
 //    bench_a_star(m.value());
 //    bench_default_ai(m.value());
     bench_serialization();

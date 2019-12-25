@@ -17,6 +17,7 @@
 */
 
 #include "login_menu_scene.h"
+#include "show_characters_scene.h"
 #include <rendering/imgui/imgui.h>
 #include <rendering/imgui/imgui_internal.h>
 #include "spdlog/spdlog.h"
@@ -29,7 +30,7 @@
 using namespace std;
 using namespace ibh;
 
-void login_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
+void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(_closed) {
         return;
     }
@@ -58,16 +59,10 @@ void login_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeD
         if (ImGui::Button("Register")) {
             if(_show_register) {
                 if(strlen(bufpass) >= 4 && strlen(bufuser) >= 2 && strlen(bufmail) >= 4) {
-                    auto view = es.view<socket_component>();
-                    for (auto entity : view) {
-
-                        register_request req{bufuser, bufpass, bufmail};
-
-                        socket_component &socket = view.get<socket_component>(entity);
+                    register_request req{bufuser, bufpass, bufmail};
 #ifdef __EMSCRIPTEN__
-                        emscripten_websocket_send_utf8_text(socket.socket, req.serialize().c_str());
+                    emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
 #endif
-                    }
                 } else {
                     _error = "Input not correct";
                 }
@@ -79,16 +74,10 @@ void login_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeD
         if (ImGui::Button("Login")) {
             _show_register = false;
             if(strlen(bufpass) >= 4 && strlen(bufuser) >= 2) {
-                auto view = es.view<socket_component>();
-                for (auto entity : view) {
-
-                    login_request req{bufuser, bufpass};
-
-                    socket_component &socket = view.get<socket_component>(entity);
+                login_request req{bufuser, bufpass};
 #ifdef __EMSCRIPTEN__
-                    emscripten_websocket_send_utf8_text(socket.socket, req.serialize().c_str());
+                emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
 #endif
-                }
             } else {
                 _error = "Input not correct";
             }
@@ -103,7 +92,7 @@ void login_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeD
     ImGui::End();
 }
 
-void login_menu_scene::handle_message(uint32_t type, message *msg) {
+void login_menu_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
     spdlog::trace("[{}] received message {}", __FUNCTION__, type);
     switch (type) {
         case login_response::type: {
@@ -112,6 +101,8 @@ void login_menu_scene::handle_message(uint32_t type, message *msg) {
             if(!resp_msg) {
                 return;
             }
+
+            manager->add(new show_characters_scene(manager, resp_msg->characters));
 
             _waiting_for_reply = false;
             _closed = true;

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <config.h>
+#include <ecs/ecs.h>
 
 namespace ibh {
     class scene;
@@ -31,5 +32,7 @@ namespace ibh {
         virtual void add(scene *scene) = 0;
         virtual void force_goto_scene(scene *new_scene) = 0;
         virtual config * get_config() = 0;
+        virtual entt::registry& get_entity_registry() = 0;
+        virtual int get_socket() = 0;
     };
 }

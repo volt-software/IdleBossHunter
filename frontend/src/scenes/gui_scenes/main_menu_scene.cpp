@@ -26,7 +26,7 @@
 using namespace std;
 using namespace ibh;
 
-void main_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
+void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::MenuItem("Login")) {
             manager->add(new login_menu_scene());
@@ -40,6 +40,6 @@ void main_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDe
     }
 }
 
-void main_menu_scene::handle_message(uint32_t type, message *msg) {
+void main_menu_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
 
 }

@@ -30,7 +30,7 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
     auto env_contents = read_whole_file(file);
 
     if(!env_contents) {
-        spdlog::trace("[{}] couldn't load monster!", __FUNCTION__);
+        spdlog::trace("[{}] couldn't load monster file {}!", __FUNCTION__, file);
         return {};
     }
 
@@ -38,13 +38,13 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
     d.Parse(env_contents->c_str(), env_contents->size());
 
     if(!d.IsObject() || !d.HasMember("name") || !d.HasMember("min_level") || !d.HasMember("max_level") ||
-            !d.HasMember("stats") || !d["stats"].IsArray()) {
-        spdlog::trace("[{}] couldn't load monster!", __FUNCTION__);
+            !d.HasMember("stats") || !d["stats"].IsObject()) {
+        spdlog::trace("[{}] couldn't load monster due to missing members {}!", __FUNCTION__, file);
         return {};
     }
 
     vector<stat_component> stats;
-    stats.reserve(d["stats"].Size());
+    stats.reserve(d["stats"].MemberCount());
 
     for (auto const &stat : stat_names) {
         if(d["stats"].HasMember(stat.c_str())) {

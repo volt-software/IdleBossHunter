@@ -27,7 +27,7 @@ namespace ibh {
         settings_menu_scene() = default;
         ~settings_menu_scene() override = default;
 
-        void update(iscene_manager *manager, entt::registry &es, TimeDelta dt) override;
-        void handle_message(uint32_t type, message* msg) override;
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint32_t type, message* msg) override;
     };
 }

@@ -22,19 +22,20 @@
 #include <scenes/gui_scenes/main_menu_scene.h>
 #include <messages/chat/message_response.h>
 #include <messages/user_access/login_response.h>
+#include <messages/user_access/character_select_response.h>
 #include <messages/generic_error_response.h>
 #include <messages/generic_ok_response.h>
 
 using namespace std;
 using namespace ibh;
 
-scene_system::scene_system(config *config)
-        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _id_counter(0) {
+scene_system::scene_system(config *config, entt::registry &es)
+        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), es(es), _id_counter(0) {
 }
 
 void scene_system::update(entt::registry &es, TimeDelta dt) {
     for(auto& scene : _scenes) {
-        scene->update(this, es, dt);
+        scene->update(this, dt);
         if(scene->_closed) {
             remove(scene.get());
         }
@@ -106,6 +107,9 @@ unique_ptr<message> deserialize_message(uint32_t &type, rapidjson::Document &d) 
         case generic_ok_response::type: {
             return generic_ok_response::deserialize(d);
         }
+        case character_select_response::type: {
+            return character_select_response::deserialize(d);
+        }
         default:
             return nullptr;
     }
@@ -123,6 +127,21 @@ void scene_system::handle_message(rapidjson::Document &d) {
     spdlog::trace("[{}] Handling message type {} for {} scenes", __FUNCTION__, type, _scenes.size());
 
     for(auto& scene : _scenes) {
-        scene->handle_message(type, msg.get());
+        scene->handle_message(this, type, msg.get());
     }
+}
+
+entt::registry &scene_system::get_entity_registry() {
+    return es;
+}
+
+int scene_system::get_socket() {
+    auto view = es.view<socket_component>();
+    for (auto entity : view) {
+        socket_component &socket = view.get<socket_component>(entity);
+        return socket.socket;
+    }
+
+    spdlog::error("[{}] Couldn't find socket", __FUNCTION__);
+    return -1;
 }

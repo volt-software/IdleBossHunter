@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     entt::registry es{};
-    scene_system ss(&config);
+    scene_system ss(&config, es);
 
     init_sdl(config);
     init_net(config, es, ss);

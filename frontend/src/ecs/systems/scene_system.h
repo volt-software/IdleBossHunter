@@ -33,7 +33,7 @@
 namespace ibh {
     class scene_system : public ecs_system, iscene_manager  {
     public:
-        explicit scene_system(config *config);
+        explicit scene_system(config *config, entt::registry &es);
 
         ~scene_system() override = default;
 
@@ -45,6 +45,8 @@ namespace ibh {
         void add(scene *scene) override;
         void force_goto_scene(scene *new_scene) override;
         config * get_config() override;
+        entt::registry& get_entity_registry() override;
+        int get_socket() override;
 
         // scene_system
         void init_main_menu();
@@ -57,6 +59,7 @@ namespace ibh {
         vector<unsigned int> _scenes_to_erase;
         vector<unique_ptr<scene>> _scenes_to_add;
         unique_ptr<scene> _force_goto_scene;
+        entt::registry &es;
 
         unsigned int _id_counter;
     };
