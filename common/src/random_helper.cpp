@@ -21,7 +21,7 @@
 #include <spdlog/spdlog.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 //#define EXTREME_RANDOM_LOGGING
 
@@ -101,4 +101,4 @@ bool random_helper::one_in_x(uint32_t x) {
     return ret;
 }
 
-thread_local random_helper lotr::random;
+thread_local random_helper ibh::random;

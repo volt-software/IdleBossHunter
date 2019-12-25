@@ -21,7 +21,7 @@
 #include "game_logic/censor_sensor.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("censor sensor tests") {
     SECTION( "marks words as profane" ) {

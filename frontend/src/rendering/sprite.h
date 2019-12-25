@@ -29,15 +29,16 @@
 #include <optional>
 
 #include "texture_atlas.h"
-
-class sprite {
+namespace ibh {
+    class sprite {
     public:
-        sprite(std::shared_ptr<texture_atlas> texture_atlas, glm::vec4 const position, std::optional<glm::vec4> const clip) noexcept;
-        sprite(sprite&&) = default;
+        sprite(std::shared_ptr<texture_atlas> texture_atlas, glm::vec4 const position,
+               std::optional<glm::vec4> const clip) noexcept;
+
+        sprite(sprite &&) = default;
 
         ~sprite() noexcept;
-
-        void set_position(glm::vec4& position) noexcept;
+        void set_position(glm::vec4 &position) noexcept;
         glm::vec4 get_position() noexcept;
         std::array<GLfloat, 24> get_vertex_data();
 
@@ -46,4 +47,5 @@ class sprite {
         std::shared_ptr<texture_atlas> _texture_atlas;
         glm::vec4 _position;
         std::optional<glm::vec4> _clip;
-};
+    };
+}

@@ -22,7 +22,7 @@
 #include <ecs/components.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 // TODO
 

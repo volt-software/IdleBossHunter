@@ -23,10 +23,10 @@
 #include <rapidjson/document.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 using namespace rapidjson;
 
-optional<monster_definition_component> lotr::load_monsters(string const &file) {
+optional<monster_definition_component> ibh::load_monsters(string const &file) {
     auto env_contents = read_whole_file(file);
 
     if(!env_contents) {
@@ -38,7 +38,7 @@ optional<monster_definition_component> lotr::load_monsters(string const &file) {
     d.Parse(env_contents->c_str(), env_contents->size());
 
     if(!d.IsObject() || !d.HasMember("name") || !d.HasMember("min_level") || !d.HasMember("max_level") ||
-            !d.HasMember("stats")) {
+            !d.HasMember("stats") || !d["stats"].IsArray()) {
         spdlog::trace("[{}] couldn't load monster!", __FUNCTION__);
         return {};
     }

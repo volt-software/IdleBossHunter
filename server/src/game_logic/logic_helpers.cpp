@@ -22,13 +22,13 @@
 #include <random_helper.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
-void lotr::remove_dead_monsters(entt::registry &registry) noexcept {
+void ibh::remove_dead_monsters(entt::registry &registry) noexcept {
     // TODO
     //npcs.erase(remove_if(begin(npcs), end(npcs), [&](npc_component &npc) noexcept { return npc.stats[stat_hp] <= 0; }), end(npcs));
 }
 
-void lotr::fill_spawners(entt::registry &registry) {
+void ibh::fill_spawners(entt::registry &registry) {
     // TODO
 }

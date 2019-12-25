@@ -41,7 +41,7 @@
 #include <ecs/components.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 #define SERDE_SINGLE(type) type msg{}; \
             rapidjson::Document d; \
@@ -69,7 +69,7 @@ TEST_CASE("message serialization tests") {
         vector<character_object> players;
         vector<account_object> users;
         SERDE(login_response, move(players), move(users), "username", "email", "motd");
-        REQUIRE(msg.players.size() == msg2->players.size());
+        REQUIRE(msg.characters.size() == msg2->characters.size());
         REQUIRE(msg.username == msg2->username);
         REQUIRE(msg.email == msg2->email);
         REQUIRE(msg.motd == msg2->motd);
@@ -83,21 +83,21 @@ TEST_CASE("message serialization tests") {
         users.emplace_back(false, true, false, 123, 456, "user1");
         users.emplace_back(true, false, true, 890, 342, "user2");
         SERDE(login_response, move(players), move(users), "username", "email", "motd");
-        REQUIRE(msg.players.size() == msg2->players.size());
+        REQUIRE(msg.characters.size() == msg2->characters.size());
         REQUIRE(msg.online_users.size() == msg2->online_users.size());
         REQUIRE(msg.username == msg2->username);
         REQUIRE(msg.email == msg2->email);
         REQUIRE(msg.motd == msg2->motd);
 
-        for(uint32_t i = 0; i < msg.players.size(); i++) {
-            REQUIRE(msg.players[i].name == msg2->players[i].name);
-            REQUIRE(msg.players[i].race == msg2->players[i].race);
-            REQUIRE(msg.players[i].baseclass == msg2->players[i].baseclass);
-            REQUIRE(msg.players[i].level == msg2->players[i].level);
-            REQUIRE(msg.players[i].slot == msg2->players[i].slot);
-            REQUIRE(msg.players[i].gold == msg2->players[i].gold);
-            REQUIRE(msg.players[i].xp == msg2->players[i].xp);
-            REQUIRE(msg.players[i].skill_points == msg2->players[i].skill_points);
+        for(uint32_t i = 0; i < msg.characters.size(); i++) {
+            REQUIRE(msg.characters[i].name == msg2->characters[i].name);
+            REQUIRE(msg.characters[i].race == msg2->characters[i].race);
+            REQUIRE(msg.characters[i].baseclass == msg2->characters[i].baseclass);
+            REQUIRE(msg.characters[i].level == msg2->characters[i].level);
+            REQUIRE(msg.characters[i].slot == msg2->characters[i].slot);
+            REQUIRE(msg.characters[i].gold == msg2->characters[i].gold);
+            REQUIRE(msg.characters[i].xp == msg2->characters[i].xp);
+            REQUIRE(msg.characters[i].skill_points == msg2->characters[i].skill_points);
         }
 
         for(uint32_t i = 0; i < msg.online_users.size(); i++) {

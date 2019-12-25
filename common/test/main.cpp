@@ -23,7 +23,7 @@
 #include <working_directory_manipulation.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 int main(int argc, char **argv) {
     set_cwd(get_selfpath());

@@ -25,14 +25,14 @@
 #include "../custom_server.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("register handler tests") {
     SECTION("Prohibit too short usernames") {
         string message = register_request("a", "okay_password", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 
@@ -51,7 +51,7 @@ TEST_CASE("register handler tests") {
         string message = register_request("漢", "okay_password", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 
@@ -70,7 +70,7 @@ TEST_CASE("register handler tests") {
         string message = register_request("aalishdiquwhgebilugfhkjsdhasdasd", "okay_password", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 
@@ -89,7 +89,7 @@ TEST_CASE("register handler tests") {
         string message = register_request("ab", "shortpw", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 
@@ -108,7 +108,7 @@ TEST_CASE("register handler tests") {
         string message = register_request("ab", "漢字漢字漢字", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 
@@ -127,7 +127,7 @@ TEST_CASE("register handler tests") {
         string message = register_request("okay_p$ssword", "okay_p$ssword", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 
@@ -146,7 +146,7 @@ TEST_CASE("register handler tests") {
         string message = register_request("ab", "an_email", "an_email").serialize();
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        lotr_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
         user_data.ws = 1;
 

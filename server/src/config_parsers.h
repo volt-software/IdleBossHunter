@@ -23,6 +23,6 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     optional<config> parse_env_file();
 }

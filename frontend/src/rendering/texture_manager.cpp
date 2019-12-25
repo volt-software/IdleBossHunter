@@ -30,10 +30,11 @@
 #include "shader_utils.h"
 
 using namespace std;
+using namespace ibh;
 
 robin_hood::unordered_map<string, texture> texture_cache;
 
-texture create_texture_from_image(string const & image) {
+texture ibh::create_texture_from_image(string const & image) {
 
     auto found_texture = texture_cache.find(image);
 
@@ -119,7 +120,7 @@ texture create_texture_from_image(string const & image) {
     return tex;
 }
 
-GLuint create_shader_program(string const & vertex_shader, string const & fragment_shader) {
+GLuint ibh::create_shader_program(string const & vertex_shader, string const & fragment_shader) {
     GLuint program_id = glCreateProgram();
 
     auto vertexShaderMaybe = load_shader_from_file(vertex_shader, GL_VERTEX_SHADER);
@@ -156,7 +157,7 @@ GLuint create_shader_program(string const & vertex_shader, string const & fragme
     return program_id;
 }
 
-void delete_texture(std::string const & image) {
+void ibh::delete_texture(std::string const & image) {
     auto found_texture = texture_cache.find(image);
 
     if(found_texture != texture_cache.end()) {

@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     /*template<typename T>
     concept bool DatabaseTransaction = requires(T a, string& a2) {
         { a.execute(a2) } -> pqxx::result;

@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace lotr {
+namespace ibh {
     struct user {
         uint64_t id;
         string username;

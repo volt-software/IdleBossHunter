@@ -24,7 +24,7 @@
 #include "asset_loading/load_character_select.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("character select loading tests") {
     ofstream charsel_file("test_charselect.json", ios_base::trunc);

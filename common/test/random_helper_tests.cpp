@@ -20,23 +20,23 @@
 #include "random_helper.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("random_helper tests") {
     SECTION("quickcheck generate within bounds") {
         for(uint32_t i = 0; i < 1'000; i++) {
-            auto ret = lotr::random.generate_single((uint64_t)0, 3);
+            auto ret = ibh::random.generate_single((uint64_t)0, 3);
             REQUIRE(ret <= 3);
 
-            auto ret2 = lotr::random.generate_single((int64_t)-5, 5);
+            auto ret2 = ibh::random.generate_single((int64_t)-5, 5);
             REQUIRE(ret2 >= -5);
             REQUIRE(ret2 <= 5);
 
-            auto ret3 = lotr::random.generate_single(-0.5f, .5f);
+            auto ret3 = ibh::random.generate_single(-0.5f, .5f);
             REQUIRE(ret3 >= -0.5f);
             REQUIRE(ret3 <= .5f);
 
-            auto ret4 = lotr::random.generate_single(-0.5, .5);
+            auto ret4 = ibh::random.generate_single(-0.5, .5);
             REQUIRE(ret4 >= -0.5);
             REQUIRE(ret4 <= .5);
         }

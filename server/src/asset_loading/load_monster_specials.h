@@ -20,6 +20,6 @@
 
 #include <ecs/components.h>
 
-namespace lotr {
+namespace ibh {
     optional<monster_special_definition_component> load_monster_specials(string const &file);
 }

@@ -19,9 +19,9 @@
 #include "characters_repository.h"
 #include <spdlog/spdlog.h>
 
-using namespace lotr;
+using namespace ibh;
 
-template class lotr::characters_repository<database_pool, database_transaction>;
+template class ibh::characters_repository<database_pool, database_transaction>;
 
 template<typename pool_T, typename transaction_T>
 characters_repository<pool_T, transaction_T>::characters_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {

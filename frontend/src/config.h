@@ -20,11 +20,13 @@
 
 #include <string>
 
+using namespace std;
+
 namespace ibh {
     struct config {
         // to be filled by .env
-        std::string debug_level;
-        std::string server_url;
+        string debug_level;
+        string server_url;
         bool debug_roa_library;
         uint32_t tick_length;
         bool log_fps;

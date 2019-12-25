@@ -20,13 +20,13 @@
 
 #include <string>
 #include <vector>
-#include <lotr_flat_map.h>
+#include <ibh_containers.h>
 #include <concurrentqueue.h>
 #include <messages/message.h>
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     struct stat_component;
     using outward_queues = moodycamel::ConcurrentQueue<outward_message>;
 

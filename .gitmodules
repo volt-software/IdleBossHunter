@@ -44,3 +44,9 @@
 [submodule "external/zstd"]
 	path = external/zstd
 	url = https://github.com/facebook/zstd.git
+[submodule "external/wyhash"]
+	path = external/wyhash
+	url = https://github.com/wangyi-fudan/wyhash.git
+[submodule "external/cereal"]
+	path = external/cereal
+	url = https://github.com/USCiLab/cereal.git

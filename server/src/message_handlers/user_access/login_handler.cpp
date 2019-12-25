@@ -36,16 +36,16 @@
 
 
 using namespace std;
-namespace lotr {
+namespace ibh {
     template <class Server, class WebSocket>
     void handle_login(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-                      per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, lotr_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                      per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION()
         DESERIALIZE_WITH_NOT_LOGIN_CHECK(login_request)
 
         users_repository<database_pool, database_transaction> user_repo(pool);
         banned_users_repository<database_pool, database_transaction> banned_user_repo(pool);
-        characters_repository<database_pool, database_transaction> player_repo(pool);
+        characters_repository<database_pool, database_transaction> character_repo(pool);
         character_stats_repository<database_pool, database_transaction> stats_repo(pool);
 
         auto transaction = user_repo.create_transaction();
@@ -59,7 +59,7 @@ namespace lotr {
         auto usr = user_repo.get(msg->username, transaction);
 
         if (!usr) {
-            SEND_ERROR("User already exists", "", "", true);
+            SEND_ERROR("User doesn't exist", "", "", true);
             return;
         }
 
@@ -79,12 +79,12 @@ namespace lotr {
         user_data->username = usr->username;
         user_data->is_game_master = usr->is_game_master;
 
-        vector<character_object> message_players;
-        auto players = player_repo.get_by_user_id(usr->id, transaction);
-        message_players.reserve(players.size());
+        vector<character_object> message_characters;
+        auto characters = character_repo.get_by_user_id(usr->id, transaction);
+        message_characters.reserve(characters.size());
 
-        for (auto &player : players) {
-            auto db_stats = stats_repo.get_by_character_id(player.id, transaction);
+        for (auto &character : characters) {
+            auto db_stats = stats_repo.get_by_character_id(character.id, transaction);
             vector<stat_component> stats;
             stats.reserve(db_stats.size());
             for(auto const &stat : db_stats) {
@@ -92,7 +92,7 @@ namespace lotr {
             }
             vector<item_object> items;
             vector<skill_object> skills;
-            message_players.emplace_back(player.name, player.race, player._class, player.level, player.slot, player.gold, player.xp, player.skill_points, move(stats), move(items), move(skills));
+            message_characters.emplace_back(character.name, character.race, character._class, character.level, character.slot, character.gold, character.xp, character.skill_points, move(stats), move(items), move(skills));
         }
 
         vector<account_object> online_users;
@@ -120,11 +120,11 @@ namespace lotr {
             }
         }
 
-        login_response response(move(message_players), move(online_users), usr->username, usr->email, motd);
+        login_response response(move(message_characters), move(online_users), usr->username, usr->email, motd);
         auto response_msg = response.serialize();
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
     }
 
     template void handle_login<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-            per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, lotr_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
+                                                                    per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

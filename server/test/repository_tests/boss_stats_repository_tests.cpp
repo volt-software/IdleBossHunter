@@ -24,7 +24,7 @@
 #include "repositories/bosses_repository.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("boss stats repository tests") {
     boss_stats_repository<database_pool, database_transaction> stat_repo(db_pool);

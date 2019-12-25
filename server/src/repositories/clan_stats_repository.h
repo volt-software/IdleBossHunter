@@ -25,7 +25,7 @@
 #include <database/database_transaction.h>
 #include "models.h"
 
-namespace lotr {
+namespace ibh {
     template<typename pool_T, typename transaction_T>
     class clan_stats_repository  {
     public:

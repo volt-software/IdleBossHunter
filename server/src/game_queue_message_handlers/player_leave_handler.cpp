@@ -23,7 +23,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     void handle_player_leave_message(queue_message* msg, entt::registry& registry, outward_queues&) {
         auto *leave_message = dynamic_cast<player_leave_message*>(msg);
 

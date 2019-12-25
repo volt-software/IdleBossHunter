@@ -19,14 +19,7 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
-#include "components/ai_component.h"
-#include "components/character_component.h"
-#include "components/effect_component.h"
-#include "components/map_component.h"
-#include "components/player_component.h"
-#include "components/position_component.h"
-#include "components/stat_component.h"
-#include "components/tile_component.h"
+#include "components.h"
 
 namespace ibh {
     using TimeDelta = uint32_t;

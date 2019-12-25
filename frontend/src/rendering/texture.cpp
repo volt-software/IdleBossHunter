@@ -18,7 +18,7 @@
 
 #include "texture.h"
 
-texture::texture(GLuint texture_id, uint32_t reference_count, uint32_t width, uint32_t height) noexcept
+ibh::texture::texture(GLuint texture_id, uint32_t reference_count, uint32_t width, uint32_t height) noexcept
     : _texture_id(texture_id), _reference_count(reference_count), _width(width), _height(height) {
 
 }

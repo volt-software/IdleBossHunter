@@ -20,7 +20,7 @@
 
 #include <string>
 
-namespace lotr {
+namespace ibh {
     class custom_server {
     public:
         bool send([[maybe_unused]] uint64_t handle, string message, [[maybe_unused]] websocketpp::frame::opcode::value op_code) {

@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace lotr {
+namespace ibh {
 
     template<typename T, typename DatabaseType, DatabaseTransaction DBT>
     concept bool Repository = requires(T a, DatabaseType& ref_type, unique_ptr<DBT> transaction, int id) {

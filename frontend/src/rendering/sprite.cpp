@@ -31,21 +31,21 @@
 
 using namespace std;
 
-sprite::sprite(std::shared_ptr<texture_atlas> texture_atlas, glm::vec4 const position, optional<glm::vec4> const clip) noexcept
+ibh::sprite::sprite(std::shared_ptr<texture_atlas> texture_atlas, glm::vec4 const position, optional<glm::vec4> const clip) noexcept
      : _texture_atlas(move(texture_atlas)), _position(position), _clip(clip) {
     _vertex_data_position = _texture_atlas->add_data_object(this);
 }
 
-sprite::~sprite() noexcept {
+ibh::sprite::~sprite() noexcept {
     _texture_atlas->remove_data_object(this);
 }
 
-void sprite::set_position(glm::vec4 &position) noexcept {
+void ibh::sprite::set_position(glm::vec4 &position) noexcept {
     _position = position;
     _texture_atlas->update_data_object(this);
 }
 
-array<GLfloat, 24> sprite::get_vertex_data() {
+array<GLfloat, 24> ibh::sprite::get_vertex_data() {
     float x = _position.x;
     float y = _position.y;
     float w = _position.z;
@@ -89,6 +89,6 @@ array<GLfloat, 24> sprite::get_vertex_data() {
     return vertex_data;
 }
 
-glm::vec4 sprite::get_position() noexcept {
+glm::vec4 ibh::sprite::get_position() noexcept {
     return _position;
 }

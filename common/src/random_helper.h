@@ -20,7 +20,7 @@
 
 #include <pcg_random.hpp>
 
-namespace lotr {
+namespace ibh {
     class random_helper {
     public:
         random_helper();

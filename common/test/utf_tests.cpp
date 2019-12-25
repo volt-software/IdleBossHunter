@@ -20,7 +20,7 @@
 #include <utf.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("utf character count test") {
     string input = "ńößôб漢";

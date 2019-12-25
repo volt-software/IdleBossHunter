@@ -23,7 +23,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     string get_selfpath();
     void set_cwd(string const &path);
     optional<string> read_whole_file(string const &path);

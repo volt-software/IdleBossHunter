@@ -20,9 +20,17 @@
 #include "spdlog/spdlog.h"
 #include <scenes/gui_scenes/alpha_window_scene.h>
 #include <scenes/gui_scenes/main_menu_scene.h>
+#include <messages/chat/message_response.h>
+#include <messages/user_access/login_response.h>
+#include <messages/generic_error_response.h>
+#include <messages/generic_ok_response.h>
 
 using namespace std;
 using namespace ibh;
+
+scene_system::scene_system(config *config)
+        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _id_counter(0) {
+}
 
 void scene_system::update(entt::registry &es, TimeDelta dt) {
     for(auto& scene : _scenes) {
@@ -33,7 +41,7 @@ void scene_system::update(entt::registry &es, TimeDelta dt) {
     }
 
     if(_force_goto_scene) {
-        spdlog::info("[scene_system] force goto new scene");
+        spdlog::info("[{}] force goto new scene", __FUNCTION__);
         _scenes.clear();
         _scenes_to_add.clear();
         _scenes_to_erase.clear();
@@ -65,7 +73,7 @@ void scene_system::add(scene *scene) {
 
 void scene_system::force_goto_scene(scene *new_scene) {
     if(_force_goto_scene) {
-        spdlog::error("[scene_system] force goto scene wasn't empty");
+        spdlog::error("[{}] force goto scene wasn't empty", __FUNCTION__);
         throw runtime_error("force goto scene wasn't empty");
     }
 
@@ -85,4 +93,36 @@ void scene_system::init_main_menu() {
     spdlog::info("alpha window id {}", alpha_window->_id);
     _scenes.push_back(move(main_menu));
     _scenes.push_back(move(alpha_window));
+}
+
+unique_ptr<message> deserialize_message(uint32_t &type, rapidjson::Document &d) {
+    switch(type){
+        case login_response::type: {
+            return login_response::deserialize(d);
+        }
+        case generic_error_response::type: {
+            return generic_error_response::deserialize(d);
+        }
+        case generic_ok_response::type: {
+            return generic_ok_response::deserialize(d);
+        }
+        default:
+            return nullptr;
+    }
+}
+
+void scene_system::handle_message(rapidjson::Document &d) {
+    auto type = d["type"].GetUint();
+    auto msg = deserialize_message(type, d);
+
+    if(!msg) {
+        spdlog::error("[{}] No message for type {}", __FUNCTION__, type);
+        return;
+    }
+
+    spdlog::trace("[{}] Handling message type {} for {} scenes", __FUNCTION__, type, _scenes.size());
+
+    for(auto& scene : _scenes) {
+        scene->handle_message(type, msg.get());
+    }
 }

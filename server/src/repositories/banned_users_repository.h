@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     template<typename pool_T, typename transaction_T>
     class banned_users_repository {
     public:

@@ -23,25 +23,17 @@
 #include <array>
 #include <vector>
 #include <optional>
-#include <lotr_flat_map.h>
+#include <ibh_containers.h>
 #include <entt/entity/registry.hpp>
+#include "common_components.h"
 
 using namespace std;
 
-namespace lotr {
-    extern array<string const, 42> const stat_names;
-    extern array<string const, 14> const slot_names;
+namespace ibh {
 
     // enums
 
     // components
-
-    struct stat_component {
-        string name;
-        int64_t value;
-
-        stat_component(string name, int64_t value) : name(move(name)), value(value) {}
-    };
 
     struct random_stat_component {
         string name;
@@ -156,9 +148,9 @@ namespace lotr {
         uint64_t level;
         uint64_t skill_points;
 
-        lotr_flat_map<string, uint64_t> stats;
-        lotr_flat_map<string, item_component> items;
-        lotr_flat_map<string, skill_component> skills;
+        ibh_flat_map<string, uint64_t> stats;
+        ibh_flat_map<string, item_component> items;
+        ibh_flat_map<string, skill_component> skills;
 
         pc_component() : id(), name(), race(), dir(), _class(), spawn_message(),
                           level(), skill_points(), stats(), items(), skills() {}
@@ -181,62 +173,4 @@ namespace lotr {
 
 
     // constants
-
-    extern string const stat_str;
-    extern string const stat_dex;
-    extern string const stat_agi;
-    extern string const stat_int;
-    extern string const stat_wis;
-    extern string const stat_wil;
-    extern string const stat_luk;
-    extern string const stat_cha;
-    extern string const stat_con;
-    extern string const stat_move;
-    extern string const stat_hpregen;
-    extern string const stat_mpregen;
-    extern string const stat_hp;
-    extern string const stat_max_hp;
-    extern string const stat_mp;
-    extern string const stat_max_mp;
-    extern string const stat_xp;
-    extern string const stat_gold;
-    extern string const stat_hweapon_damage_rolls;
-    extern string const stat_weapon_armor_class;
-    extern string const stat_armor_class;
-    extern string const stat_accuracy;
-    extern string const stat_offense;
-    extern string const stat_defense;
-    extern string const stat_stealth;
-    extern string const stat_perception;
-    extern string const stat_physical_damage_boost;
-    extern string const stat_magical_damage_boost;
-    extern string const stat_healing_boost;
-    extern string const stat_physical_damage_reflect;
-    extern string const stat_magical_damage_reflect;
-    extern string const stat_mitigation;
-    extern string const stat_magical_resist;
-    extern string const stat_physical_resist;
-    extern string const stat_necrotic_resist;
-    extern string const stat_energy_resist;
-    extern string const stat_water_resist;
-    extern string const stat_fire_resist;
-    extern string const stat_ice_resist;
-    extern string const stat_poison_resist;
-    extern string const stat_disease_resist;
-    extern string const stat_action_speed;
-
-    extern string const gear_slot_right_hand;
-    extern string const gear_slot_left_hand;
-    extern string const gear_slot_armor;
-    extern string const gear_slot_robe1;
-    extern string const gear_slot_robe2;
-    extern string const gear_slot_ring1;
-    extern string const gear_slot_ring2;
-    extern string const gear_slot_head;
-    extern string const gear_slot_next;
-    extern string const gear_slot_waist;
-    extern string const gear_slot_wrist;
-    extern string const gear_slot_hands;
-    extern string const gear_slot_feet;
-    extern string const gear_slot_ear;
 }

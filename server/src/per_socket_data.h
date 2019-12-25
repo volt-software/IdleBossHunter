@@ -23,7 +23,7 @@
 #include <websocketpp/config/asio.hpp>
 #pragma GCC diagnostic pop
 
-namespace lotr {
+namespace ibh {
     using server = websocketpp::server<websocketpp::config::asio_tls>;
 
     template <class WebSocket>

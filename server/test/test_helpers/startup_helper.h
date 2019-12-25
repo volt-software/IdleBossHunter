@@ -21,7 +21,7 @@
 #include "../../src/config.h"
 #include "../../src/database/database_pool.h"
 
-namespace lotr {
+namespace ibh {
     extern config config;
     extern std::shared_ptr<database_pool> db_pool;
 }

@@ -22,7 +22,7 @@
 #include <ecs/components.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("character leave tests") {
     SECTION( "character leaves world" ) {

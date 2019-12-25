@@ -25,7 +25,7 @@
 #include "repositories/users_repository.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("items repository tests") {
     items_repository<database_pool, database_transaction> items_repo(db_pool);

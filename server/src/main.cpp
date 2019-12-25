@@ -45,7 +45,7 @@
 
 #include "uws_thread.h"
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 atomic<bool> quit{false};
 
@@ -115,7 +115,7 @@ int main() {
     auto next_log_tick_times = chrono::system_clock::now() + chrono::seconds(1);
     uint32_t tick_counter = 0;
 
-    lotr_flat_map<uint32_t, function<void(queue_message*, entt::registry&, outward_queues&)>> game_queue_message_router;
+    ibh_flat_map<uint32_t, function<void(queue_message*, entt::registry&, outward_queues&)>> game_queue_message_router;
     game_queue_message_router.emplace(player_enter_message::_type, handle_player_enter_message);
     game_queue_message_router.emplace(player_leave_message::_type, handle_player_leave_message);
 

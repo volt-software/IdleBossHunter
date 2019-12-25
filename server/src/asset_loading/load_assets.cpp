@@ -25,9 +25,9 @@
 #include <game_logic/logic_helpers.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
-void lotr::load_assets(entt::registry &registry, atomic<bool> const &quit) {
+void ibh::load_assets(entt::registry &registry, atomic<bool> const &quit) {
     uint32_t monster_count = 0;
     uint32_t monster_specials_count = 0;
     auto loading_start = chrono::system_clock::now();

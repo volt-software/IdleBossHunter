@@ -18,7 +18,7 @@
 
 #include "uws_thread.h"
 #include <spdlog/spdlog.h>
-#include <lotr_flat_map.h>
+#include <ibh_containers.h>
 #include <rapidjson/document.h>
 #include <message_handlers/user_access/login_handler.h>
 #include <message_handlers/user_access/register_handler.h>
@@ -43,10 +43,10 @@
 #include <ecs/components.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
-using message_router_type = lotr_flat_map<string, function<void(server*, rapidjson::Document const &, shared_ptr<database_pool>, per_socket_data<websocketpp::connection_hdl>*,
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &, lotr_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &)>>;
+using message_router_type = ibh_flat_map<uint32_t, function<void(server*, rapidjson::Document const &, shared_ptr<database_pool>, per_socket_data<websocketpp::connection_hdl>*,
+                                                               moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &)>>;
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -55,12 +55,12 @@ using websocketpp::lib::bind;
 using context_ptr = websocketpp::lib::shared_ptr<websocketpp::lib::asio::ssl::context>;
 
 atomic<uint64_t> connection_id_counter = 0;
-lotr_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> lotr::user_connections;
-lotr_flat_map<websocketpp::connection_hdl, uint64_t> handle_to_connection_id_map;
-moodycamel::ConcurrentQueue<unique_ptr<queue_message>> lotr::game_loop_queue;
-string lotr::motd;
-character_select_response lotr::select_response{{}, {}};
-shared_mutex lotr::user_connections_mutex;
+ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> ibh::user_connections;
+ibh_flat_map<websocketpp::connection_hdl, uint64_t> handle_to_connection_id_map;
+moodycamel::ConcurrentQueue<unique_ptr<queue_message>> ibh::game_loop_queue;
+string ibh::motd;
+character_select_response ibh::select_response{{}, {}};
+shared_mutex ibh::user_connections_mutex;
 atomic<bool> init_done = false;
 
 // See https://wiki.mozilla.org/Security/Server_Side_TLS for more details about
@@ -162,16 +162,16 @@ void on_message(shared_ptr<database_pool> pool, message_router_type &message_rou
         user_data = &user_data_it->second;
     }
 
-    rapidjson::Document d;
+    rapidjson::Document d{};
     d.Parse(&message[0], message.size());
 
-    if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsString()) {
+    if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsUint()) {
         spdlog::warn("[{}] conn {} deserialize failed", __FUNCTION__, id_map_it->second);
         SEND_ERROR("Unrecognized message", "", "", true);
         return;
     }
 
-    string type = d["type"].GetString();
+    auto type = d["type"].GetUint();
 
     auto handler = message_router.find(type);
     if (handler != message_router.end()) {
@@ -255,7 +255,7 @@ void add_routes(message_router_type &message_router) {
     message_router.emplace(set_motd_request::type, set_motd_handler<server, websocketpp::connection_hdl>);
 }
 
-thread lotr::run_uws(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {
+thread ibh::run_uws(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {
     connection_id_counter = 0;
     motd = "";
 

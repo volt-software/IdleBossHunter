@@ -23,7 +23,7 @@
 #include "repositories/bosses_repository.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("bosses repository tests") {
     bosses_repository<database_pool, database_transaction> bosses_repo(db_pool);

@@ -22,6 +22,6 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     void load_assets(entt::registry &registry, atomic<bool> const &quit);
 }

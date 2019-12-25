@@ -22,14 +22,16 @@
 #include <GL/glew.h>
 #endif
 
-class texture {
+namespace ibh {
+    class texture {
     public:
         texture(GLuint texture_id, uint32_t reference_count, uint32_t width, uint32_t height) noexcept;
-        texture(texture&&) = default;
-        texture(const texture&) = default;
+        texture(texture &&) = default;
+        texture(const texture &) = default;
 
         GLuint const _texture_id;
         uint32_t _reference_count;
         uint32_t const _width;
         uint32_t const _height;
-};
+    };
+}

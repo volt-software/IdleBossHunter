@@ -21,6 +21,10 @@
 
 #include "../scene.h"
 
+#include <string>
+
+using namespace std;
+
 namespace ibh {
     class login_menu_scene : public scene  {
     public:
@@ -28,5 +32,10 @@ namespace ibh {
         ~login_menu_scene() override = default;
 
         void update(iscene_manager *manager, entt::registry &es, TimeDelta dt) override;
+        void handle_message(uint32_t type, message* msg) override;
+
+    private:
+        string _error;
+        bool _show_register;
     };
 }

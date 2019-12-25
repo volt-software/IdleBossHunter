@@ -20,4 +20,9 @@ make clean
 make -j$CPUS
 rm *.so*
 
+cd $dir/external/capnproto
+mkdir build
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTING=off ../c++/
+make -j$CPUS
+
 cd $DIR

@@ -18,13 +18,13 @@
 
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
-#include <lotr_flat_map.h>
+#include <ibh_containers.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("ensure xxhash has no collisions for map locations") {
-    lotr_flat_map <uint64_t, bool> hashes{};
+    ibh_flat_map <uint64_t, bool> hashes{};
     for(int x = -1000; x < 1000; x++) {
         for(int y = -1000; y < 1000; y++) {
             auto t = make_tuple(x, y);

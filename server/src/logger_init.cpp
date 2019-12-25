@@ -22,7 +22,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
-void lotr::reconfigure_logger(config const& config) noexcept {
+void ibh::reconfigure_logger(config const& config) noexcept {
     auto console_sink = make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
     auto time_since_epoch = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());

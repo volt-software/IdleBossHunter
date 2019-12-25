@@ -23,7 +23,7 @@
 #include "repositories/clans_repository.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("clans repository tests") {
     clans_repository<database_pool, database_transaction> clans_repo(db_pool);

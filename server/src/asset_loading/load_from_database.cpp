@@ -27,9 +27,9 @@
 #include <repositories/clan_stats_repository.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
-void lotr::load_from_database(entt::registry &registry, shared_ptr<database_pool> db_pool, atomic<bool> const &quit) {
+void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool> db_pool, atomic<bool> const &quit) {
     item_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
     items_repository<database_pool, database_transaction> items_repo(db_pool);
     characters_repository<database_pool, database_transaction> char_repo(db_pool);

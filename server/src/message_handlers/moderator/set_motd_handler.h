@@ -26,8 +26,8 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     template <class Server, class WebSocket>
     void set_motd_handler(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-                     per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, lotr_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+                          per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
 }

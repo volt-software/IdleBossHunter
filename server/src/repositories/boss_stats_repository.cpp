@@ -19,9 +19,9 @@
 #include "boss_stats_repository.h"
 #include <spdlog/spdlog.h>
 
-using namespace lotr;
+using namespace ibh;
 
-template class lotr::boss_stats_repository<database_pool, database_transaction>;
+template class ibh::boss_stats_repository<database_pool, database_transaction>;
 
 template<typename pool_T, typename transaction_T>
 boss_stats_repository<pool_T, transaction_T>::boss_stats_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {

@@ -24,12 +24,16 @@
 #include "../../config.h"
 #include "ecs_system.h"
 #include "../../scenes/scene_manager.h"
+#include <ibh_containers.h>
+#include <rapidjson/document.h>
+#include <functional>
+#include <messages/message.h>
+#include <optional>
 
 namespace ibh {
     class scene_system : public ecs_system, iscene_manager  {
     public:
-        explicit scene_system(config *config)
-                : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _id_counter(0) {}
+        explicit scene_system(config *config);
 
         ~scene_system() override = default;
 
@@ -44,12 +48,15 @@ namespace ibh {
 
         // scene_system
         void init_main_menu();
+
+        // message handling
+        void handle_message(rapidjson::Document &d);
     private:
         config *_config;
-        std::vector<std::unique_ptr<scene>> _scenes;
-        std::vector<unsigned int> _scenes_to_erase;
-        std::vector<std::unique_ptr<scene>> _scenes_to_add;
-        std::unique_ptr<scene> _force_goto_scene;
+        vector<unique_ptr<scene>> _scenes;
+        vector<unsigned int> _scenes_to_erase;
+        vector<unique_ptr<scene>> _scenes_to_add;
+        unique_ptr<scene> _force_goto_scene;
 
         unsigned int _id_counter;
     };

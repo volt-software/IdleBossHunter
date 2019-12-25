@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     [[nodiscard]]
     u32string To_UTF32(const string &s);
     void string_tolower(string &str);

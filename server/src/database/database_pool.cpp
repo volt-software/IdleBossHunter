@@ -24,7 +24,7 @@
 #include <thread>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 using namespace pqxx;
 
 database_pool::database_pool() noexcept : _connection_string(), _min_connections(), _connections(), _connections_mutex() {

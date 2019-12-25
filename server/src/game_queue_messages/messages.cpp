@@ -19,7 +19,7 @@
 #include "messages.h"
 #include <ecs/components.h>
 
-namespace lotr {
+namespace ibh {
     uint32_t const player_enter_message::_type = 1;
     uint32_t const player_leave_message::_type = 2;
     uint32_t const player_move_message::_type  = 3;

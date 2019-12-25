@@ -31,21 +31,21 @@
 
 #include "texture.h"
 
-class sprite;
+namespace ibh {
+    class sprite;
 
-class texture_atlas {
+    class texture_atlas {
     public:
-        texture_atlas(std::string const & image, std::string const & vertex_shader, std::string const & fragment_shader,
-            glm::mat4 const projection_matrix, uint32_t capacity);
+        texture_atlas(std::string const &image, std::string const &vertex_shader, std::string const &fragment_shader,
+                      glm::mat4 const projection_matrix, uint32_t capacity);
 
         ~texture_atlas() noexcept;
 
         void render() const noexcept;
-        void set_projection(glm::mat4& projection) noexcept;
+        void set_projection(glm::mat4 &projection) noexcept;
         uint32_t add_data_object(sprite *sprite);
         bool update_data_object(sprite *sprite);
         void remove_data_object(sprite *sprite);
-
         uint32_t texture_width() const noexcept;
         uint32_t texture_height() const noexcept;
 
@@ -59,9 +59,10 @@ class texture_atlas {
         glm::mat4 _projection;
         GLint _projection_location;
         GLint _textureunit_location;
-        std::vector<sprite*> _sprites;
+        std::vector<sprite *> _sprites;
         std::queue<uint32_t> _vertex_data_unused;
         uint32_t _capacity;
         uint32_t _highest_allocated;
         bool _allocated_at_least_one;
-};
+    };
+}

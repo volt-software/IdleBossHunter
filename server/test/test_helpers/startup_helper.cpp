@@ -18,7 +18,7 @@
 
 #include "startup_helper.h"
 
-namespace lotr {
+namespace ibh {
     struct config config;
     std::shared_ptr<database_pool> db_pool;
 }

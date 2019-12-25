@@ -22,8 +22,7 @@
 #include <rendering/imgui/imgui.h>
 #include <rendering/imgui/imgui_impl_sdl.h>
 #include <rendering/imgui/imgui_impl_opengl3.h>
-#include "../components/sprite_component.h"
-#include "../components/atlas_component.h"
+#include "../components.h"
 #include "../../rendering/sprite.h"
 #include "../../rendering/texture_atlas.h"
 

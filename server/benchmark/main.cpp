@@ -23,23 +23,34 @@
 #include <sodium.h>
 #include <csignal>
 #include <rapidjson/writer.h>
+#define CEREAL_THREAD_SAFE 1
+#include <cereal/cereal.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/string.hpp>
 
 #include "../src/config.h"
 #include "../src/config_parsers.h"
 #include "benchmark_helpers/startup_helper.h"
 #include "../src/working_directory_manipulation.h"
-#include "game_logic/fov.h"
-#include "../src/asset_loading/load_map.h"
-#include <game_logic/a_star.h>
+//#include "game_logic/fov.h"
+//#include "../src/asset_loading/load_map.h"
+//#include <game_logic/a_star.h>
 #include <asset_loading/load_assets.h>
-#include <ai/default_ai.h>
+//#include <ai/default_ai.h>
 #include <messages/generic_error_response.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 using namespace rapidjson;
 
 atomic<bool> quit{false};
+namespace ibh {
+    template<class Archive>
+    void serialize(Archive &archive,
+                   generic_error_response &m) {
+        archive((uint32_t)ibh::generic_error_response::type, m.error, m.pretty_error_description, m.pretty_error_name, m.clear_login_data);
+    }
+}
 
 void on_sigint(int sig) {
     quit = true;
@@ -63,22 +74,22 @@ void bench_censor_sensor() {
     spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
-void bench_fov(map_component const &m) {
-    if(quit) {
-        return;
-    }
-
-    auto loc = make_tuple(4, 4);
-    auto start = chrono::system_clock::now();
-
-    for(int i = 0; i < 1'000'000; i++) {
-        compute_fov_restrictive_shadowcasting(m, loc, false);
-    }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
-}
+//void bench_fov(map_component const &m) {
+//    if(quit) {
+//        return;
+//    }
+//
+//    auto loc = make_tuple(4, 4);
+//    auto start = chrono::system_clock::now();
+//
+//    for(int i = 0; i < 1'000'000; i++) {
+//        compute_fov_restrictive_shadowcasting(m, loc, false);
+//    }
+//
+//    auto end = chrono::system_clock::now();
+//
+//    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
+//}
 
 char hashed_password[crypto_pwhash_STRBYTES];
 string test_pass = "very_secure_password";
@@ -121,35 +132,58 @@ void bench_hash_verify() {
     spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
-void bench_a_star(map_component const &m) {
+//void bench_a_star(map_component const &m) {
+//    if(quit) {
+//        return;
+//    }
+//
+//    auto start = chrono::system_clock::now();
+//    auto start_loc = make_tuple(10, 10);
+//    auto goal_loc = make_tuple(25, 25);
+//
+//    for(int i = 0; i < 10'000; i++) {
+//        a_star_path(m, start_loc, goal_loc);
+//    }
+//
+//    auto end = chrono::system_clock::now();
+//
+//    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
+//}
+//
+//void bench_default_ai(map_component &m) {
+//    if(quit) {
+//        return;
+//    }
+//
+//    auto start = chrono::system_clock::now();
+//    lotr_player_location_map player_locs{};
+//
+//    for(int i = 0; i < 10'000; i++) {
+//        for(auto &npc : m.npcs) {
+//            run_ai_on(npc, m, player_locs);
+//        }
+//    }
+//
+//    auto end = chrono::system_clock::now();
+//
+//    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
+//}
+
+void bench_serialization() {
     if(quit) {
         return;
     }
 
     auto start = chrono::system_clock::now();
-    auto start_loc = make_tuple(10, 10);
-    auto goal_loc = make_tuple(25, 25);
+    generic_error_response resp{"err", "pretty err", "desc", true};
 
-    for(int i = 0; i < 10'000; i++) {
-        a_star_path(m, start_loc, goal_loc);
-    }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
-}
-
-void bench_default_ai(map_component &m) {
-    if(quit) {
-        return;
-    }
-
-    auto start = chrono::system_clock::now();
-    lotr_player_location_map player_locs{};
-
-    for(int i = 0; i < 10'000; i++) {
-        for(auto &npc : m.npcs) {
-            run_ai_on(npc, m, player_locs);
+    for(int i = 0; i < 1'000'000; i++) {
+        auto msg = resp.serialize();
+        rapidjson::Document d;
+        d.Parse(&msg[0], msg.size());
+        auto resp2 = generic_error_response::deserialize(d);
+        if(resp.clear_login_data != resp2->clear_login_data) {
+            spdlog::error("[{}] err in serialization", __FUNCTION__);
         }
     }
 
@@ -158,16 +192,28 @@ void bench_default_ai(map_component &m) {
     spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
-void bench_serialization() {
+void bench_serialization_cereal() {
     if(quit) {
         return;
     }
 
     auto start = chrono::system_clock::now();
+    generic_error_response resp{"err", "pretty err", "desc", true};
 
     for(int i = 0; i < 1'000'000; i++) {
-        generic_error_response resp{"err", "pretty err", "desc", true};
-        auto msg = resp.serialize();
+        stringstream ss;
+        {
+            cereal::BinaryOutputArchive ar(ss);
+            ar(resp);
+        }
+        {
+            cereal::BinaryInputArchive ar(ss);
+            generic_error_response resp2{"", "", "", false};
+            ar(resp2);
+            if(resp.clear_login_data != resp2.clear_login_data) {
+                spdlog::error("[{}] err in serialization", __FUNCTION__);
+            }
+        }
     }
 
     auto end = chrono::system_clock::now();
@@ -242,31 +288,32 @@ int main(int argc, char **argv) {
     }
 
     entt::registry registry;
-    load_assets(registry, quit);
+    //load_assets(registry, quit);
 
-    auto map_view = registry.view<map_component>();
+//    auto map_view = registry.view<map_component>();
+//
+//    optional<map_component> m;
+//    for(auto m_entity : map_view) {
+//        map_component &mc = map_view.get(m_entity);
+//
+//        if(mc.name == "DedlaenMaze") {
+//            m = mc;
+//        }
+//    }
+//
+//    if(!m) {
+//        spdlog::error("[{}] could not find map", __FUNCTION__);
+//        return 1;
+//    }
 
-    optional<map_component> m;
-    for(auto m_entity : map_view) {
-        map_component &mc = map_view.get(m_entity);
-
-        if(mc.name == "DedlaenMaze") {
-            m = mc;
-        }
-    }
-
-    if(!m) {
-        spdlog::error("[{}] could not find map", __FUNCTION__);
-        return 1;
-    }
-
-    bench_censor_sensor();
-    bench_fov(m.value());
-    bench_hashing();
-    bench_hash_verify();
-    bench_a_star(m.value());
-    bench_default_ai(m.value());
+//    bench_censor_sensor();
+//    bench_fov(m.value());
+//    bench_hashing();
+//    bench_hash_verify();
+//    bench_a_star(m.value());
+//    bench_default_ai(m.value());
     bench_serialization();
-    bench_rapidjson_without_strlen();
-    bench_rapidjson_with_strlen();
+    bench_serialization_cereal();
+//    bench_rapidjson_without_strlen();
+//    bench_rapidjson_with_strlen();
 }

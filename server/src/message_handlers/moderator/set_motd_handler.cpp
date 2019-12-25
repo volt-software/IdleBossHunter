@@ -28,10 +28,10 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     template <class Server, class WebSocket>
     void set_motd_handler(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
-                          moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, lotr_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                          moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         if(!user_data->is_game_master) {
             spdlog::warn("[{}] user {} tried to set motd but is not a game master!", __FUNCTION__, user_data->username);
             return;
@@ -61,6 +61,6 @@ namespace lotr {
     }
 
     template void set_motd_handler<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-                                                               per_socket_data<websocketpp::connection_hdl> *user_data,
-                                                               moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, lotr_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
+                                                                        per_socket_data<websocketpp::connection_hdl> *user_data,
+                                                                        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

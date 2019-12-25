@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     void remove_dead_monsters(entt::registry &registry) noexcept;
     void fill_spawners(entt::registry &registry);
 }

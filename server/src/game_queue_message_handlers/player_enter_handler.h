@@ -23,6 +23,6 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     void handle_player_enter_message(queue_message*, entt::registry&, outward_queues&);
 }

@@ -23,6 +23,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -mavx")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -ggdb -Og -mavx")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -mavx")
 
+# define targets
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE COMMON_SOURCES ${TOP_DIR}/common/src/*.cpp)
 file(GLOB SPDLOG_SOURCE ${EXTERNAL_DIR}/spdlog/src/*.cpp)
@@ -72,10 +73,12 @@ include_directories("${EXTERNAL_DIR}/Catch2/single_include")
 include_directories("${ZLIB_INCLUDE_DIRS}")
 include_directories("${EXTERNAL_DIR}/libsodium/src/libsodium/include")
 include_directories("${EXTERNAL_DIR}/xxHash")
+include_directories("${EXTERNAL_DIR}/wyhash")
 include_directories("${EXTERNAL_DIR}/robin-hood-hashing/src/include")
 include_directories("${EXTERNAL_DIR}/entt/src")
 include_directories("${EXTERNAL_DIR}/pcg-cpp/include")
 include_directories("${EXTERNAL_DIR}/concurrentqueue")
+include_directories("${EXTERNAL_DIR}/cereal/include")
 
 
 target_link_libraries(ibh_backend PUBLIC ${PQXX_LIBRARY} -lpq)

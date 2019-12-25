@@ -23,10 +23,10 @@
 #include <rapidjson/document.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 using namespace rapidjson;
 
-optional<monster_special_definition_component> lotr::load_monster_specials(string const &file) {
+optional<monster_special_definition_component> ibh::load_monster_specials(string const &file) {
     auto env_contents = read_whole_file(file);
 
     if(!env_contents) {

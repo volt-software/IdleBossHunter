@@ -25,7 +25,7 @@
 #include <spdlog/spdlog.h>
 
 
-string lotr::get_selfpath() {
+string ibh::get_selfpath() {
     char buff[PATH_MAX];
     ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
     if (len != -1) {
@@ -36,12 +36,12 @@ string lotr::get_selfpath() {
     throw runtime_error("Couldn't get self path");
 }
 
-void lotr::set_cwd(string const &path) {
+void ibh::set_cwd(string const &path) {
     spdlog::info("cwd changing to {}", path);
     filesystem::current_path(path);
 }
 
-optional<string> lotr::read_whole_file(string const &path) {
+optional<string> ibh::read_whole_file(string const &path) {
     string contents;
     ifstream file(path);
 

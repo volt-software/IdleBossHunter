@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     /*template<typename T>
     concept bool DatabasePool = requires(T a, uint32_t id) {
         { a.create_transaction() } -> unique_ptr<DatabaseTransaction>;

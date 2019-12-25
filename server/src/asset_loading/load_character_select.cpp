@@ -22,7 +22,7 @@
 #include <ecs/components.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 using namespace rapidjson;
 
 void emplace_maxhp_maxmp(vector<stat_component> &stat_mods) {
@@ -112,7 +112,7 @@ void read_races(Value const &race_array, vector<character_race> &races) {
     }
 }
 
-optional<character_select_response> lotr::load_character_select(string const &file) {
+optional<character_select_response> ibh::load_character_select(string const &file) {
     auto env_contents = read_whole_file(file);
 
     if(!env_contents) {

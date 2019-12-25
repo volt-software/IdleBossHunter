@@ -22,10 +22,10 @@
 #include <spdlog/spdlog.h>
 #include <rapidjson/document.h>
 
-using namespace lotr;
+using namespace ibh;
 using namespace rapidjson;
 
-optional<config> lotr::parse_env_file() {
+optional<config> ibh::parse_env_file() {
     auto env_contents = read_whole_file("config.json");
     if(!env_contents) {
         spdlog::error("[{}] no config.json file found. Please make one.", __FUNCTION__);

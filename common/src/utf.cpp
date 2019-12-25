@@ -19,23 +19,23 @@
 #include "utf.h"
 #include <algorithm>
 
-u32string lotr::To_UTF32(const string &s) {
+u32string ibh::To_UTF32(const string &s) {
     wstring_convert<codecvt_utf8<char32_t>, char32_t> conv;
     return conv.from_bytes(s);
 }
 
-void lotr::string_tolower(string &str) {
+void ibh::string_tolower(string &str) {
     transform(str.begin(), str.end(), str.begin(),
               [](unsigned char c){ return tolower(c); });
 }
 
-string lotr::string_tolower_copy(string str) {
+string ibh::string_tolower_copy(string str) {
     transform(str.begin(), str.end(), str.begin(),
               [](unsigned char c){ return tolower(c); });
     return str;
 }
 
-string lotr::utf_to_upper_copy(string const &str)
+string ibh::utf_to_upper_copy(string const &str)
 {
     wstring_convert<codecvt_utf8_utf16<wchar_t>> to_wstring_convertor;
     auto wstr = to_wstring_convertor.from_bytes(str);
@@ -47,7 +47,7 @@ string lotr::utf_to_upper_copy(string const &str)
     return to_wstring_convertor.to_bytes(wstr);
 }
 
-string lotr::utf_to_lower_copy(string const &str)
+string ibh::utf_to_lower_copy(string const &str)
 {
     wstring_convert<codecvt_utf8<wchar_t>> to_wstring_convertor;
     auto wstr = to_wstring_convertor.from_bytes(str);

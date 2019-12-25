@@ -21,11 +21,11 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <lotr_flat_map.h>
+#include <ibh_containers.h>
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     enum class profanity_type : uint32_t {
         SLURS,
         COMMON_PROFANITY,
@@ -45,7 +45,7 @@ namespace lotr {
         void disable_tier(uint32_t tier);
 
     private:
-        lotr_flat_map<string, int> _word_tiers;
+        ibh_flat_map<string, int> _word_tiers;
         unordered_set<int> _enabled_tiers;
     };
 

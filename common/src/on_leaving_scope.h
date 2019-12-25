@@ -45,7 +45,7 @@
 
 #pragma once
 
-namespace lotr {
+namespace ibh {
     template<typename Func>
     class on_leaving_scope_class {
     public:

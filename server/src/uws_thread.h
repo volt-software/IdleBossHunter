@@ -21,26 +21,26 @@
 #include <shared_mutex>
 #include <config.h>
 #include <database/database_pool.h>
-#include <lotr_flat_map.h>
+#include <ibh_containers.h>
 #include <concurrentqueue.h>
 
 #include <game_queue_messages/messages.h>
 #include "per_socket_data.h"
 
-namespace lotr {
+namespace ibh {
     struct server_handle {
         server* s;
     };
 
     struct character_select_response;
 
-    extern lotr_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> user_connections;
+    extern ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> user_connections;
     extern moodycamel::ConcurrentQueue<unique_ptr<queue_message>> game_loop_queue;
     extern string motd;
     extern character_select_response select_response;
     extern shared_mutex user_connections_mutex;
 
-    using user_connections_type = lotr_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>>::value_type;
+    using user_connections_type = ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>>::value_type;
 
     thread run_uws(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit);
 }

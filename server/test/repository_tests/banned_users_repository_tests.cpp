@@ -24,7 +24,7 @@
 #include "repositories/banned_users_repository.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("banned users repository tests") {
     users_repository<database_pool, database_transaction> user_repo(db_pool);

@@ -25,7 +25,7 @@
 #include "repositories/characters_repository.h"
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 TEST_CASE("character stats repository tests") {
     character_stats_repository<database_pool, database_transaction> stat_repo(db_pool);

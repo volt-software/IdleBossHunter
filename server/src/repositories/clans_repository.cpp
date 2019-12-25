@@ -19,10 +19,10 @@
 #include "clans_repository.h"
 #include <spdlog/spdlog.h>
 
-using namespace lotr;
+using namespace ibh;
 using namespace chrono;
 
-template class lotr::clans_repository<database_pool, database_transaction>;
+template class ibh::clans_repository<database_pool, database_transaction>;
 
 template<typename pool_T, typename transaction_T>
 clans_repository<pool_T, transaction_T>::clans_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {

@@ -20,6 +20,6 @@
 
 #include "config.h"
 
-namespace lotr {
+namespace ibh {
     void reconfigure_logger(config const &config) noexcept;
 }

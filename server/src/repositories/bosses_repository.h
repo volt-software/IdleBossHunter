@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     template<typename pool_T, typename transaction_T>
     class bosses_repository {
     public:

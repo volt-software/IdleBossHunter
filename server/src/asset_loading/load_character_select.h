@@ -20,6 +20,6 @@
 
 #include <messages/user_access/character_select_response.h>
 
-namespace lotr {
+namespace ibh {
     optional<character_select_response> load_character_select(string const &file);
 }

@@ -34,7 +34,7 @@ using namespace std;
 using namespace experimental;
 #endif
 
-texture_atlas::texture_atlas(string const & image, string const & vertex_shader, string const & fragment_shader,
+ibh::texture_atlas::texture_atlas(string const & image, string const & vertex_shader, string const & fragment_shader,
     glm::mat4 const projection_matrix, uint32_t capacity) :
         _image(image), _texture(create_texture_from_image(image)), _capacity(capacity), _highest_allocated(0), _allocated_at_least_one(false) {
     _program_id = create_shader_program(vertex_shader, fragment_shader);
@@ -75,14 +75,14 @@ texture_atlas::texture_atlas(string const & image, string const & vertex_shader,
     glUseProgram(0);
 }
 
-texture_atlas::~texture_atlas() noexcept {
+ibh::texture_atlas::~texture_atlas() noexcept {
     glDeleteBuffers(1, &_buffer_object);
     glDeleteVertexArrays(1, &_vertex_array);
     glDeleteProgram(_program_id);
     delete_texture(_image);
 }
 
-void texture_atlas::render() const noexcept {
+void ibh::texture_atlas::render() const noexcept {
     if(!_allocated_at_least_one) {
         spdlog::info("!_allocated_at_least_one for {}", _image);
         return;
@@ -102,14 +102,14 @@ void texture_atlas::render() const noexcept {
     glUseProgram(0);
 }
 
-void texture_atlas::set_projection(glm::mat4& projection) noexcept {
+void ibh::texture_atlas::set_projection(glm::mat4& projection) noexcept {
     _projection = projection;
     glUseProgram(_program_id);
     glUniformMatrix4fv(_projection_location, 1, GL_FALSE, glm::value_ptr(_projection));
     glUseProgram(0);
 }
 
-uint32_t texture_atlas::add_data_object(sprite *sprite) {
+uint32_t ibh::texture_atlas::add_data_object(sprite *sprite) {
     optional<uint32_t> foundLocation;
     if(!_vertex_data_unused.empty()) {
         foundLocation = _vertex_data_unused.front();
@@ -150,7 +150,7 @@ uint32_t texture_atlas::add_data_object(sprite *sprite) {
     return i;
 }
 
-bool texture_atlas::update_data_object(sprite *sprite) {
+bool ibh::texture_atlas::update_data_object(sprite *sprite) {
     if(sprite->_vertex_data_position > _capacity) {
         spdlog::error("[texture_atlas] update_data_object position out of bounds, got {} expected less than {}", sprite->_vertex_data_position, _capacity);
         throw runtime_error("[texture_atlas] update_data_object position out of bounds");
@@ -163,7 +163,7 @@ bool texture_atlas::update_data_object(sprite *sprite) {
     return true;
 }
 
-void texture_atlas::remove_data_object(sprite *sprite) {
+void ibh::texture_atlas::remove_data_object(sprite *sprite) {
     if(sprite->_vertex_data_position > _capacity) {
         spdlog::error("[texture_atlas] update_data_object position out of bounds, got {} expected less than {}", sprite->_vertex_data_position, _capacity);
         throw runtime_error("[texture_atlas] update_data_object position out of bounds");
@@ -176,10 +176,10 @@ void texture_atlas::remove_data_object(sprite *sprite) {
     _vertex_data_unused.push(sprite->_vertex_data_position);
 }
 
-uint32_t texture_atlas::texture_width() const noexcept {
+uint32_t ibh::texture_atlas::texture_width() const noexcept {
     return _texture._width;
 }
 
-uint32_t texture_atlas::texture_height() const noexcept {
+uint32_t ibh::texture_atlas::texture_height() const noexcept {
     return _texture._height;
 }

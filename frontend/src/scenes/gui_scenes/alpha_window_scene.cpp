@@ -24,14 +24,20 @@ using namespace std;
 using namespace ibh;
 
 void alpha_window_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
-    if(!_closed) {
-        if(ImGui::Begin("Alpha quality")) {
-            ImGui::Text("This build is alpha/beta quality, things may be broken or otherwise.");
-            if (ImGui::Button("Gotcha")) {
-                _closed = true;
-                manager->remove(this);
-            }
-        }
-        ImGui::End();
+    if(_closed) {
+        return;
     }
+
+    if(ImGui::Begin("Alpha quality")) {
+        ImGui::Text("This build is alpha/beta quality, things may be broken or otherwise.");
+        if (ImGui::Button("Gotcha")) {
+            _closed = true;
+            manager->remove(this);
+        }
+    }
+    ImGui::End();
+}
+
+void alpha_window_scene::handle_message(uint32_t type, message *msg) {
+
 }

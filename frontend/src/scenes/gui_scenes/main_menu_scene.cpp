@@ -18,6 +18,7 @@
 
 #include "main_menu_scene.h"
 #include "settings_menu_scene.h"
+#include "login_menu_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
 #include <SDL.h>
@@ -28,7 +29,7 @@ using namespace ibh;
 void main_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDelta dt) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::MenuItem("Login")) {
-
+            manager->add(new login_menu_scene());
         }
 
         if (ImGui::MenuItem("Settings")) {
@@ -37,4 +38,8 @@ void main_menu_scene::update(iscene_manager *manager, entt::registry &es, TimeDe
 
         ImGui::EndMainMenuBar();
     }
+}
+
+void main_menu_scene::handle_message(uint32_t type, message *msg) {
+
 }

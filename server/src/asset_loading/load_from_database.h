@@ -23,6 +23,6 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     void load_from_database(entt::registry &registry, shared_ptr<database_pool> db_pool, atomic<bool> const &quit);
 }

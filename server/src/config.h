@@ -22,7 +22,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     struct config {
         string address;
         uint16_t port;

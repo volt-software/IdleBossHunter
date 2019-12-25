@@ -21,7 +21,7 @@
 #include <spdlog/spdlog.h>
 
 using namespace std;
-using namespace lotr;
+using namespace ibh;
 
 database_transaction::database_transaction(database_pool *pool, uint32_t connection_id, shared_ptr<pqxx::connection> connection) noexcept
         : _pool(pool), _connection_id(connection_id), _transaction(*connection) {

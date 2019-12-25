@@ -25,7 +25,7 @@
 
 using namespace std;
 
-namespace lotr {
+namespace ibh {
     void handle_player_enter_message(queue_message* msg, entt::registry& registry, outward_queues& outward_queue) {
         auto *enter_msg = dynamic_cast<player_enter_message*>(msg);
 
