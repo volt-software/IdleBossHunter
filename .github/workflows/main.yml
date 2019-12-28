@@ -21,7 +21,7 @@ jobs:
         submodules: true
     - uses: lovasoa/setup-emscripten@master
       with:
-        emscripten-version: '1.39.47'
+        emscripten-version: '1.39.4'
     - name: Create Build Environment
       shell: bash
       # Some projects don't allow in-source building, so create a separate build directory
