@@ -21,26 +21,13 @@
 
 #include "../scene.h"
 
-#include <messages/objects/character_object.h>
-#include <messages/user_access/character_select_response.h>
-
 namespace ibh {
-    class show_characters_scene : public scene  {
+    class connection_lost_scene : public scene  {
     public:
-        explicit show_characters_scene(iscene_manager *manager, vector<character_object> characters);
-        ~show_characters_scene() override = default;
+        connection_lost_scene() = default;
+        ~connection_lost_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
         void handle_message(iscene_manager *manager, uint32_t type, message* msg) override;
-
-    private:
-        vector<character_object> _characters;
-        vector<character_race> _races;
-        vector<character_class> _classes;
-        bool _show_create;
-        bool _waiting_for_select;
-        string _error;
-        string _selected_race;
-        string _selected_class;
     };
 }

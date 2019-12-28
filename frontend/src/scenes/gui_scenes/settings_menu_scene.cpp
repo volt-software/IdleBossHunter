@@ -34,13 +34,13 @@ void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         if (ImGui::BeginCombo("Resolution", resolution_label.c_str()))
         {
             if (ImGui::Selectable("1280x720", config->screen_width == 1280)) {
-                send_event(config->user_event_type, 0);
+                enqueue_sdl_event(config->user_event_type, 0);
             }
             if (ImGui::Selectable("1600x900", config->screen_width == 1600)) {
-                send_event(config->user_event_type, 1);
+                enqueue_sdl_event(config->user_event_type, 1);
             }
             if (ImGui::Selectable("1920x1080", config->screen_width == 1920)) {
-                send_event(config->user_event_type, 2);
+                enqueue_sdl_event(config->user_event_type, 2);
             }
             ImGui::EndCombo();
         }
@@ -50,7 +50,7 @@ void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         if (ImGui::BeginCombo("Music", music_label.c_str())) {
             for(uint32_t i = 1; i <= 8; i++) {
                 if (ImGui::Selectable(fmt::format("{}", i).c_str(), config->music_to_play == i)) {
-                    send_event(config->user_event_type, 3, new int(i));
+                    enqueue_sdl_event(config->user_event_type, 3, new int(i));
                 }
             }
 

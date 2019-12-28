@@ -18,7 +18,7 @@
 
 #include <catch2/catch.hpp>
 #include "test_helpers/startup_helper.h"
-#include "game_logic/random_helper.h"
+#include <random_helper.h>
 
 using namespace std;
 using namespace ibh;

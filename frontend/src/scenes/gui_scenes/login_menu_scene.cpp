@@ -59,10 +59,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         if (ImGui::Button("Register")) {
             if(_show_register) {
                 if(strlen(bufpass) >= 4 && strlen(bufuser) >= 2 && strlen(bufmail) >= 4) {
-                    register_request req{bufuser, bufpass, bufmail};
-#ifdef __EMSCRIPTEN__
-                    emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
-#endif
+                    send_message<register_request>(manager, bufuser, bufpass, bufmail);
                 } else {
                     _error = "Input not correct";
                 }
@@ -74,10 +71,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         if (ImGui::Button("Login")) {
             _show_register = false;
             if(strlen(bufpass) >= 4 && strlen(bufuser) >= 2) {
-                login_request req{bufuser, bufpass};
-#ifdef __EMSCRIPTEN__
-                emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
-#endif
+                send_message<login_request>(manager, bufuser, bufpass);
             } else {
                 _error = "Input not correct";
             }

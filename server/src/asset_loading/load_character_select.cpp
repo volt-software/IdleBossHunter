@@ -123,7 +123,7 @@ optional<character_select_response> ibh::load_character_select(string const &fil
     Document d;
     d.Parse(env_contents->c_str(), env_contents->size());
 
-    if(!d.IsObject() || !d.HasMember("races") || !d.HasMember("races")) {
+    if(!d.IsObject() || !d.HasMember("classes") || !d.HasMember("races")) {
         spdlog::trace("[{}] couldn't load character select!", __FUNCTION__);
         return {};
     }

@@ -39,7 +39,7 @@ void rendering_system::update(entt::registry &es, TimeDelta dt) {
     }
 
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(_window, dt);
+    ImGui_ImplSDL2_NewFrame(_window);
     ImGui::NewFrame();
     if(_config->show_demo_window) {
         ImGui::ShowDemoWindow();

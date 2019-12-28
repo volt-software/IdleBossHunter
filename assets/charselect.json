@@ -3,23 +3,21 @@
     "name": "Warrior",
     "description": "",
     "expGain": 100,
-    "levelStats": {
-      "strength": 10,
-      "agility": 5,
-      "psi": 1,
-      "vitality": 5,
-      "speed": 5
-    },
+    "str": 10,
+    "agi": 5,
+    "int": 1,
+    "vit": 5,
+    "spd": 5,
     "items": [{
       "slot": "weapon",
       "name": "Long Sword",
       "value": 10,
-      "strength": 25
+      "str": 25
     },{
       "slot": "body",
       "name": "Shirt",
       "value": 10,
-      "vitality": 25
+      "vit": 25
     }],
     "skills": [{
       "name": "Melee Prowess",
@@ -29,23 +27,21 @@
     "name": "Mage",
     "description": "",
     "expGain": 100,
-    "levelStats": {
-      "strength": 10,
-      "agility": 5,
-      "psi": 1,
-      "vitality": 5,
-      "speed": 5
-    },
+    "str": 1,
+    "agi": 5,
+    "int": 10,
+    "vit": 5,
+    "spd": 5,
     "items": [{
       "slot": "weapon",
       "name": "Staff",
       "value": 10,
-      "psi": 25
+      "int": 25
     },{
       "slot": "body",
       "name": "Shirt",
       "value": 10,
-      "vitality": 25
+      "vit": 25
     }],
     "skills": [{
       "name": "Magic Prowess",
@@ -55,24 +51,22 @@
     "name": "Thief",
     "description": "",
     "expGain": 100,
-    "levelStats": {
-      "strength": 10,
-      "agility": 5,
-      "psi": 1,
-      "vitality": 5,
-      "speed": 5
-    },
+    "str": 5,
+    "agi": 6,
+    "int": 3,
+    "vit": 5,
+    "spd": 7,
     "items": [{
       "slot": "weapon",
       "name": "Dagger",
       "value": 10,
-      "agility": 10,
-      "speed": 15
+      "agi": 10,
+      "spd": 15
     },{
       "slot": "body",
       "name": "Shirt",
       "value": 10,
-      "Vitality": 25
+      "vit": 25
     }],
     "skills": [{
       "name": "Thievery",
@@ -82,52 +76,42 @@
   "races": [{
     "name": "Human",
     "description": "",
-    "levelStats": {
-      "strength": 7,
-      "agility": 7,
-      "psi": 7,
-      "vitality": 7,
-      "speed": 7
-    }
+    "str": 7,
+    "agi": 7,
+    "int": 7,
+    "vit": 7,
+    "spd": 7
   },{
     "name": "Dwarf",
     "description": "",
-    "levelStats": {
-      "strength": 10,
-      "agility": 5,
-      "psi": 5,
-      "vitality": 10,
-      "speed": 5
-    }
+    "str": 10,
+    "agi": 5,
+    "int": 5,
+    "vit": 10,
+    "spd": 5
   },{
     "name": "Gnome",
     "description": "",
-    "levelStats": {
-      "strength": 5,
-      "agility": 10,
-      "psi": 5,
-      "vitality": 5,
-      "speed": 10
-    }
+    "str": 5,
+    "agi": 10,
+    "int": 5,
+    "vit": 5,
+    "spd": 10
   },{
     "name": "Elf",
     "description": "",
-    "levelStats": {
-      "strength": 5,
-      "agility": 5,
-      "psi": 5,
-      "vitality": 10,
-      "speed": 10
-    }
+    "str": 5,
+    "agi": 5,
+    "int": 5,
+    "vit": 10,
+    "spd": 10
   },{
     "name": "High Elf",
     "description": "",
-    "levelStats": {
-      "strength": 5,
-      "agility": 5,
-      "psi": 10,
-      "vitality": 10,
-      "speed": 5
-    }
+    "str": 5,
+    "agi": 5,
+    "int": 10,
+    "vit": 10,
+    "spd": 5
   }]
 }

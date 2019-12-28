@@ -16,20 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "connection_lost_scene.h"
+#include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
-#include <SDL.h>
 
 using namespace std;
-namespace ibh {
-    void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr) {
-        SDL_Event event{0};
-        event.type = type;
-        event.user.code = code;
-        event.user.data1 = data1;
-        event.user.data2 = data2;
-        auto ret = SDL_PushEvent(&event);
-        if (ret != 1) {
-            spdlog::error("error pushing event {}", ret);
-        }
+using namespace ibh;
+
+void connection_lost_scene::update(iscene_manager *manager, TimeDelta dt) {
+    if(_closed) {
+        return;
     }
+
+    if(ImGui::Begin("Connection lost")) {
+        ImGui::Text("Connection lost with the server. Please refresh the page.");
+    }
+    ImGui::End();
+}
+
+void connection_lost_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
+
 }

@@ -23,6 +23,11 @@
 #include <messages/chat/message_response.h>
 #include <messages/user_access/login_response.h>
 #include <messages/user_access/character_select_response.h>
+#include <messages/user_access/create_character_response.h>
+#include <messages/user_access/user_entered_game_response.h>
+#include <messages/user_access/user_joined_response.h>
+#include <messages/user_access/user_left_game_response.h>
+#include <messages/user_access/user_left_response.h>
 #include <messages/generic_error_response.h>
 #include <messages/generic_ok_response.h>
 
@@ -109,6 +114,24 @@ unique_ptr<message> deserialize_message(uint32_t &type, rapidjson::Document &d) 
         }
         case character_select_response::type: {
             return character_select_response::deserialize(d);
+        }
+        case create_character_response::type: {
+            return create_character_response::deserialize(d);
+        }
+        case user_entered_game_response::type: {
+            return user_entered_game_response::deserialize(d);
+        }
+        case user_joined_response::type: {
+            return user_joined_response::deserialize(d);
+        }
+        case user_left_game_response::type: {
+            return user_left_game_response::deserialize(d);
+        }
+        case user_left_response::type: {
+            return user_left_response::deserialize(d);
+        }
+        case message_response::type: {
+            return message_response::deserialize(d);
         }
         default:
             return nullptr;

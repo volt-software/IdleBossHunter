@@ -22,18 +22,17 @@
 #include "messages/user_access/character_select_response.h"
 #include "messages/generic_error_response.h"
 #include "messages/update_response.h"
+#include "ibh_containers.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
 #include <SDL.h>
+#include <algorithm>
 
 using namespace std;
 using namespace ibh;
 
-show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true), _error() {
-    character_select_request req{};
-#ifdef __EMSCRIPTEN__
-    emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
-#endif
+show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true), _error(), _selected_race(), _selected_class() {
+    send_message<character_select_request>(manager);
 }
 
 void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
@@ -67,7 +66,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             _show_create = true;
         }
 
-        if (ImGui::Button("Play")) {
+        if (ImGui::Button("Play") && selected_char_slot >= 0) {
             send_message<play_character_request>(manager, static_cast<uint32_t>(selected_char_slot));
         }
     }
@@ -80,6 +79,53 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(ImGui::Begin("Create Character", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         if(_error.size() > 0) {
             ImGui::Text("%s", _error.c_str());
+        }
+
+        if (ImGui::BeginCombo("Race", _selected_race.c_str()))
+        {
+            for(auto &race : _races) {
+                if (ImGui::Selectable(race.name.c_str(), _selected_race == race.name)) {
+                    _selected_race = race.name;
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::BeginCombo("Class", _selected_class.c_str()))
+        {
+            for(auto &c : _classes) {
+                if (ImGui::Selectable(c.name.c_str(), _selected_class == c.name)) {
+                    _selected_class = c.name;
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if(!_selected_class.empty() && !_selected_race.empty()) {
+            ibh_flat_map<string, int64_t> combined_stats;
+
+            vector<character_race>::iterator r = find_if(begin(_races), end(_races), [&_selected_race = _selected_race](const character_race &race){return race.name == _selected_race;});
+            vector<character_class>::iterator c = find_if(begin(_classes), end(_classes), [&_selected_class = _selected_class](const character_class &_class){return _class.name == _selected_class;});
+
+            if(r == end(_races) || c == end(_classes)) {
+                spdlog::error("[{}] something went wrong with calculating stats. Please report this as a bug.", __FUNCTION__);
+                ImGui::End();
+                return;
+            }
+
+            for(auto &stat : r->level_stat_mods) {
+                ImGui::Text("%s %s: %lli", r->name.c_str(), stat.name.c_str(), stat.value);
+                combined_stats[stat.name] += stat.value;
+            }
+
+            for(auto &stat : c->stat_mods) {
+                ImGui::Text("%s %s: %lli", c->name.c_str(), stat.name.c_str(), stat.value);
+                combined_stats[stat.name] += stat.value;
+            }
+
+            for(auto &stat : c->stat_mods) {
+                ImGui::Text("%s: %lli", stat.name.c_str(), combined_stats[stat.name]);
+            }
         }
     }
     ImGui::End();

@@ -40,6 +40,8 @@ namespace ibh {
                       glm::mat4 const projection_matrix, uint32_t capacity);
 
         ~texture_atlas() noexcept;
+        texture_atlas(texture_atlas const &other) = delete;
+        texture_atlas(texture_atlas &&other) = delete;
 
         void render() const noexcept;
         void set_projection(glm::mat4 &projection) noexcept;
@@ -55,7 +57,7 @@ namespace ibh {
         GLuint _program_id;
         GLuint _buffer_object;
         GLuint _vertex_array;
-        glm::vec4 _clip;
+        //glm::vec4 _clip;
         glm::mat4 _projection;
         GLint _projection_location;
         GLint _textureunit_location;

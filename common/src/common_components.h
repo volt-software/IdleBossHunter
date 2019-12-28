@@ -37,8 +37,8 @@ namespace ibh {
     extern string const stat_dex;
     extern string const stat_agi;
     extern string const stat_int;
-    extern string const stat_wis;
-    extern string const stat_wil;
+    extern string const stat_spd;
+    extern string const stat_vit;
     extern string const stat_luk;
     extern string const stat_cha;
     extern string const stat_con;

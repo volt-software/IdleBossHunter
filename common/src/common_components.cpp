@@ -24,8 +24,8 @@ namespace ibh {
     string const stat_dex = "dex";
     string const stat_agi = "agi";
     string const stat_int = "int";
-    string const stat_wis = "wis";
-    string const stat_wil = "wil";
+    string const stat_spd = "spd";
+    string const stat_vit = "vit";
     string const stat_luk = "luk";
     string const stat_cha = "cha";
     string const stat_con = "con";
@@ -79,7 +79,7 @@ namespace ibh {
     string const gear_slot_feet = "feet";
     string const gear_slot_ear = "ear";
 
-    array<string const, 42> const stat_names = {stat_str, stat_dex, stat_agi, stat_int, stat_wis, stat_wil, stat_luk, stat_cha, stat_con, stat_move,
+    array<string const, 42> const stat_names = {stat_str, stat_dex, stat_agi, stat_int, stat_spd, stat_vit, stat_luk, stat_cha, stat_con, stat_move,
                                                 stat_hpregen, stat_mpregen, stat_hp, stat_mp, stat_max_hp, stat_max_mp, stat_xp, stat_gold, stat_hweapon_damage_rolls, stat_weapon_armor_class, stat_armor_class,
                                                 stat_accuracy, stat_offense, stat_defense, stat_stealth, stat_perception, stat_physical_damage_boost, stat_magical_damage_boost,
                                                 stat_healing_boost, stat_physical_damage_reflect, stat_magical_damage_reflect, stat_mitigation, stat_magical_resist,

@@ -48,5 +48,5 @@ namespace ibh {
         bool _closed;
     };
 
-    void send_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr);
+    void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr);
 }

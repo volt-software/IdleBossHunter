@@ -156,7 +156,7 @@ TEST_CASE("message serialization tests") {
             vector<skill_object> skills;
 
             stat_mods.emplace_back("test2", 234);
-            items.emplace_back(1, 2, 3, "test3", "4", "5", vector<stat_component>{});
+            items.emplace_back(1, "test3", "4", "5", vector<stat_component>{});
             skills.emplace_back("test4", 345);
             classes.emplace_back("test5", "test6", stat_mods, items, skills);
         }

@@ -52,6 +52,7 @@
 #include "map_loading/map.h"
 #include "init/sdl_init.h"
 #include "init/logger_init.h"
+#include "scenes/gui_scenes/connection_lost_scene.h"
 
 using namespace std;
 using namespace ibh;
@@ -156,7 +157,19 @@ EM_BOOL WebSocketOpen(int eventType, const EmscriptenWebSocketOpenEvent *e, void
 
 EM_BOOL WebSocketClose(int eventType, const EmscriptenWebSocketCloseEvent *e, void *userData)
 {
-    spdlog::debug("close(eventType={}, wasClean={}, code={}, reason=%s)\n", eventType, e->wasClean, e->code, e->reason);
+    try {
+        spdlog::debug("close(eventType={}, wasClean={}, code={}, reason=%s)\n", eventType, e->wasClean, e->code, e->reason);
+
+        if (userData == nullptr) {
+            spdlog::error("[{}] No manager passed!", __FUNCTION__);
+            exit(1);
+        }
+
+        scene_system *manager = static_cast<scene_system *>(userData);
+        manager->add(new connection_lost_scene());
+    } catch (exception const &e) {
+        spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
+    }
     return 0;
 }
 
@@ -221,7 +234,7 @@ void init_net(config& config, entt::registry &es, scene_system &ss) {
     }
 
     emscripten_websocket_set_onopen_callback(socket, &es, WebSocketOpen);
-    emscripten_websocket_set_onclose_callback(socket, nullptr, WebSocketClose);
+    emscripten_websocket_set_onclose_callback(socket, &ss, WebSocketClose);
     emscripten_websocket_set_onerror_callback(socket, nullptr, WebSocketError);
     emscripten_websocket_set_onmessage_callback(socket, &ss, WebSocketMessage);
 #endif
@@ -281,6 +294,7 @@ int main(int argc, char* argv[]) {
     init_net(config, es, ss);
     init_sdl_image();
     init_sdl_mixer();
+
     set_threads_config(config);
     auto& io = init_imgui();
 
@@ -390,7 +404,7 @@ int main(int argc, char* argv[]) {
 //                                        close();
 //                                    }
 //                                    Mix_PlayMusic(mus1, 0);
-//                                    config.music_to_play = *val;
+                                    config.music_to_play = *val;
                                     delete val;
                                 }
                             }
