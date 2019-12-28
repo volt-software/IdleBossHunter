@@ -59,5 +59,6 @@ jobs:
       env:
         CC: gcc-9
         CXX: g++-9
+        EM_CACHE: ${{runner.workspace}}/emcache
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: make -j all
