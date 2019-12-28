@@ -41,6 +41,9 @@ namespace ibh {
     public:
         database_pool() noexcept;
         ~database_pool();
+        database_pool(database_pool const &o) = delete;
+        database_pool(database_pool &&o) = delete;
+        database_pool& operator=(database_pool const &o) = delete;
 
         void create_connections(const string& connection_string, uint32_t min_connections = 5);
 

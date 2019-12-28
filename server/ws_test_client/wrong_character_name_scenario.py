@@ -5,7 +5,7 @@ import sys
 
 ws = websocket.WebSocket(sslopt={"cert_reqs": ssl.CERT_NONE})
 #ws.connect("wss://localhost:8080/")
-ws.connect("wss://62.210.141.213:8080/")
+ws.connect("wss://www.realmofaesir.com/")
 ws.send("{\"type\": \"Auth:register\", \"username\": \"wrongname\", \"password\": \"testtest\", \"email\": \"test@test.nl\"}")
 res = ws.recv()
 print(f'res: {res}')

@@ -3768,7 +3768,7 @@ struct ExampleAppConsole
             Strtrim(s);
             if (s[0])
                 ExecCommand(s);
-            strcpy(s, "");
+            strncpy(s, "", 256);
             reclaim_focus = true;
         }
 

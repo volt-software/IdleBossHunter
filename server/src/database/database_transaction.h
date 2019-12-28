@@ -39,6 +39,9 @@ namespace ibh {
         explicit database_transaction(database_pool *pool, uint32_t connection_id, shared_ptr<pqxx::connection> connection) noexcept;
 
         ~database_transaction();
+        database_transaction(database_transaction const &o) = delete;
+        database_transaction(database_transaction &&o) = delete;
+        database_transaction& operator=(database_transaction const &o) = delete;
 
         pqxx::result execute(string const & query);
         string escape(string const & element);

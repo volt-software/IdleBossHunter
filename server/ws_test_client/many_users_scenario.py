@@ -33,7 +33,7 @@ def run_thread(i):
     ws = websocket.WebSocket(sslopt={"cert_reqs": ssl.CERT_NONE})
     ws.settimeout(5)
     ws.connect("ws://localhost:8080/")
-    #ws.connect("wss://62.210.141.213:8080/")
+    #ws.connect("wss://www.realmofaesir.com/")
     ws.send("{\"type\": \"Auth:register\", \"username\": \"many_user" + str(i) + "\", \"password\": \"testtest\", \"email\": \"test@test.nl\"}")
     msg_type = wait_for_these_types(ws, i, ['error_response', 'Auth:login_response'])
 
