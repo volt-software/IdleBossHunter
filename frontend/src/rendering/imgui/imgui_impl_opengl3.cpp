@@ -232,10 +232,10 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
     float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
     const float ortho_projection[4][4] =
             {
-                    { 2.0f/(R-L),   0.0f,         0.0f,   0.0f },
-                    { 0.0f,         2.0f/(T-B),   0.0f,   0.0f },
-                    { 0.0f,         0.0f,        -1.0f,   0.0f },
-                    { (R+L)/(L-R),  (T+B)/(B-T),  0.0f,   1.0f },
+                    { 2.0F/(R-L),   0.0F,         0.0F,   0.0F },
+                    { 0.0F,         2.0F/(T-B),   0.0F,   0.0F },
+                    { 0.0F,         0.0F,        -1.0F,   0.0F },
+                    { (R+L)/(L-R),  (T+B)/(B-T),  0.0F,   1.0F },
             };
     glUseProgram(g_ShaderHandle);
     glUniform1i(g_AttribLocationTex, 0);
@@ -348,7 +348,7 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                 clip_rect.z = (pcmd->ClipRect.z - clip_off.x) * clip_scale.x;
                 clip_rect.w = (pcmd->ClipRect.w - clip_off.y) * clip_scale.y;
 
-                if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
+                if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0F && clip_rect.w >= 0.0F)
                 {
                     // Apply scissor/clipping rectangle
                     if (clip_origin_lower_left)

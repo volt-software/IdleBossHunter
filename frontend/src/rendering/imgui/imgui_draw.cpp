@@ -1,10 +1,7 @@
 // dear imgui, v1.75 WIP
 // (drawing and font code)
 
-/*
-
-Index of this file:
-
+// Index of this file:
 // [SECTION] STB libraries implementation
 // [SECTION] Style functions
 // [SECTION] ImDrawList
@@ -19,8 +16,6 @@ Index of this file:
 // [SECTION] Internal Render Helpers
 // [SECTION] Decompression code
 // [SECTION] Default font data (ProggyClean.ttf)
-
-*/
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
@@ -178,54 +173,54 @@ void ImGui::StyleColorsDark(ImGuiStyle* dst)
     ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
 
-    colors[ImGuiCol_Text]                   = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
-    colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_PopupBg]                = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-    colors[ImGuiCol_Border]                 = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-    colors[ImGuiCol_BorderShadow]           = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_FrameBg]                = ImVec4(0.16f, 0.29f, 0.48f, 0.54f);
-    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-    colors[ImGuiCol_TitleBg]                = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.16f, 0.29f, 0.48f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
-    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-    colors[ImGuiCol_CheckMark]              = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_SliderGrab]             = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
-    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_Button]                 = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_ButtonActive]           = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-    colors[ImGuiCol_Header]                 = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
-    colors[ImGuiCol_HeaderActive]           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_Text]                   = ImVec4(1.00F, 1.00F, 1.00F, 1.00F);
+    colors[ImGuiCol_TextDisabled]           = ImVec4(0.50F, 0.50F, 0.50F, 1.00F);
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.06F, 0.06F, 0.06F, 0.94F);
+    colors[ImGuiCol_ChildBg]                = ImVec4(0.00F, 0.00F, 0.00F, 0.00F);
+    colors[ImGuiCol_PopupBg]                = ImVec4(0.08F, 0.08F, 0.08F, 0.94F);
+    colors[ImGuiCol_Border]                 = ImVec4(0.43F, 0.43F, 0.50F, 0.50F);
+    colors[ImGuiCol_BorderShadow]           = ImVec4(0.00F, 0.00F, 0.00F, 0.00F);
+    colors[ImGuiCol_FrameBg]                = ImVec4(0.16F, 0.29F, 0.48F, 0.54F);
+    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.26F, 0.59F, 0.98F, 0.40F);
+    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.26F, 0.59F, 0.98F, 0.67F);
+    colors[ImGuiCol_TitleBg]                = ImVec4(0.04F, 0.04F, 0.04F, 1.00F);
+    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.16F, 0.29F, 0.48F, 1.00F);
+    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.00F, 0.00F, 0.00F, 0.51F);
+    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.14F, 0.14F, 0.14F, 1.00F);
+    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.02F, 0.02F, 0.02F, 0.53F);
+    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.31F, 0.31F, 0.31F, 1.00F);
+    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.41F, 0.41F, 0.41F, 1.00F);
+    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.51F, 0.51F, 0.51F, 1.00F);
+    colors[ImGuiCol_CheckMark]              = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_SliderGrab]             = ImVec4(0.24F, 0.52F, 0.88F, 1.00F);
+    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_Button]                 = ImVec4(0.26F, 0.59F, 0.98F, 0.40F);
+    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.06F, 0.53F, 0.98F, 1.00F);
+    colors[ImGuiCol_Header]                 = ImVec4(0.26F, 0.59F, 0.98F, 0.31F);
+    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.26F, 0.59F, 0.98F, 0.80F);
+    colors[ImGuiCol_HeaderActive]           = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
     colors[ImGuiCol_Separator]              = colors[ImGuiCol_Border];
-    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
-    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
-    colors[ImGuiCol_ResizeGrip]             = ImVec4(0.26f, 0.59f, 0.98f, 0.25f);
-    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80f);
+    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.10F, 0.40F, 0.75F, 0.78F);
+    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.10F, 0.40F, 0.75F, 1.00F);
+    colors[ImGuiCol_ResizeGrip]             = ImVec4(0.26F, 0.59F, 0.98F, 0.25F);
+    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.26F, 0.59F, 0.98F, 0.67F);
+    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.26F, 0.59F, 0.98F, 0.95F);
+    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80F);
     colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
-    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
-    colors[ImGuiCol_PlotLines]              = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-    colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-    colors[ImGuiCol_NavHighlight]           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60F);
+    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80F);
+    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40F);
+    colors[ImGuiCol_PlotLines]              = ImVec4(0.61F, 0.61F, 0.61F, 1.00F);
+    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00F, 0.43F, 0.35F, 1.00F);
+    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90F, 0.70F, 0.00F, 1.00F);
+    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00F, 0.60F, 0.00F, 1.00F);
+    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.26F, 0.59F, 0.98F, 0.35F);
+    colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00F, 1.00F, 0.00F, 0.90F);
+    colors[ImGuiCol_NavHighlight]           = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00F, 1.00F, 1.00F, 0.70F);
+    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80F, 0.80F, 0.80F, 0.20F);
+    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80F, 0.80F, 0.80F, 0.35F);
 }
 
 void ImGui::StyleColorsClassic(ImGuiStyle* dst)
@@ -233,54 +228,54 @@ void ImGui::StyleColorsClassic(ImGuiStyle* dst)
     ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
 
-    colors[ImGuiCol_Text]                   = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
-    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.00f, 0.00f, 0.00f, 0.70f);
-    colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_PopupBg]                = ImVec4(0.11f, 0.11f, 0.14f, 0.92f);
-    colors[ImGuiCol_Border]                 = ImVec4(0.50f, 0.50f, 0.50f, 0.50f);
-    colors[ImGuiCol_BorderShadow]           = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_FrameBg]                = ImVec4(0.43f, 0.43f, 0.43f, 0.39f);
-    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.47f, 0.47f, 0.69f, 0.40f);
-    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.42f, 0.41f, 0.64f, 0.69f);
-    colors[ImGuiCol_TitleBg]                = ImVec4(0.27f, 0.27f, 0.54f, 0.83f);
-    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.32f, 0.32f, 0.63f, 0.87f);
-    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.40f, 0.40f, 0.80f, 0.20f);
-    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.40f, 0.40f, 0.55f, 0.80f);
-    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
-    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.40f, 0.40f, 0.80f, 0.30f);
-    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.40f, 0.40f, 0.80f, 0.40f);
-    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.41f, 0.39f, 0.80f, 0.60f);
-    colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.90f, 0.90f, 0.50f);
-    colors[ImGuiCol_SliderGrab]             = ImVec4(1.00f, 1.00f, 1.00f, 0.30f);
-    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.41f, 0.39f, 0.80f, 0.60f);
-    colors[ImGuiCol_Button]                 = ImVec4(0.35f, 0.40f, 0.61f, 0.62f);
-    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.40f, 0.48f, 0.71f, 0.79f);
-    colors[ImGuiCol_ButtonActive]           = ImVec4(0.46f, 0.54f, 0.80f, 1.00f);
-    colors[ImGuiCol_Header]                 = ImVec4(0.40f, 0.40f, 0.90f, 0.45f);
-    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.45f, 0.45f, 0.90f, 0.80f);
-    colors[ImGuiCol_HeaderActive]           = ImVec4(0.53f, 0.53f, 0.87f, 0.80f);
-    colors[ImGuiCol_Separator]              = ImVec4(0.50f, 0.50f, 0.50f, 0.60f);
-    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.60f, 0.60f, 0.70f, 1.00f);
-    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.70f, 0.70f, 0.90f, 1.00f);
-    colors[ImGuiCol_ResizeGrip]             = ImVec4(1.00f, 1.00f, 1.00f, 0.16f);
-    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.78f, 0.82f, 1.00f, 0.60f);
-    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.78f, 0.82f, 1.00f, 0.90f);
-    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80f);
+    colors[ImGuiCol_Text]                   = ImVec4(0.90F, 0.90F, 0.90F, 1.00F);
+    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60F, 0.60F, 0.60F, 1.00F);
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.00F, 0.00F, 0.00F, 0.70F);
+    colors[ImGuiCol_ChildBg]                = ImVec4(0.00F, 0.00F, 0.00F, 0.00F);
+    colors[ImGuiCol_PopupBg]                = ImVec4(0.11F, 0.11F, 0.14F, 0.92F);
+    colors[ImGuiCol_Border]                 = ImVec4(0.50F, 0.50F, 0.50F, 0.50F);
+    colors[ImGuiCol_BorderShadow]           = ImVec4(0.00F, 0.00F, 0.00F, 0.00F);
+    colors[ImGuiCol_FrameBg]                = ImVec4(0.43F, 0.43F, 0.43F, 0.39F);
+    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.47F, 0.47F, 0.69F, 0.40F);
+    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.42F, 0.41F, 0.64F, 0.69F);
+    colors[ImGuiCol_TitleBg]                = ImVec4(0.27F, 0.27F, 0.54F, 0.83F);
+    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.32F, 0.32F, 0.63F, 0.87F);
+    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.40F, 0.40F, 0.80F, 0.20F);
+    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.40F, 0.40F, 0.55F, 0.80F);
+    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.20F, 0.25F, 0.30F, 0.60F);
+    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.40F, 0.40F, 0.80F, 0.30F);
+    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.40F, 0.40F, 0.80F, 0.40F);
+    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.41F, 0.39F, 0.80F, 0.60F);
+    colors[ImGuiCol_CheckMark]              = ImVec4(0.90F, 0.90F, 0.90F, 0.50F);
+    colors[ImGuiCol_SliderGrab]             = ImVec4(1.00F, 1.00F, 1.00F, 0.30F);
+    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.41F, 0.39F, 0.80F, 0.60F);
+    colors[ImGuiCol_Button]                 = ImVec4(0.35F, 0.40F, 0.61F, 0.62F);
+    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.40F, 0.48F, 0.71F, 0.79F);
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.46F, 0.54F, 0.80F, 1.00F);
+    colors[ImGuiCol_Header]                 = ImVec4(0.40F, 0.40F, 0.90F, 0.45F);
+    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.45F, 0.45F, 0.90F, 0.80F);
+    colors[ImGuiCol_HeaderActive]           = ImVec4(0.53F, 0.53F, 0.87F, 0.80F);
+    colors[ImGuiCol_Separator]              = ImVec4(0.50F, 0.50F, 0.50F, 0.60F);
+    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.60F, 0.60F, 0.70F, 1.00F);
+    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.70F, 0.70F, 0.90F, 1.00F);
+    colors[ImGuiCol_ResizeGrip]             = ImVec4(1.00F, 1.00F, 1.00F, 0.16F);
+    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.78F, 0.82F, 1.00F, 0.60F);
+    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.78F, 0.82F, 1.00F, 0.90F);
+    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80F);
     colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
-    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
-    colors[ImGuiCol_PlotLines]              = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
-    colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60F);
+    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80F);
+    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40F);
+    colors[ImGuiCol_PlotLines]              = ImVec4(1.00F, 1.00F, 1.00F, 1.00F);
+    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.90F, 0.70F, 0.00F, 1.00F);
+    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90F, 0.70F, 0.00F, 1.00F);
+    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00F, 0.60F, 0.00F, 1.00F);
+    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.00F, 0.00F, 1.00F, 0.35F);
+    colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00F, 1.00F, 0.00F, 0.90F);
     colors[ImGuiCol_NavHighlight]           = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00F, 1.00F, 1.00F, 0.70F);
+    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80F, 0.80F, 0.80F, 0.20F);
+    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20F, 0.20F, 0.20F, 0.35F);
 }
 
 // Those light colors are better suited with a thicker font than the default one + FrameBorder
@@ -289,68 +284,63 @@ void ImGui::StyleColorsLight(ImGuiStyle* dst)
     ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
 
-    colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
-    colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_PopupBg]                = ImVec4(1.00f, 1.00f, 1.00f, 0.98f);
-    colors[ImGuiCol_Border]                 = ImVec4(0.00f, 0.00f, 0.00f, 0.30f);
-    colors[ImGuiCol_BorderShadow]           = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_FrameBg]                = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-    colors[ImGuiCol_TitleBg]                = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
-    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
-    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
-    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.69f, 0.69f, 0.69f, 0.80f);
-    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.49f, 0.49f, 0.49f, 0.80f);
-    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-    colors[ImGuiCol_CheckMark]              = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_SliderGrab]             = ImVec4(0.26f, 0.59f, 0.98f, 0.78f);
-    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.46f, 0.54f, 0.80f, 0.60f);
-    colors[ImGuiCol_Button]                 = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_ButtonActive]           = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-    colors[ImGuiCol_Header]                 = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
-    colors[ImGuiCol_HeaderActive]           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-    colors[ImGuiCol_Separator]              = ImVec4(0.39f, 0.39f, 0.39f, 0.62f);
-    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.14f, 0.44f, 0.80f, 0.78f);
-    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.14f, 0.44f, 0.80f, 1.00f);
-    colors[ImGuiCol_ResizeGrip]             = ImVec4(0.80f, 0.80f, 0.80f, 0.56f);
-    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.90f);
+    colors[ImGuiCol_Text]                   = ImVec4(0.00F, 0.00F, 0.00F, 1.00F);
+    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60F, 0.60F, 0.60F, 1.00F);
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.94F, 0.94F, 0.94F, 1.00F);
+    colors[ImGuiCol_ChildBg]                = ImVec4(0.00F, 0.00F, 0.00F, 0.00F);
+    colors[ImGuiCol_PopupBg]                = ImVec4(1.00F, 1.00F, 1.00F, 0.98F);
+    colors[ImGuiCol_Border]                 = ImVec4(0.00F, 0.00F, 0.00F, 0.30F);
+    colors[ImGuiCol_BorderShadow]           = ImVec4(0.00F, 0.00F, 0.00F, 0.00F);
+    colors[ImGuiCol_FrameBg]                = ImVec4(1.00F, 1.00F, 1.00F, 1.00F);
+    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.26F, 0.59F, 0.98F, 0.40F);
+    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.26F, 0.59F, 0.98F, 0.67F);
+    colors[ImGuiCol_TitleBg]                = ImVec4(0.96F, 0.96F, 0.96F, 1.00F);
+    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.82F, 0.82F, 0.82F, 1.00F);
+    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(1.00F, 1.00F, 1.00F, 0.51F);
+    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.86F, 0.86F, 0.86F, 1.00F);
+    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.98F, 0.98F, 0.98F, 0.53F);
+    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.69F, 0.69F, 0.69F, 0.80F);
+    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.49F, 0.49F, 0.49F, 0.80F);
+    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.49F, 0.49F, 0.49F, 1.00F);
+    colors[ImGuiCol_CheckMark]              = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_SliderGrab]             = ImVec4(0.26F, 0.59F, 0.98F, 0.78F);
+    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.46F, 0.54F, 0.80F, 0.60F);
+    colors[ImGuiCol_Button]                 = ImVec4(0.26F, 0.59F, 0.98F, 0.40F);
+    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.06F, 0.53F, 0.98F, 1.00F);
+    colors[ImGuiCol_Header]                 = ImVec4(0.26F, 0.59F, 0.98F, 0.31F);
+    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.26F, 0.59F, 0.98F, 0.80F);
+    colors[ImGuiCol_HeaderActive]           = ImVec4(0.26F, 0.59F, 0.98F, 1.00F);
+    colors[ImGuiCol_Separator]              = ImVec4(0.39F, 0.39F, 0.39F, 0.62F);
+    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.14F, 0.44F, 0.80F, 0.78F);
+    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.14F, 0.44F, 0.80F, 1.00F);
+    colors[ImGuiCol_ResizeGrip]             = ImVec4(0.80F, 0.80F, 0.80F, 0.56F);
+    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.26F, 0.59F, 0.98F, 0.67F);
+    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.26F, 0.59F, 0.98F, 0.95F);
+    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.90F);
     colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
-    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
-    colors[ImGuiCol_PlotLines]              = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00f, 0.45f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-    colors[ImGuiCol_DragDropTarget]         = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60F);
+    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80F);
+    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40F);
+    colors[ImGuiCol_PlotLines]              = ImVec4(0.39F, 0.39F, 0.39F, 1.00F);
+    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00F, 0.43F, 0.35F, 1.00F);
+    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90F, 0.70F, 0.00F, 1.00F);
+    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00F, 0.45F, 0.00F, 1.00F);
+    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.26F, 0.59F, 0.98F, 0.35F);
+    colors[ImGuiCol_DragDropTarget]         = ImVec4(0.26F, 0.59F, 0.98F, 0.95F);
     colors[ImGuiCol_NavHighlight]           = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
-    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
-    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.70F, 0.70F, 0.70F, 0.70F);
+    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.20F, 0.20F, 0.20F, 0.20F);
+    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20F, 0.20F, 0.20F, 0.35F);
 }
 
 //-----------------------------------------------------------------------------
 // ImDrawList
 //-----------------------------------------------------------------------------
 
-ImDrawListSharedData::ImDrawListSharedData()
+ImDrawListSharedData::ImDrawListSharedData() : Font(NULL), FontSize(0.0F), CurveTessellationTol(0.0F),
+                                               ClipRectFullscreen(ImVec4(-8192.0F, -8192.0F, +8192.0F, +8192.0F)), InitialFlags(ImDrawListFlags_None)
 {
-    Font = NULL;
-    FontSize = 0.0f;
-    CurveTessellationTol = 0.0f;
-    ClipRectFullscreen = ImVec4(-8192.0f, -8192.0f, +8192.0f, +8192.0f);
-    InitialFlags = ImDrawListFlags_None;
-
     // Const data
     for (int i = 0; i < IM_ARRAYSIZE(CircleVtx12); i++)
     {
@@ -443,7 +433,7 @@ void ImDrawList::UpdateClipRect()
     }
 
     // Try to merge with previous command if it matches, else use current command
-    ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
+    const ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
     if (curr_cmd->ElemCount == 0 && prev_cmd && memcmp(&prev_cmd->ClipRect, &curr_clip_rect, sizeof(ImVec4)) == 0 && prev_cmd->TextureId == GetCurrentTextureId() && prev_cmd->UserCallback == NULL)
         CmdBuffer.pop_back();
     else
@@ -462,7 +452,7 @@ void ImDrawList::UpdateTextureID()
     }
 
     // Try to merge with previous command if it matches, else use current command
-    ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
+    const ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
     if (curr_cmd->ElemCount == 0 && prev_cmd && prev_cmd->TextureId == curr_texture_id && memcmp(&prev_cmd->ClipRect, &GetCurrentClipRect(), sizeof(ImVec4)) == 0 && prev_cmd->UserCallback == NULL)
         CmdBuffer.pop_back();
     else
@@ -600,8 +590,8 @@ void ImDrawList::PrimQuadUV(const ImVec2& a, const ImVec2& b, const ImVec2& c, c
 
 // On AddPolyline() and AddConvexPolyFilled() we intentionally avoid using ImVec2 and superflous function calls to optimize debug/non-inlined builds.
 // Those macros expects l-values.
-#define IM_NORMALIZE2F_OVER_ZERO(VX,VY)     { float d2 = VX*VX + VY*VY; if (d2 > 0.0f) { float inv_len = 1.0f / ImSqrt(d2); VX *= inv_len; VY *= inv_len; } }
-#define IM_FIXNORMAL2F(VX,VY)               { float d2 = VX*VX + VY*VY; if (d2 < 0.5f) d2 = 0.5f; float inv_lensq = 1.0f / d2; VX *= inv_lensq; VY *= inv_lensq; }
+#define IM_NORMALIZE2F_OVER_ZERO(VX,VY)     { float d2 = VX*VX + VY*VY; if (d2 > 0.0F) { float inv_len = 1.0F / ImSqrt(d2); VX *= inv_len; VY *= inv_len; } }
+#define IM_FIXNORMAL2F(VX,VY)               { float d2 = VX*VX + VY*VY; if (d2 < 0.5F) d2 = 0.5F; float inv_lensq = 1.0F / d2; VX *= inv_lensq; VY *= inv_lensq; }
 
 // TODO: Thickness anti-aliased lines cap are missing their AA fringe.
 // We avoid using the ImVec2 math operators here to reduce cost to a minimum for debug/non-inlined builds.
@@ -616,11 +606,11 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
     if (!closed)
         count = points_count-1;
 
-    const bool thick_line = thickness > 1.0f;
+    const bool thick_line = thickness > 1.0F;
     if (Flags & ImDrawListFlags_AntiAliasedLines)
     {
         // Anti-aliased stroke
-        const float AA_SIZE = 1.0f;
+        const float AA_SIZE = 1.0F;
         const ImU32 col_trans = col & ~IM_COL32_A_MASK;
 
         const int idx_count = thick_line ? count*18 : count*12;
@@ -661,8 +651,8 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
                 unsigned int idx2 = (i1+1) == points_count ? _VtxCurrentIdx : idx1+3;
 
                 // Average normals
-                float dm_x = (temp_normals[i1].x + temp_normals[i2].x) * 0.5f;
-                float dm_y = (temp_normals[i1].y + temp_normals[i2].y) * 0.5f;
+                float dm_x = (temp_normals[i1].x + temp_normals[i2].x) * 0.5F;
+                float dm_y = (temp_normals[i1].y + temp_normals[i2].y) * 0.5F;
                 IM_FIXNORMAL2F(dm_x, dm_y)
                 dm_x *= AA_SIZE;
                 dm_y *= AA_SIZE;
@@ -695,7 +685,7 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
         }
         else
         {
-            const float half_inner_thickness = (thickness - AA_SIZE) * 0.5f;
+            const float half_inner_thickness = (thickness - AA_SIZE) * 0.5F;
             if (!closed)
             {
                 temp_points[0] = points[0] + temp_normals[0] * (half_inner_thickness + AA_SIZE);
@@ -716,8 +706,8 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
                 unsigned int idx2 = (i1+1) == points_count ? _VtxCurrentIdx : idx1+4;
 
                 // Average normals
-                float dm_x = (temp_normals[i1].x + temp_normals[i2].x) * 0.5f;
-                float dm_y = (temp_normals[i1].y + temp_normals[i2].y) * 0.5f;
+                float dm_x = (temp_normals[i1].x + temp_normals[i2].x) * 0.5F;
+                float dm_y = (temp_normals[i1].y + temp_normals[i2].y) * 0.5F;
                 IM_FIXNORMAL2F(dm_x, dm_y);
                 float dm_out_x = dm_x * (half_inner_thickness + AA_SIZE);
                 float dm_out_y = dm_y * (half_inner_thickness + AA_SIZE);
@@ -775,8 +765,8 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
             float dx = p2.x - p1.x;
             float dy = p2.y - p1.y;
             IM_NORMALIZE2F_OVER_ZERO(dx, dy);
-            dx *= (thickness * 0.5f);
-            dy *= (thickness * 0.5f);
+            dx *= (thickness * 0.5F);
+            dy *= (thickness * 0.5F);
 
             _VtxWritePtr[0].pos.x = p1.x + dy; _VtxWritePtr[0].pos.y = p1.y - dx; _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;
             _VtxWritePtr[1].pos.x = p2.x + dy; _VtxWritePtr[1].pos.y = p2.y - dx; _VtxWritePtr[1].uv = uv; _VtxWritePtr[1].col = col;
@@ -803,7 +793,7 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2* points, const int points_coun
     if (Flags & ImDrawListFlags_AntiAliasedFill)
     {
         // Anti-aliased Fill
-        const float AA_SIZE = 1.0f;
+        const float AA_SIZE = 1.0F;
         const ImU32 col_trans = col & ~IM_COL32_A_MASK;
         const int idx_count = (points_count-2)*3 + points_count*6;
         const int vtx_count = (points_count*2);
@@ -836,11 +826,11 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2* points, const int points_coun
             // Average normals
             const ImVec2& n0 = temp_normals[i0];
             const ImVec2& n1 = temp_normals[i1];
-            float dm_x = (n0.x + n1.x) * 0.5f;
-            float dm_y = (n0.y + n1.y) * 0.5f;
+            float dm_x = (n0.x + n1.x) * 0.5F;
+            float dm_y = (n0.y + n1.y) * 0.5F;
             IM_FIXNORMAL2F(dm_x, dm_y);
-            dm_x *= AA_SIZE * 0.5f;
-            dm_y *= AA_SIZE * 0.5f;
+            dm_x *= AA_SIZE * 0.5F;
+            dm_y *= AA_SIZE * 0.5F;
 
             // Add vertices
             _VtxWritePtr[0].pos.x = (points[i1].x - dm_x); _VtxWritePtr[0].pos.y = (points[i1].y - dm_y); _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;        // Inner
@@ -876,7 +866,7 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2* points, const int points_coun
 
 void ImDrawList::PathArcToFast(const ImVec2& center, float radius, int a_min_of_12, int a_max_of_12)
 {
-    if (radius == 0.0f || a_min_of_12 > a_max_of_12)
+    if (radius == 0.0F || a_min_of_12 > a_max_of_12)
     {
         _Path.push_back(center);
         return;
@@ -891,7 +881,7 @@ void ImDrawList::PathArcToFast(const ImVec2& center, float radius, int a_min_of_
 
 void ImDrawList::PathArcTo(const ImVec2& center, float radius, float a_min, float a_max, int num_segments)
 {
-    if (radius == 0.0f)
+    if (radius == 0.0F)
     {
         _Path.push_back(center);
         return;
@@ -909,7 +899,7 @@ void ImDrawList::PathArcTo(const ImVec2& center, float radius, float a_min, floa
 
 ImVec2 ImBezierCalc(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, float t)
 {
-    float u = 1.0f - t;
+    float u = 1.0F - t;
     float w1 = u*u*u;
     float w2 = 3*u*u*t;
     float w3 = 3*u*t*t;
@@ -932,12 +922,12 @@ static void PathBezierToCasteljau(ImVector<ImVec2>* path, float x1, float y1, fl
     }
     else if (level < 10)
     {
-        float x12 = (x1+x2)*0.5f,       y12 = (y1+y2)*0.5f;
-        float x23 = (x2+x3)*0.5f,       y23 = (y2+y3)*0.5f;
-        float x34 = (x3+x4)*0.5f,       y34 = (y3+y4)*0.5f;
-        float x123 = (x12+x23)*0.5f,    y123 = (y12+y23)*0.5f;
-        float x234 = (x23+x34)*0.5f,    y234 = (y23+y34)*0.5f;
-        float x1234 = (x123+x234)*0.5f, y1234 = (y123+y234)*0.5f;
+        float x12 = (x1+x2)*0.5F,       y12 = (y1+y2)*0.5F;
+        float x23 = (x2+x3)*0.5F,       y23 = (y2+y3)*0.5F;
+        float x34 = (x3+x4)*0.5F,       y34 = (y3+y4)*0.5F;
+        float x123 = (x12+x23)*0.5F,    y123 = (y12+y23)*0.5F;
+        float x234 = (x23+x34)*0.5F,    y234 = (y23+y34)*0.5F;
+        float x1234 = (x123+x234)*0.5F, y1234 = (y123+y234)*0.5F;
         PathBezierToCasteljau(path, x1,y1,        x12,y12,    x123,y123,  x1234,y1234, tess_tol, level+1);
         PathBezierToCasteljau(path, x1234,y1234,  x234,y234,  x34,y34,    x4,y4,       tess_tol, level+1);
     }
@@ -952,7 +942,7 @@ void ImDrawList::PathBezierCurveTo(const ImVec2& p2, const ImVec2& p3, const ImV
     }
     else
     {
-        float t_step = 1.0f / (float)num_segments;
+        float t_step = 1.0F / (float)num_segments;
         for (int i_step = 1; i_step <= num_segments; i_step++)
             _Path.push_back(ImBezierCalc(p1, p2, p3, p4, t_step * i_step));
     }
@@ -960,10 +950,10 @@ void ImDrawList::PathBezierCurveTo(const ImVec2& p2, const ImVec2& p3, const ImV
 
 void ImDrawList::PathRect(const ImVec2& a, const ImVec2& b, float rounding, ImDrawCornerFlags rounding_corners)
 {
-    rounding = ImMin(rounding, ImFabs(b.x - a.x) * ( ((rounding_corners & ImDrawCornerFlags_Top)  == ImDrawCornerFlags_Top)  || ((rounding_corners & ImDrawCornerFlags_Bot)   == ImDrawCornerFlags_Bot)   ? 0.5f : 1.0f ) - 1.0f);
-    rounding = ImMin(rounding, ImFabs(b.y - a.y) * ( ((rounding_corners & ImDrawCornerFlags_Left) == ImDrawCornerFlags_Left) || ((rounding_corners & ImDrawCornerFlags_Right) == ImDrawCornerFlags_Right) ? 0.5f : 1.0f ) - 1.0f);
+    rounding = ImMin(rounding, ImFabs(b.x - a.x) * ( ((rounding_corners & ImDrawCornerFlags_Top)  == ImDrawCornerFlags_Top)  || ((rounding_corners & ImDrawCornerFlags_Bot)   == ImDrawCornerFlags_Bot)   ? 0.5f : 1.0F ) - 1.0F);
+    rounding = ImMin(rounding, ImFabs(b.y - a.y) * ( ((rounding_corners & ImDrawCornerFlags_Left) == ImDrawCornerFlags_Left) || ((rounding_corners & ImDrawCornerFlags_Right) == ImDrawCornerFlags_Right) ? 0.5f : 1.0F ) - 1.0F);
 
-    if (rounding <= 0.0f || rounding_corners == 0)
+    if (rounding <= 0.0F || rounding_corners == 0)
     {
         PathLineTo(a);
         PathLineTo(ImVec2(b.x, a.y));
@@ -972,10 +962,10 @@ void ImDrawList::PathRect(const ImVec2& a, const ImVec2& b, float rounding, ImDr
     }
     else
     {
-        const float rounding_tl = (rounding_corners & ImDrawCornerFlags_TopLeft) ? rounding : 0.0f;
-        const float rounding_tr = (rounding_corners & ImDrawCornerFlags_TopRight) ? rounding : 0.0f;
-        const float rounding_br = (rounding_corners & ImDrawCornerFlags_BotRight) ? rounding : 0.0f;
-        const float rounding_bl = (rounding_corners & ImDrawCornerFlags_BotLeft) ? rounding : 0.0f;
+        const float rounding_tl = (rounding_corners & ImDrawCornerFlags_TopLeft) ? rounding : 0.0F;
+        const float rounding_tr = (rounding_corners & ImDrawCornerFlags_TopRight) ? rounding : 0.0F;
+        const float rounding_br = (rounding_corners & ImDrawCornerFlags_BotRight) ? rounding : 0.0F;
+        const float rounding_bl = (rounding_corners & ImDrawCornerFlags_BotLeft) ? rounding : 0.0F;
         PathArcToFast(ImVec2(a.x + rounding_tl, a.y + rounding_tl), rounding_tl, 6, 9);
         PathArcToFast(ImVec2(b.x - rounding_tr, a.y + rounding_tr), rounding_tr, 9, 12);
         PathArcToFast(ImVec2(b.x - rounding_br, b.y - rounding_br), rounding_br, 0, 3);
@@ -987,8 +977,8 @@ void ImDrawList::AddLine(const ImVec2& p1, const ImVec2& p2, ImU32 col, float th
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
-    PathLineTo(p1 + ImVec2(0.5f, 0.5f));
-    PathLineTo(p2 + ImVec2(0.5f, 0.5f));
+    PathLineTo(p1 + ImVec2(0.5F, 0.5F));
+    PathLineTo(p2 + ImVec2(0.5F, 0.5F));
     PathStroke(col, false, thickness);
 }
 
@@ -999,9 +989,9 @@ void ImDrawList::AddRect(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, fl
     if ((col & IM_COL32_A_MASK) == 0)
         return;
     if (Flags & ImDrawListFlags_AntiAliasedLines)
-        PathRect(p_min + ImVec2(0.50f,0.50f), p_max - ImVec2(0.50f,0.50f), rounding, rounding_corners);
+        PathRect(p_min + ImVec2(0.50F,0.50F), p_max - ImVec2(0.50F,0.50F), rounding, rounding_corners);
     else
-        PathRect(p_min + ImVec2(0.50f,0.50f), p_max - ImVec2(0.49f,0.49f), rounding, rounding_corners); // Better looking lower-right corner and rounded non-AA shapes.
+        PathRect(p_min + ImVec2(0.50F,0.50F), p_max - ImVec2(0.49F,0.49F), rounding, rounding_corners); // Better looking lower-right corner and rounded non-AA shapes.
     PathStroke(col, true, thickness);
 }
 
@@ -1009,7 +999,7 @@ void ImDrawList::AddRectFilled(const ImVec2& p_min, const ImVec2& p_max, ImU32 c
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
-    if (rounding > 0.0f)
+    if (rounding > 0.0F)
     {
         PathRect(p_min, p_max, rounding, rounding_corners);
         PathFillConvex(col);
@@ -1089,8 +1079,8 @@ void ImDrawList::AddCircle(const ImVec2& center, float radius, ImU32 col, int nu
         return;
 
     // Because we are filling a closed shape we remove 1 from the count of segments/points
-    const float a_max = (IM_PI * 2.0f) * ((float)num_segments - 1.0f) / (float)num_segments;
-    PathArcTo(center, radius - 0.5f, 0.0f, a_max, num_segments - 1);
+    const float a_max = (IM_PI * 2.0F) * ((float)num_segments - 1.0F) / (float)num_segments;
+    PathArcTo(center, radius - 0.5F, 0.0F, a_max, num_segments - 1);
     PathStroke(col, true, thickness);
 }
 
@@ -1100,8 +1090,8 @@ void ImDrawList::AddCircleFilled(const ImVec2& center, float radius, ImU32 col, 
         return;
 
     // Because we are filling a closed shape we remove 1 from the count of segments/points
-    const float a_max = (IM_PI * 2.0f) * ((float)num_segments - 1.0f) / (float)num_segments;
-    PathArcTo(center, radius, 0.0f, a_max, num_segments - 1);
+    const float a_max = (IM_PI * 2.0F) * ((float)num_segments - 1.0F) / (float)num_segments;
+    PathArcTo(center, radius, 0.0F, a_max, num_segments - 1);
     PathFillConvex(col);
 }
 
@@ -1112,8 +1102,8 @@ void ImDrawList::AddNgon(const ImVec2& center, float radius, ImU32 col, int num_
         return;
 
     // Because we are filling a closed shape we remove 1 from the count of segments/points
-    const float a_max = (IM_PI * 2.0f) * ((float)num_segments - 1.0f) / (float)num_segments;
-    PathArcTo(center, radius - 0.5f, 0.0f, a_max, num_segments - 1);
+    const float a_max = (IM_PI * 2.0F) * ((float)num_segments - 1.0F) / (float)num_segments;
+    PathArcTo(center, radius - 0.5F, 0.0F, a_max, num_segments - 1);
     PathStroke(col, true, thickness);
 }
 
@@ -1124,8 +1114,8 @@ void ImDrawList::AddNgonFilled(const ImVec2& center, float radius, ImU32 col, in
         return;
 
     // Because we are filling a closed shape we remove 1 from the count of segments/points
-    const float a_max = (IM_PI * 2.0f) * ((float)num_segments - 1.0f) / (float)num_segments;
-    PathArcTo(center, radius, 0.0f, a_max, num_segments - 1);
+    const float a_max = (IM_PI * 2.0F) * ((float)num_segments - 1.0F) / (float)num_segments;
+    PathArcTo(center, radius, 0.0F, a_max, num_segments - 1);
     PathFillConvex(col);
 }
 
@@ -1153,7 +1143,7 @@ void ImDrawList::AddText(const ImFont* font, float font_size, const ImVec2& pos,
     // Pull default font/size from the shared ImDrawListSharedData instance
     if (font == NULL)
         font = _Data->Font;
-    if (font_size == 0.0f)
+    if (font_size == 0.0F)
         font_size = _Data->FontSize;
 
     IM_ASSERT(font->ContainerAtlas->TexID == _TextureIdStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.
@@ -1171,7 +1161,7 @@ void ImDrawList::AddText(const ImFont* font, float font_size, const ImVec2& pos,
 
 void ImDrawList::AddText(const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end)
 {
-    AddText(NULL, 0.0f, pos, col, text_begin, text_end);
+    AddText(NULL, 0.0F, pos, col, text_begin, text_end);
 }
 
 void ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
@@ -1211,7 +1201,7 @@ void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_mi
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
-    if (rounding <= 0.0f || (rounding_corners & ImDrawCornerFlags_All) == 0)
+    if (rounding <= 0.0F || (rounding_corners & ImDrawCornerFlags_All) == 0)
     {
         AddImage(user_texture_id, p_min, p_max, uv_min, uv_max, col);
         return;
@@ -1285,7 +1275,7 @@ void ImDrawListSplitter::Split(ImDrawList* draw_list, int channels_count)
     }
 }
 
-static inline bool CanMergeDrawCommands(ImDrawCmd* a, ImDrawCmd* b)
+static inline bool CanMergeDrawCommands(const ImDrawCmd* a, const ImDrawCmd* b)
 {
     return memcmp(&a->ClipRect, &b->ClipRect, sizeof(a->ClipRect)) == 0 && a->TextureId == b->TextureId && a->VtxOffset == b->VtxOffset && !a->UserCallback && !b->UserCallback;
 }
@@ -1335,7 +1325,7 @@ void ImDrawListSplitter::Merge(ImDrawList* draw_list)
     ImDrawIdx* idx_write = draw_list->IdxBuffer.Data + draw_list->IdxBuffer.Size - new_idx_buffer_count;
     for (int i = 1; i < _Count; i++)
     {
-        ImDrawChannel& ch = _Channels[i];
+        const ImDrawChannel& ch = _Channels[i];
         if (int sz = ch._CmdBuffer.Size) { memcpy(cmd_write, ch._CmdBuffer.Data, sz * sizeof(ImDrawCmd)); cmd_write += sz; }
         if (int sz = ch._IdxBuffer.Size) { memcpy(idx_write, ch._IdxBuffer.Data, sz * sizeof(ImDrawIdx)); idx_write += sz; }
     }
@@ -1406,13 +1396,13 @@ void ImDrawData::ScaleClipRects(const ImVec2& fb_scale)
 void ImGui::ShadeVertsLinearColorGradientKeepAlpha(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, ImVec2 gradient_p0, ImVec2 gradient_p1, ImU32 col0, ImU32 col1)
 {
     ImVec2 gradient_extent = gradient_p1 - gradient_p0;
-    float gradient_inv_length2 = 1.0f / ImLengthSqr(gradient_extent);
+    float gradient_inv_length2 = 1.0F / ImLengthSqr(gradient_extent);
     ImDrawVert* vert_start = draw_list->VtxBuffer.Data + vert_start_idx;
-    ImDrawVert* vert_end = draw_list->VtxBuffer.Data + vert_end_idx;
+    const ImDrawVert* vert_end = draw_list->VtxBuffer.Data + vert_end_idx;
     for (ImDrawVert* vert = vert_start; vert < vert_end; vert++)
     {
         float d = ImDot(vert->pos - gradient_p0, gradient_extent);
-        float t = ImClamp(d * gradient_inv_length2, 0.0f, 1.0f);
+        float t = ImClamp(d * gradient_inv_length2, 0.0F, 1.0F);
         int r = ImLerp((int)(col0 >> IM_COL32_R_SHIFT) & 0xFF, (int)(col1 >> IM_COL32_R_SHIFT) & 0xFF, t);
         int g = ImLerp((int)(col0 >> IM_COL32_G_SHIFT) & 0xFF, (int)(col1 >> IM_COL32_G_SHIFT) & 0xFF, t);
         int b = ImLerp((int)(col0 >> IM_COL32_B_SHIFT) & 0xFF, (int)(col1 >> IM_COL32_B_SHIFT) & 0xFF, t);
@@ -1426,11 +1416,11 @@ void ImGui::ShadeVertsLinearUV(ImDrawList* draw_list, int vert_start_idx, int ve
     const ImVec2 size = b - a;
     const ImVec2 uv_size = uv_b - uv_a;
     const ImVec2 scale = ImVec2(
-            size.x != 0.0f ? (uv_size.x / size.x) : 0.0f,
-            size.y != 0.0f ? (uv_size.y / size.y) : 0.0f);
+            size.x != 0.0F ? (uv_size.x / size.x) : 0.0F,
+            size.y != 0.0F ? (uv_size.y / size.y) : 0.0F);
 
     ImDrawVert* vert_start = draw_list->VtxBuffer.Data + vert_start_idx;
-    ImDrawVert* vert_end = draw_list->VtxBuffer.Data + vert_end_idx;
+    const ImDrawVert* vert_end = draw_list->VtxBuffer.Data + vert_end_idx;
     if (clamp)
     {
         const ImVec2 min = ImMin(uv_a, uv_b);
@@ -1455,18 +1445,18 @@ ImFontConfig::ImFontConfig()
     FontDataSize = 0;
     FontDataOwnedByAtlas = true;
     FontNo = 0;
-    SizePixels = 0.0f;
+    SizePixels = 0.0F;
     OversampleH = 3; // FIXME: 2 may be a better default?
     OversampleV = 1;
     PixelSnapH = false;
-    GlyphExtraSpacing = ImVec2(0.0f, 0.0f);
-    GlyphOffset = ImVec2(0.0f, 0.0f);
+    GlyphExtraSpacing = ImVec2(0.0F, 0.0F);
+    GlyphOffset = ImVec2(0.0F, 0.0F);
     GlyphRanges = NULL;
-    GlyphMinAdvanceX = 0.0f;
+    GlyphMinAdvanceX = 0.0F;
     GlyphMaxAdvanceX = FLT_MAX;
     MergeMode = false;
     RasterizerFlags = 0x00;
-    RasterizerMultiply = 1.0f;
+    RasterizerMultiply = 1.0F;
     EllipsisChar = (ImWchar)-1;
     memset(Name, 0, sizeof(Name));
     DstFont = NULL;
@@ -1536,8 +1526,8 @@ ImFontAtlas::ImFontAtlas()
     TexPixelsAlpha8 = NULL;
     TexPixelsRGBA32 = NULL;
     TexWidth = TexHeight = 0;
-    TexUvScale = ImVec2(0.0f, 0.0f);
-    TexUvWhitePixel = ImVec2(0.0f, 0.0f);
+    TexUvScale = ImVec2(0.0F, 0.0F);
+    TexUvWhitePixel = ImVec2(0.0F, 0.0F);
     for (int n = 0; n < IM_ARRAYSIZE(CustomRectIds); n++)
         CustomRectIds[n] = -1;
 }
@@ -1641,7 +1631,7 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
     IM_ASSERT(font_cfg->FontData != NULL && font_cfg->FontDataSize > 0);
-    IM_ASSERT(font_cfg->SizePixels > 0.0f);
+    IM_ASSERT(font_cfg->SizePixels > 0.0F);
 
     // Create new font
     if (!font_cfg->MergeMode)
@@ -1693,8 +1683,8 @@ ImFont* ImFontAtlas::AddFontDefault(const ImFontConfig* font_cfg_template)
         font_cfg.OversampleH = font_cfg.OversampleV = 1;
         font_cfg.PixelSnapH = true;
     }
-    if (font_cfg.SizePixels <= 0.0f)
-        font_cfg.SizePixels = 13.0f * 1.0f;
+    if (font_cfg.SizePixels <= 0.0F)
+        font_cfg.SizePixels = 13.0F * 1.0F;
     if (font_cfg.Name[0] == '\0')
         ImFormatString(font_cfg.Name, IM_ARRAYSIZE(font_cfg.Name), "ProggyClean.ttf, %dpx", (int)font_cfg.SizePixels);
     font_cfg.EllipsisChar = (ImWchar)0x0085;
@@ -1702,7 +1692,7 @@ ImFont* ImFontAtlas::AddFontDefault(const ImFontConfig* font_cfg_template)
     const char* ttf_compressed_base85 = GetDefaultCompressedFontDataTTFBase85();
     const ImWchar* glyph_ranges = font_cfg.GlyphRanges != NULL ? font_cfg.GlyphRanges : GetGlyphRangesDefault();
     ImFont* font = AddFontFromMemoryCompressedBase85TTF(ttf_compressed_base85, font_cfg.SizePixels, &font_cfg, glyph_ranges);
-    font->DisplayOffset.y = 1.0f;
+    font->DisplayOffset.y = 1.0F;
     return font;
 }
 
@@ -1892,8 +1882,8 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     // Clear atlas
     atlas->TexID = (ImTextureID)NULL;
     atlas->TexWidth = atlas->TexHeight = 0;
-    atlas->TexUvScale = ImVec2(0.0f, 0.0f);
-    atlas->TexUvWhitePixel = ImVec2(0.0f, 0.0f);
+    atlas->TexUvScale = ImVec2(0.0F, 0.0F);
+    atlas->TexUvWhitePixel = ImVec2(0.0F, 0.0F);
     atlas->ClearTexData();
 
     // Temporary storage for building
@@ -2032,7 +2022,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     if (atlas->TexDesiredWidth > 0)
         atlas->TexWidth = atlas->TexDesiredWidth;
     else
-        atlas->TexWidth = (surface_sqrt >= 4096*0.7f) ? 4096 : (surface_sqrt >= 2048*0.7f) ? 2048 : (surface_sqrt >= 1024*0.7f) ? 1024 : 512;
+        atlas->TexWidth = (surface_sqrt >= 4096*0.7F) ? 4096 : (surface_sqrt >= 2048*0.7F) ? 2048 : (surface_sqrt >= 1024*0.7F) ? 1024 : 512;
 
     // 5. Start packing
     // Pack our extra data rectangles first, so it will be on the upper-left corner of our texture (UV will have small values).
@@ -2059,7 +2049,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
 
     // 7. Allocate texture
     atlas->TexHeight = (atlas->Flags & ImFontAtlasFlags_NoPowerOfTwoHeight) ? (atlas->TexHeight + 1) : ImUpperPowerOfTwo(atlas->TexHeight);
-    atlas->TexUvScale = ImVec2(1.0f / atlas->TexWidth, 1.0f / atlas->TexHeight);
+    atlas->TexUvScale = ImVec2(1.0F / atlas->TexWidth, 1.0F / atlas->TexHeight);
     atlas->TexPixelsAlpha8 = (unsigned char*)IM_ALLOC(atlas->TexWidth * atlas->TexHeight);
     memset(atlas->TexPixelsAlpha8, 0, atlas->TexWidth * atlas->TexHeight);
     spc.pixels = atlas->TexPixelsAlpha8;
@@ -2076,7 +2066,7 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         stbtt_PackFontRangesRenderIntoRects(&spc, &src_tmp.FontInfo, &src_tmp.PackRange, 1, src_tmp.Rects);
 
         // Apply multiply operator
-        if (cfg.RasterizerMultiply != 1.0f)
+        if (cfg.RasterizerMultiply != 1.0F)
         {
             unsigned char multiply_table[256];
             ImFontAtlasBuildMultiplyCalcLookupTable(multiply_table, cfg.RasterizerMultiply);
@@ -2106,8 +2096,8 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         int unscaled_ascent, unscaled_descent, unscaled_line_gap;
         stbtt_GetFontVMetrics(&src_tmp.FontInfo, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
-        const float ascent = ImFloor(unscaled_ascent * font_scale + ((unscaled_ascent > 0.0f) ? +1 : -1));
-        const float descent = ImFloor(unscaled_descent * font_scale + ((unscaled_descent > 0.0f) ? +1 : -1));
+        const float ascent = ImFloor(unscaled_ascent * font_scale + ((unscaled_ascent > 0.0F) ? +1 : -1));
+        const float descent = ImFloor(unscaled_descent * font_scale + ((unscaled_descent > 0.0F) ? +1 : -1));
         ImFontAtlasBuildSetupFont(atlas, dst_font, &cfg, ascent, descent);
         const float font_off_x = cfg.GlyphOffset.x;
         const float font_off_y = cfg.GlyphOffset.y + IM_ROUND(dst_font->Ascent);
@@ -2121,11 +2111,11 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
             const float char_advance_x_mod = ImClamp(char_advance_x_org, cfg.GlyphMinAdvanceX, cfg.GlyphMaxAdvanceX);
             float char_off_x = font_off_x;
             if (char_advance_x_org != char_advance_x_mod)
-                char_off_x += cfg.PixelSnapH ? ImFloor((char_advance_x_mod - char_advance_x_org) * 0.5f) : (char_advance_x_mod - char_advance_x_org) * 0.5f;
+                char_off_x += cfg.PixelSnapH ? ImFloor((char_advance_x_mod - char_advance_x_org) * 0.5F) : (char_advance_x_mod - char_advance_x_org) * 0.5F;
 
             // Register glyph
             stbtt_aligned_quad q;
-            float dummy_x = 0.0f, dummy_y = 0.0f;
+            float dummy_x = 0.0F, dummy_y = 0.0F;
             stbtt_GetPackedQuad(src_tmp.PackedChars, atlas->TexWidth, atlas->TexHeight, glyph_i, &dummy_x, &dummy_y, &q, 0);
             dst_font->AddGlyph((ImWchar)codepoint, q.x0 + char_off_x, q.y0 + font_off_y, q.x1 + char_off_x, q.y1 + font_off_y, q.s0, q.t0, q.s1, q.t1, char_advance_x_mod);
         }
@@ -2218,7 +2208,7 @@ static void ImFontAtlasBuildRenderDefaultTexData(ImFontAtlas* atlas)
         const int offset = (int)(r.X) + (int)(r.Y) * w;
         atlas->TexPixelsAlpha8[offset] = atlas->TexPixelsAlpha8[offset + 1] = atlas->TexPixelsAlpha8[offset + w] = atlas->TexPixelsAlpha8[offset + w + 1] = 0xFF;
     }
-    atlas->TexUvWhitePixel = ImVec2((r.X + 0.5f) * atlas->TexUvScale.x, (r.Y + 0.5f) * atlas->TexUvScale.y);
+    atlas->TexUvWhitePixel = ImVec2((r.X + 0.5F) * atlas->TexUvScale.x, (r.Y + 0.5F) * atlas->TexUvScale.y);
 }
 
 void ImFontAtlasBuildFinish(ImFontAtlas* atlas)
@@ -2526,18 +2516,18 @@ void ImFontGlyphRangesBuilder::BuildRanges(ImVector<ImWchar>* out_ranges)
 
 ImFont::ImFont()
 {
-    FontSize = 0.0f;
-    FallbackAdvanceX = 0.0f;
+    FontSize = 0.0F;
+    FallbackAdvanceX = 0.0F;
     FallbackChar = (ImWchar)'?';
     EllipsisChar = (ImWchar)-1;
-    DisplayOffset = ImVec2(0.0f, 0.0f);
+    DisplayOffset = ImVec2(0.0F, 0.0F);
     FallbackGlyph = NULL;
     ContainerAtlas = NULL;
     ConfigData = NULL;
     ConfigDataCount = 0;
     DirtyLookupTables = false;
-    Scale = 1.0f;
-    Ascent = Descent = 0.0f;
+    Scale = 1.0F;
+    Ascent = Descent = 0.0F;
     MetricsTotalSurface = 0;
 }
 
@@ -2548,15 +2538,15 @@ ImFont::~ImFont()
 
 void    ImFont::ClearOutputData()
 {
-    FontSize = 0.0f;
-    FallbackAdvanceX = 0.0f;
+    FontSize = 0.0F;
+    FallbackAdvanceX = 0.0F;
     Glyphs.clear();
     IndexAdvanceX.clear();
     IndexLookup.clear();
     FallbackGlyph = NULL;
     ContainerAtlas = NULL;
     DirtyLookupTables = true;
-    Ascent = Descent = 0.0f;
+    Ascent = Descent = 0.0F;
     MetricsTotalSurface = 0;
 }
 
@@ -2593,9 +2583,9 @@ void ImFont::BuildLookupTable()
     }
 
     FallbackGlyph = FindGlyphNoFallback(FallbackChar);
-    FallbackAdvanceX = FallbackGlyph ? FallbackGlyph->AdvanceX : 0.0f;
+    FallbackAdvanceX = FallbackGlyph ? FallbackGlyph->AdvanceX : 0.0F;
     for (int i = 0; i < max_codepoint + 1; i++)
-        if (IndexAdvanceX[i] < 0.0f)
+        if (IndexAdvanceX[i] < 0.0F)
             IndexAdvanceX[i] = FallbackAdvanceX;
 }
 
@@ -2610,7 +2600,7 @@ void ImFont::GrowIndex(int new_size)
     IM_ASSERT(IndexAdvanceX.Size == IndexLookup.Size);
     if (new_size <= IndexLookup.Size)
         return;
-    IndexAdvanceX.resize(new_size, -1.0f);
+    IndexAdvanceX.resize(new_size, -1.0F);
     IndexLookup.resize(new_size, (ImWchar)-1);
 }
 
@@ -2636,7 +2626,7 @@ void ImFont::AddGlyph(ImWchar codepoint, float x0, float y0, float x1, float y1,
 
     // Compute rough surface usage metrics (+1 to account for average padding, +0.99 to round)
     DirtyLookupTables = true;
-    MetricsTotalSurface += (int)((glyph.U1 - glyph.U0) * ContainerAtlas->TexWidth + 1.99f) * (int)((glyph.V1 - glyph.V0) * ContainerAtlas->TexHeight + 1.99f);
+    MetricsTotalSurface += (int)((glyph.U1 - glyph.U0) * ContainerAtlas->TexWidth + 1.99F) * (int)((glyph.V1 - glyph.V0) * ContainerAtlas->TexHeight + 1.99F);
 }
 
 void ImFont::AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst)
@@ -2651,7 +2641,7 @@ void ImFont::AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst)
 
     GrowIndex(dst + 1);
     IndexLookup[dst] = (src < index_size) ? IndexLookup.Data[src] : (ImWchar)-1;
-    IndexAdvanceX[dst] = (src < index_size) ? IndexAdvanceX.Data[src] : 1.0f;
+    IndexAdvanceX[dst] = (src < index_size) ? IndexAdvanceX.Data[src] : 1.0F;
 }
 
 const ImFontGlyph* ImFont::FindGlyph(ImWchar c) const
@@ -2691,9 +2681,9 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
     // Cut words that cannot possibly fit within one line.
     // e.g.: "The tropical fish" with ~5 characters worth of width --> "The tr" "opical" "fish"
 
-    float line_width = 0.0f;
-    float word_width = 0.0f;
-    float blank_width = 0.0f;
+    float line_width = 0.0F;
+    float word_width = 0.0F;
+    float blank_width = 0.0F;
     wrap_width /= scale; // We work with unscaled widths to avoid scaling every characters
 
     const char* word_end = text;
@@ -2716,7 +2706,7 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
         {
             if (c == '\n')
             {
-                line_width = word_width = blank_width = 0.0f;
+                line_width = word_width = blank_width = 0.0F;
                 inside_word = true;
                 s = next_s;
                 continue;
@@ -2734,7 +2724,7 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
             if (inside_word)
             {
                 line_width += blank_width;
-                blank_width = 0.0f;
+                blank_width = 0.0F;
                 word_end = s;
             }
             blank_width += char_width;
@@ -2751,7 +2741,7 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
             {
                 prev_word_end = word_end;
                 line_width += word_width + blank_width;
-                word_width = blank_width = 0.0f;
+                word_width = blank_width = 0.0F;
             }
 
             // Allow wrapping after punctuation.
@@ -2782,9 +2772,9 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
     const float scale = size / FontSize;
 
     ImVec2 text_size = ImVec2(0,0);
-    float line_width = 0.0f;
+    float line_width = 0.0F;
 
-    const bool word_wrap_enabled = (wrap_width > 0.0f);
+    const bool word_wrap_enabled = (wrap_width > 0.0F);
     const char* word_wrap_eol = NULL;
 
     const char* s = text_begin;
@@ -2805,7 +2795,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
                 if (text_size.x < line_width)
                     text_size.x = line_width;
                 text_size.y += line_height;
-                line_width = 0.0f;
+                line_width = 0.0F;
                 word_wrap_eol = NULL;
 
                 // Wrapping skips upcoming blanks
@@ -2838,7 +2828,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
             {
                 text_size.x = ImMax(text_size.x, line_width);
                 text_size.y += line_height;
-                line_width = 0.0f;
+                line_width = 0.0F;
                 continue;
             }
             if (c == '\r')
@@ -2858,7 +2848,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
     if (text_size.x < line_width)
         text_size.x = line_width;
 
-    if (line_width > 0 || text_size.y == 0.0f)
+    if (line_width > 0 || text_size.y == 0.0F)
         text_size.y += line_height;
 
     if (remaining)
@@ -2873,7 +2863,7 @@ void ImFont::RenderChar(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
         return;
     if (const ImFontGlyph* glyph = FindGlyph(c))
     {
-        float scale = (size >= 0.0f) ? (size / FontSize) : 1.0f;
+        float scale = (size >= 0.0F) ? (size / FontSize) : 1.0F;
         pos.x = IM_FLOOR(pos.x + DisplayOffset.x);
         pos.y = IM_FLOOR(pos.y + DisplayOffset.y);
         draw_list->PrimReserve(6, 4);
@@ -2896,7 +2886,7 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
 
     const float scale = size / FontSize;
     const float line_height = FontSize * scale;
-    const bool word_wrap_enabled = (wrap_width > 0.0f);
+    const bool word_wrap_enabled = (wrap_width > 0.0F);
     const char* word_wrap_eol = NULL;
 
     // Fast-forward to first visible line
@@ -2991,7 +2981,7 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
                 continue;
         }
 
-        float char_width = 0.0f;
+        float char_width = 0.0F;
         if (const ImFontGlyph* glyph = FindGlyph((ImWchar)c))
         {
             char_width = glyph->AdvanceX * scale;
@@ -3017,12 +3007,12 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
                     {
                         if (x1 < clip_rect.x)
                         {
-                            u1 = u1 + (1.0f - (x2 - clip_rect.x) / (x2 - x1)) * (u2 - u1);
+                            u1 = u1 + (1.0F - (x2 - clip_rect.x) / (x2 - x1)) * (u2 - u1);
                             x1 = clip_rect.x;
                         }
                         if (y1 < clip_rect.y)
                         {
-                            v1 = v1 + (1.0f - (y2 - clip_rect.y) / (y2 - y1)) * (v2 - v1);
+                            v1 = v1 + (1.0F - (y2 - clip_rect.y) / (y2 - y1)) * (v2 - v1);
                             y1 = clip_rect.y;
                         }
                         if (x2 > clip_rect.z)
@@ -3115,10 +3105,10 @@ void ImGui::RenderArrowPointingAt(ImDrawList* draw_list, ImVec2 pos, ImVec2 half
 
 static inline float ImAcos01(float x)
 {
-    if (x <= 0.0f) return IM_PI * 0.5f;
-    if (x >= 1.0f) return 0.0f;
+    if (x <= 0.0F) return IM_PI * 0.5F;
+    if (x >= 1.0F) return 0.0F;
     return ImAcos(x);
-    //return (-0.69813170079773212f * x * x - 0.87266462599716477f) * x + 1.5707963267948966f; // Cheap approximation, may be enough for what we do.
+    //return (-0.69813170079773212f * x * x - 0.87266462599716477F) * x + 1.5707963267948966F; // Cheap approximation, may be enough for what we do.
 }
 
 // FIXME: Cleanup and move code to ImDrawList.
@@ -3131,24 +3121,24 @@ void ImGui::RenderRectFilledRangeH(ImDrawList* draw_list, const ImRect& rect, Im
 
     ImVec2 p0 = ImVec2(ImLerp(rect.Min.x, rect.Max.x, x_start_norm), rect.Min.y);
     ImVec2 p1 = ImVec2(ImLerp(rect.Min.x, rect.Max.x, x_end_norm), rect.Max.y);
-    if (rounding == 0.0f)
+    if (rounding == 0.0F)
     {
-        draw_list->AddRectFilled(p0, p1, col, 0.0f);
+        draw_list->AddRectFilled(p0, p1, col, 0.0F);
         return;
     }
 
-    rounding = ImClamp(ImMin((rect.Max.x - rect.Min.x) * 0.5f, (rect.Max.y - rect.Min.y) * 0.5f) - 1.0f, 0.0f, rounding);
-    const float inv_rounding = 1.0f / rounding;
-    const float arc0_b = ImAcos01(1.0f - (p0.x - rect.Min.x) * inv_rounding);
-    const float arc0_e = ImAcos01(1.0f - (p1.x - rect.Min.x) * inv_rounding);
-    const float half_pi = IM_PI * 0.5f; // We will == compare to this because we know this is the exact value ImAcos01 can return.
+    rounding = ImClamp(ImMin((rect.Max.x - rect.Min.x) * 0.5F, (rect.Max.y - rect.Min.y) * 0.5F) - 1.0F, 0.0F, rounding);
+    const float inv_rounding = 1.0F / rounding;
+    const float arc0_b = ImAcos01(1.0F - (p0.x - rect.Min.x) * inv_rounding);
+    const float arc0_e = ImAcos01(1.0F - (p1.x - rect.Min.x) * inv_rounding);
+    const float half_pi = IM_PI * 0.5F; // We will == compare to this because we know this is the exact value ImAcos01 can return.
     const float x0 = ImMax(p0.x, rect.Min.x + rounding);
     if (arc0_b == arc0_e)
     {
         draw_list->PathLineTo(ImVec2(x0, p1.y));
         draw_list->PathLineTo(ImVec2(x0, p0.y));
     }
-    else if (arc0_b == 0.0f && arc0_e == half_pi)
+    else if (arc0_b == 0.0F && arc0_e == half_pi)
     {
         draw_list->PathArcToFast(ImVec2(x0, p1.y - rounding), rounding, 3, 6); // BL
         draw_list->PathArcToFast(ImVec2(x0, p0.y + rounding), rounding, 6, 9); // TR
@@ -3160,15 +3150,15 @@ void ImGui::RenderRectFilledRangeH(ImDrawList* draw_list, const ImRect& rect, Im
     }
     if (p1.x > rect.Min.x + rounding)
     {
-        const float arc1_b = ImAcos01(1.0f - (rect.Max.x - p1.x) * inv_rounding);
-        const float arc1_e = ImAcos01(1.0f - (rect.Max.x - p0.x) * inv_rounding);
+        const float arc1_b = ImAcos01(1.0F - (rect.Max.x - p1.x) * inv_rounding);
+        const float arc1_e = ImAcos01(1.0F - (rect.Max.x - p0.x) * inv_rounding);
         const float x1 = ImMin(p1.x, rect.Max.x - rounding);
         if (arc1_b == arc1_e)
         {
             draw_list->PathLineTo(ImVec2(x1, p0.y));
             draw_list->PathLineTo(ImVec2(x1, p1.y));
         }
-        else if (arc1_b == 0.0f && arc1_e == half_pi)
+        else if (arc1_b == 0.0F && arc1_e == half_pi)
         {
             draw_list->PathArcToFast(ImVec2(x1, p0.y + rounding), rounding, 9, 12); // TR
             draw_list->PathArcToFast(ImVec2(x1, p1.y - rounding), rounding, 0, 3);  // BR
