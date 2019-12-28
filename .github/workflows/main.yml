@@ -40,7 +40,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cd server && make -j all
+      run: make -j all
   server:
     runs-on: ${{ matrix.os }}
     strategy:
