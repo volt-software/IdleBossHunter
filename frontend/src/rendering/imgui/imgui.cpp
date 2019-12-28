@@ -1311,6 +1311,7 @@ const char* ImStristr(const char* haystack, const char* haystack_end, const char
         if (toupper(*haystack) == un0)
         {
             const char* b = needle + 1;
+            //FIXME char *a potentially accesses memory outside of haystack
             for (const char* a = haystack + 1; b < needle_end; a++, b++)
                 if (toupper(*a) != toupper(*b))
                     break;
