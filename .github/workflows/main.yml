@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  frontend:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -22,41 +22,6 @@ jobs:
     - uses: lovasoa/setup-emscripten@master
       with:
         emscripten-version: '1.39.4'
-    - name: Create Build Environment
-      shell: bash
-      # Some projects don't allow in-source building, so create a separate build directory
-      # We'll use this as our working directory for all subsequent commands
-      run: cmake -E make_directory ${{runner.workspace}}/build
-    - name: Configure CMake
-      # Use a bash shell so we can use the same syntax for environment variable
-      # access regardless of the host operating system
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
-      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE/frontend -DCMAKE_BUILD_TYPE=RelWithDebInfo
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: make -j all
-  server:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        compiler: [gcc]
-        include:
-          - os: ubuntu-latest
-            compiler: gcc
-            sanitize: true
-
-    steps:
-    - uses: actions/checkout@v1
-      with: 
-        submodules: true
     - name: Dependencies
       run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -87,7 +52,7 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE/server -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEXCLUDE_PSQL_TESTS=1
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEXCLUDE_PSQL_TESTS=1
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
