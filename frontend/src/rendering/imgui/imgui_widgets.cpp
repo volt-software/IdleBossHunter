@@ -5791,7 +5791,7 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char* label, float (*values_ge
         for (int i = 0; i < values_count; i++)
         {
             const float v = values_getter(data, i);
-            if (v != v) // Ignore NaN values
+            if (isnan(v)) // Ignore NaN values
                 continue;
             v_min = ImMin(v_min, v);
             v_max = ImMax(v_max, v);

@@ -170,8 +170,8 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
         glsl_version = "#version 130";
 #endif
     IM_ASSERT((int)strlen(glsl_version) + 2 < IM_ARRAYSIZE(g_GlslVersionString));
-    strncpy(g_GlslVersionString, glsl_version, 32);
-    strncat(g_GlslVersionString, "\n", 32);
+    strncpy(g_GlslVersionString, glsl_version, 31);
+    strncat(g_GlslVersionString, "\n", 1);
 
     // Dummy construct to make it easily visible in the IDE and debugger which GL loader has been selected.
     // The code actually never uses the 'gl_loader' variable! It is only here so you can read it!
