@@ -27,7 +27,7 @@ using namespace std;
 
 namespace ibh {
     struct create_character_request : message {
-        create_character_request(uint32_t slot, string name, string gender, string race, string baseclass) noexcept;
+        create_character_request(uint32_t slot, string name, string race, string baseclass) noexcept;
 
         ~create_character_request() noexcept override = default;
 
@@ -39,7 +39,6 @@ namespace ibh {
 
         uint32_t slot;
         string name;
-        string gender;
         string race;
         string baseclass;
 

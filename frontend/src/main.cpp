@@ -166,7 +166,7 @@ EM_BOOL WebSocketClose(int eventType, const EmscriptenWebSocketCloseEvent *e, vo
         }
 
         scene_system *manager = static_cast<scene_system *>(userData);
-        manager->add(new connection_lost_scene());
+        manager->force_goto_scene(new connection_lost_scene());
     } catch (exception const &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
     }
@@ -326,7 +326,7 @@ int main(int argc, char* argv[]) {
     fps_timer.start();
     tick_timer.start();
 
-    rendering_system rs(&config, window);
+    rendering_system rs(&config, window, context);
     ss.init_main_menu();
 
     loop = [&] {

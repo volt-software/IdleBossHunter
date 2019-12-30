@@ -21,15 +21,14 @@
 #include <messages/user_access/login_response.h>
 #include <messages/user_access/register_request.h>
 #include <messages/user_access/play_character_request.h>
+#include <messages/user_access/play_character_response.h>
 #include <messages/user_access/create_character_request.h>
 #include <messages/user_access/create_character_response.h>
 #include <messages/user_access/character_select_request.h>
 #include <messages/user_access/character_select_response.h>
 #include <messages/user_access/delete_character_request.h>
-#include <messages/user_access/user_joined_response.h>
 #include <messages/user_access/user_entered_game_response.h>
 #include <messages/user_access/user_left_game_response.h>
-#include <messages/user_access/user_left_response.h>
 #include <messages/chat/message_request.h>
 #include <messages/chat/message_response.h>
 #include <messages/moderator/set_motd_request.h>
@@ -122,11 +121,15 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg.slot == msg2->slot);
     }
 
+    SECTION("play character response") {
+        SERDE(play_character_response, 1);
+        REQUIRE(msg.slot == msg2->slot);
+    }
+
     SECTION("create character request") {
-        SERDE(create_character_request, 1, "name", "gender", "race", "baseclass");
+        SERDE(create_character_request, 1, "name", "race", "baseclass");
         REQUIRE(msg.slot == msg2->slot);
         REQUIRE(msg.name == msg2->name);
-        REQUIRE(msg.gender == msg2->gender);
         REQUIRE(msg.race == msg2->race);
         REQUIRE(msg.baseclass == msg2->baseclass);
     }
@@ -201,7 +204,7 @@ TEST_CASE("message serialization tests") {
     }
 
     SECTION("user joined response") {
-        SERDE(user_joined_response, account_object(true, false, true, 123, 345, "username"));
+        SERDE(user_entered_game_response, account_object(true, false, true, 123, 345, "username"));
         REQUIRE(msg.user.is_game_master == msg2->user.is_game_master);
         REQUIRE(msg.user.is_tester == msg2->user.is_tester);
         REQUIRE(msg.user.has_done_trial == msg2->user.has_done_trial);
@@ -210,16 +213,6 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg.user.subscription_tier == msg2->user.subscription_tier);
         REQUIRE(msg2->user.subscription_tier == 345);
         REQUIRE(msg.user.username == msg2->user.username);
-    }
-
-    SECTION("user entered game response") {
-        SERDE(user_entered_game_response, "username");
-        REQUIRE(msg.username == msg2->username);
-    }
-
-    SECTION("user left response") {
-        SERDE(user_left_response, "username");
-        REQUIRE(msg.username == msg2->username);
     }
 
     SECTION("user left game response") {

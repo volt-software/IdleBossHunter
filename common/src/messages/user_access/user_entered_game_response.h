@@ -22,12 +22,13 @@
 #include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
+#include "messages/objects/account_object.h"
 
 using namespace std;
 
 namespace ibh {
     struct user_entered_game_response : message {
-        explicit user_entered_game_response(string username) noexcept;
+        explicit user_entered_game_response(account_object user) noexcept;
 
         ~user_entered_game_response() noexcept override = default;
 
@@ -37,7 +38,7 @@ namespace ibh {
         [[nodiscard]]
         static unique_ptr<user_entered_game_response> deserialize(rapidjson::Document const &d);
 
-        string username;
+        account_object user;
 
         inline static constexpr uint32_t type = 13;
     };

@@ -25,9 +25,8 @@
 #include <messages/user_access/character_select_response.h>
 #include <messages/user_access/create_character_response.h>
 #include <messages/user_access/user_entered_game_response.h>
-#include <messages/user_access/user_joined_response.h>
 #include <messages/user_access/user_left_game_response.h>
-#include <messages/user_access/user_left_response.h>
+#include <messages/user_access/play_character_response.h>
 #include <messages/generic_error_response.h>
 #include <messages/generic_ok_response.h>
 
@@ -58,7 +57,7 @@ void scene_system::update(entt::registry &es, TimeDelta dt) {
     }
 
     for(auto &scene_id : _scenes_to_erase) {
-        _scenes.erase(remove_if(begin(_scenes), end(_scenes), [=](const unique_ptr<scene> &sc) { return sc->_id == scene_id; }), end(_scenes));
+        _scenes.erase(remove_if(begin(_scenes), end(_scenes), [=](const unique_ptr<scene> &sc) noexcept { return sc->_id == scene_id; }), end(_scenes));
     }
 
     _scenes.reserve(_scenes.size() + _scenes_to_add.size());
@@ -121,17 +120,14 @@ unique_ptr<message> deserialize_message(uint32_t &type, rapidjson::Document &d) 
         case user_entered_game_response::type: {
             return user_entered_game_response::deserialize(d);
         }
-        case user_joined_response::type: {
-            return user_joined_response::deserialize(d);
-        }
         case user_left_game_response::type: {
             return user_left_game_response::deserialize(d);
         }
-        case user_left_response::type: {
-            return user_left_response::deserialize(d);
-        }
         case message_response::type: {
             return message_response::deserialize(d);
+        }
+        case play_character_response::type: {
+            return play_character_response::deserialize(d);
         }
         default:
             return nullptr;

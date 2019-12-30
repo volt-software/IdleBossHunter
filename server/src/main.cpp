@@ -27,6 +27,7 @@
 #include <entt/entt.hpp>
 #include <asset_loading/load_assets.h>
 #include <game_logic/logic_helpers.h>
+#include <game_logic/censor_sensor.h>
 #include <sodium.h>
 #include <messages/update_response.h>
 #include <game_queue_message_handlers/player_enter_handler.h>
@@ -58,6 +59,8 @@ int main() {
     set_cwd(get_selfpath());
     ::signal(SIGINT, on_sigint);
     locale::global(locale("en_US.UTF-8"));
+
+    sensor.add_dictionary("assets/profanity_locales/en.json");
 
     config config;
     try {

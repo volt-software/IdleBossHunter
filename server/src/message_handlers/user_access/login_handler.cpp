@@ -29,7 +29,7 @@
 #include <repositories/characters_repository.h>
 #include <repositories/character_stats_repository.h>
 #include <on_leaving_scope.h>
-#include <messages/user_access/user_joined_response.h>
+#include <messages/user_access/user_entered_game_response.h>
 #include <uws_thread.h>
 #include "message_handlers/handler_macros.h"
 #include <ecs/components.h>
@@ -96,7 +96,8 @@ namespace ibh {
         }
 
         vector<account_object> online_users;
-        user_joined_response join_msg(account_object(usr->is_game_master, false, false, 0, 0, usr->username));
+        ibh_unordered_set<uint64_t> online_user_ids;
+        user_entered_game_response join_msg(account_object(usr->is_game_master, false, false, 0, 0, usr->username));
         auto join_msg_str = join_msg.serialize();
         {
             shared_lock lock(user_connections_mutex);
@@ -109,6 +110,15 @@ namespace ibh {
                     if (other_user_data.user_id != user_data->user_id) {
                         s->send(other_user_data.ws, join_msg_str, websocketpp::frame::opcode::value::TEXT);
 
+                        // add each user_id at most once
+                        if (!other_user_data.username.empty() && online_user_ids.find(other_user_data.user_id) == end(online_user_ids)) {
+                            online_users.emplace_back(other_user_data.is_game_master, other_user_data.is_tester, false, 0, other_user_data.subscription_tier,
+                                                      other_user_data.username);
+                            online_user_ids.insert(other_user_data.user_id);
+                        }
+                    }
+                    // add self at most once
+                    else if (other_user_data.connection_id == user_data->connection_id) {
                         if (!other_user_data.username.empty()) {
                             online_users.emplace_back(other_user_data.is_game_master, other_user_data.is_tester, false, 0, other_user_data.subscription_tier,
                                                       other_user_data.username);

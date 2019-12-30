@@ -26,8 +26,8 @@
 namespace ibh {
     class rendering_system : public ecs_system  {
     public:
-        explicit rendering_system(config *config, SDL_Window *window)
-        : _config(config), _window(window) {}
+        explicit rendering_system(config *config, SDL_Window *window, SDL_GLContext context)
+        : _config(config), _window(window), _context(context) {}
 
         ~rendering_system() override = default;
 
@@ -36,5 +36,6 @@ namespace ibh {
     private:
         config *_config;
         SDL_Window *_window;
+        SDL_GLContext _context;
     };
 }

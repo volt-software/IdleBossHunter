@@ -21,6 +21,7 @@
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
 #include <working_directory_manipulation.h>
+#include <game_logic/censor_sensor.h>
 
 #include "../src/config.h"
 #include "../src/config_parsers.h"
@@ -30,8 +31,12 @@ using namespace std;
 using namespace ibh;
 
 int main(int argc, char **argv) {
+    spdlog::set_level(spdlog::level::trace);
+
     set_cwd(get_selfpath());
     locale::global(locale("en_US.UTF-8"));
+
+    sensor.add_dictionary("assets/profanity_locales/en.json");
 
     try {
         auto config_opt = parse_env_file();
@@ -43,8 +48,6 @@ int main(int argc, char **argv) {
         spdlog::error("[main] config.json file is malformed json.");
         return 1;
     }
-
-    spdlog::set_level(spdlog::level::trace);
 
 #ifndef EXCLUDE_PSQL_TESTS
     db_pool = make_shared<database_pool>();

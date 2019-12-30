@@ -36,7 +36,8 @@ namespace ibh {
 
     class censor_sensor {
     public:
-        explicit censor_sensor(string const &profanity_dictionary_path);
+        explicit censor_sensor();
+        void add_dictionary(string const &profanity_dictionary_path);
         bool is_profane(string phrase);
         bool is_profane_ish(string phrase);
         string clean_profanity(string phrase);

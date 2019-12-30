@@ -32,7 +32,7 @@
 #include <game_logic/censor_sensor.h>
 #include "message_handlers/handler_macros.h"
 #include <utf.h>
-#include <messages/user_access/user_joined_response.h>
+#include <messages/user_access/user_entered_game_response.h>
 #include <uws_thread.h>
 #include <ecs/components.h>
 
@@ -141,7 +141,7 @@ namespace ibh {
             }
 
             vector<account_object> online_users;
-            user_joined_response join_msg(account_object(new_usr.is_game_master, false, false, 0, 0, new_usr.username));
+            user_entered_game_response join_msg(account_object(new_usr.is_game_master, false, false, 0, 0, new_usr.username));
             auto join_msg_str = join_msg.serialize();
             {
                 shared_lock lock(user_connections_mutex);
@@ -156,6 +156,12 @@ namespace ibh {
                         if (other_user_data.user_id != user_data->user_id) {
                             s->send(other_user_data.ws, join_msg_str, websocketpp::frame::opcode::value::TEXT);
                             
+                            if (!other_user_data.username.empty()) {
+                                online_users.emplace_back(other_user_data.is_game_master, other_user_data.is_tester, false, 0, other_user_data.subscription_tier,
+                                                          other_user_data.username);
+                            }
+                        }
+                        else if (other_user_data.connection_id == user_data->connection_id) {
                             if (!other_user_data.username.empty()) {
                                 online_users.emplace_back(other_user_data.is_game_master, other_user_data.is_tester, false, 0, other_user_data.subscription_tier,
                                                           other_user_data.username);

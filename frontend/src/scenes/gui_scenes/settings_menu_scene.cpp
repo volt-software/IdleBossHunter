@@ -28,7 +28,7 @@ void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         return;
     }
 
-    if(ImGui::Begin("Settings Menu", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if(ImGui::Begin("Settings Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         auto *config = manager->get_config();
         string resolution_label = fmt::format("{}x{}", config->screen_width, config->screen_height);
         if (ImGui::BeginCombo("Resolution", resolution_label.c_str()))

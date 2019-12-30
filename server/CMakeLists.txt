@@ -36,15 +36,15 @@ add_executable(ibh_backend ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES}
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
 file(GLOB_RECURSE PROJECT_TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-add_executable(ibh_test ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_TEST_SOURCES})
-add_test(NAME MyTest COMMAND ibh_test)
+add_executable(ibh_server_test ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_TEST_SOURCES})
+add_test(NAME MyTest COMMAND ibh_server_test)
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
 file(GLOB PROJECT_BENCHMARK_SOURCES ${PROJECT_SOURCE_DIR}/benchmark/*.cpp ${PROJECT_SOURCE_DIR}/benchmark/benchmark_helpers/*.cpp)
 add_executable(ibh_benchmark ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_BENCHMARK_SOURCES})
 
-target_compile_definitions(ibh_test PRIVATE TEST_CODE=1)
+target_compile_definitions(ibh_server_test PRIVATE TEST_CODE=1)
 
 find_library(PQXX_LIBRARY pqxx HINTS ${EXTERNAL_DIR}/libpqxx/src/.libs)
 find_library(SODIUM_LIBRARY sodium HINTS ${EXTERNAL_DIR}/libsodium/src/libsodium/.libs)
@@ -87,12 +87,12 @@ target_link_libraries(ibh_backend PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_backend PUBLIC ${SODIUM_LIBRARY})
 target_link_libraries(ibh_backend PUBLIC -static-libgcc -static-libstdc++)
 
-target_link_libraries(ibh_test PUBLIC ${PQXX_LIBRARY} -lpq)
-target_link_libraries(ibh_test PUBLIC -lpthread -lstdc++fs)
-target_link_libraries(ibh_test PUBLIC ${ZLIB_LIBRARIES} )
-target_link_libraries(ibh_test PUBLIC ${OPENSSL_LIBRARIES})
-target_link_libraries(ibh_test PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_test PUBLIC -static-libgcc -static-libstdc++)
+target_link_libraries(ibh_server_test PUBLIC ${PQXX_LIBRARY} -lpq)
+target_link_libraries(ibh_server_test PUBLIC -lpthread -lstdc++fs)
+target_link_libraries(ibh_server_test PUBLIC ${ZLIB_LIBRARIES} )
+target_link_libraries(ibh_server_test PUBLIC ${OPENSSL_LIBRARIES})
+target_link_libraries(ibh_server_test PUBLIC ${SODIUM_LIBRARY})
+target_link_libraries(ibh_server_test PUBLIC -static-libgcc -static-libstdc++)
 
 target_link_libraries(ibh_benchmark PUBLIC ${PQXX_LIBRARY} -lpq)
 target_link_libraries(ibh_benchmark PUBLIC -lpthread -lstdc++fs)
@@ -108,7 +108,7 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/assets)
 
 add_custom_command(
-        TARGET ibh_test POST_BUILD
+        TARGET ibh_server_test POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets/
         ${CMAKE_BINARY_DIR}/assets)

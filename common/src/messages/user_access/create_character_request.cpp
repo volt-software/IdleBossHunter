@@ -23,8 +23,8 @@
 using namespace ibh;
 using namespace rapidjson;
 
-create_character_request::create_character_request(uint32_t slot, string name, string gender, string race, string baseclass) noexcept
-    : slot(slot), name(move(name)), gender(move(gender)), race(move(race)), baseclass(move(baseclass)) {
+create_character_request::create_character_request(uint32_t slot, string name, string race, string baseclass) noexcept
+    : slot(slot), name(move(name)), race(move(race)), baseclass(move(baseclass)) {
 
 }
 
@@ -43,9 +43,6 @@ string create_character_request::serialize() const {
     writer.String(KEY_STRING("name"));
     writer.String(name.c_str(), name.size());
 
-    writer.String(KEY_STRING("gender"));
-    writer.String(gender.c_str(), gender.size());
-
     writer.String(KEY_STRING("race"));
     writer.String(race.c_str(), race.size());
 
@@ -57,7 +54,7 @@ string create_character_request::serialize() const {
 }
 
 unique_ptr<create_character_request> create_character_request::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("slot")  || !d.HasMember("name") || ! d.HasMember("gender") || ! d.HasMember("race") || ! d.HasMember("baseclass")) {
+    if (!d.HasMember("type") || !d.HasMember("slot")  || !d.HasMember("name") || ! d.HasMember("race") || ! d.HasMember("baseclass")) {
         spdlog::warn("[create_character_request] deserialize failed");
         return nullptr;
     }
@@ -67,5 +64,5 @@ unique_ptr<create_character_request> create_character_request::deserialize(rapid
         return nullptr;
     }
 
-    return make_unique<create_character_request>(d["slot"].GetUint(), d["name"].GetString(), d["gender"].GetString(), d["race"].GetString(), d["baseclass"].GetString());
+    return make_unique<create_character_request>(d["slot"].GetUint(), d["name"].GetString(), d["race"].GetString(), d["baseclass"].GetString());
 }

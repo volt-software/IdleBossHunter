@@ -23,6 +23,7 @@
 
 #include <messages/objects/character_object.h>
 #include <messages/user_access/character_select_response.h>
+#include <mutex>
 
 namespace ibh {
     class show_characters_scene : public scene  {
@@ -39,8 +40,11 @@ namespace ibh {
         vector<character_class> _classes;
         bool _show_create;
         bool _waiting_for_select;
+        bool _waiting_for_reply;
         string _error;
         string _selected_race;
         string _selected_class;
+        uint32_t _selected_slot;
+        int32_t _selected_play_slot;
     };
 }

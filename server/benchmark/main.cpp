@@ -61,7 +61,8 @@ void bench_censor_sensor() {
         return;
     }
 
-    censor_sensor s("assets/profanity_locales/en.json");
+    censor_sensor s{};
+    s.add_dictionary("assets/profanity_locales/en.json");
 
     auto start = chrono::system_clock::now();
 

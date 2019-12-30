@@ -26,18 +26,18 @@
 using namespace std;
 
 namespace ibh {
-    struct user_left_response : message {
-        explicit user_left_response(string username) noexcept;
+    struct play_character_response : message {
+        explicit play_character_response(uint32_t slot) noexcept;
 
-        ~user_left_response() noexcept override = default;
+        ~play_character_response() noexcept override = default;
 
         [[nodiscard]]
         string serialize() const override;
 
         [[nodiscard]]
-        static unique_ptr<user_left_response> deserialize(rapidjson::Document const &d);
+        static unique_ptr<play_character_response> deserialize(rapidjson::Document const &d);
 
-        string username;
+        uint32_t slot;
 
         inline static constexpr uint32_t type = 16;
     };

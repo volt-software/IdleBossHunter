@@ -23,8 +23,8 @@
 using namespace ibh;
 using namespace rapidjson;
 
-user_entered_game_response::user_entered_game_response(string username) noexcept
-        : username(move(username)) {
+user_entered_game_response::user_entered_game_response(account_object user) noexcept
+        : user(move(user)) {
 
 }
 
@@ -37,15 +37,15 @@ string user_entered_game_response::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint(type);
 
-    writer.String(KEY_STRING("username"));
-    writer.String(username.c_str(), username.size());
+    write_account_object(writer, user);
 
     writer.EndObject();
     return sb.GetString();
 }
 
 unique_ptr<user_entered_game_response> user_entered_game_response::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("username")) {
+    if (!d.HasMember("type") || !d.HasMember("is_game_master") || !d.HasMember("is_tester") || !d.HasMember("has_done_trial") ||
+        !d.HasMember("trial_ends_unix_timestamp") || !d.HasMember("subscription_tier") || !d.HasMember("username")) {
         spdlog::warn("[user_entered_game_response] deserialize failed");
         return nullptr;
     }
@@ -55,5 +55,6 @@ unique_ptr<user_entered_game_response> user_entered_game_response::deserialize(r
         return nullptr;
     }
 
-    return make_unique<user_entered_game_response>(d["username"].GetString());
+    return make_unique<user_entered_game_response>(account_object(d["is_game_master"].GetBool(), d["is_tester"].GetBool(), d["has_done_trial"].GetBool(),
+                                                            d["trial_ends_unix_timestamp"].GetUint64(), d["subscription_tier"].GetUint(), d["username"].GetString()));
 }

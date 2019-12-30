@@ -18,12 +18,16 @@
 
 #include "show_characters_scene.h"
 #include "messages/user_access/play_character_request.h"
+#include "messages/user_access/play_character_response.h"
+#include "messages/user_access/create_character_request.h"
+#include "messages/user_access/create_character_response.h"
 #include "messages/user_access/character_select_request.h"
 #include "messages/user_access/character_select_response.h"
 #include "messages/generic_error_response.h"
 #include "messages/update_response.h"
 #include "ibh_containers.h"
 #include <rendering/imgui/imgui.h>
+#include <rendering/imgui/imgui_internal.h>
 #include "spdlog/spdlog.h"
 #include <SDL.h>
 #include <algorithm>
@@ -31,7 +35,8 @@
 using namespace std;
 using namespace ibh;
 
-show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true), _error(), _selected_race(), _selected_class() {
+show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true),
+_waiting_for_reply(false), _error(), _selected_race(), _selected_class(), _selected_slot(0), _selected_play_slot(-1) {
     send_message<character_select_request>(manager);
 }
 
@@ -41,23 +46,22 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
 
     if(_waiting_for_select) {
-        if(ImGui::Begin("Waiting for server", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+        if(ImGui::Begin("Waiting for server", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 
         }
         ImGui::End();
         return;
     }
 
-    if(ImGui::Begin("Characters List", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if(ImGui::Begin("Characters List", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if(_error.size() > 0) {
             ImGui::Text("%s", _error.c_str());
         }
 
-        int selected_char_slot = -1;
         ImGui::ListBoxHeader("Characters", _characters.size(), 4);
         for(auto& character : _characters) {
-            if(ImGui::Selectable(fmt::format("{} {}", character.name, character.level).c_str())) {
-                selected_char_slot = character.slot;
+            if(ImGui::Selectable(fmt::format("{} {}", character.name, character.level).c_str(), _selected_play_slot == character.slot)) {
+                _selected_play_slot = character.slot;
             }
         }
         ImGui::ListBoxFooter();
@@ -66,8 +70,22 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             _show_create = true;
         }
 
-        if (ImGui::Button("Play") && selected_char_slot >= 0) {
-            send_message<play_character_request>(manager, static_cast<uint32_t>(selected_char_slot));
+        if(_selected_play_slot < 0 || _waiting_for_reply) {
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        }
+
+        bool pressed_this_frame = false;
+        if (ImGui::Button("Play")) {
+            send_message<play_character_request>(manager, static_cast<uint32_t>(_selected_play_slot));
+            _waiting_for_reply = true;
+            pressed_this_frame = true;
+        }
+
+        if (!pressed_this_frame && (_selected_play_slot < 0 || _waiting_for_reply))
+        {
+            ImGui::PopItemFlag();
+            ImGui::PopStyleVar();
         }
     }
     ImGui::End();
@@ -76,10 +94,13 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
         return;
     }
 
-    if(ImGui::Begin("Create Character", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if(ImGui::Begin("Create Character", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if(_error.size() > 0) {
             ImGui::Text("%s", _error.c_str());
         }
+
+        static char bufcharname[64];
+        ImGui::InputTextWithHint("Character name", "<character name>", bufcharname, 64, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
 
         if (ImGui::BeginCombo("Race", _selected_race.c_str()))
         {
@@ -99,6 +120,34 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
                 }
             }
             ImGui::EndCombo();
+        }
+
+        if (ImGui::BeginCombo("Slot", fmt::format("{}", _selected_slot).c_str()))
+        {
+            for(uint32_t i = 0; i < 4; i++) {
+                if (ImGui::Selectable(fmt::format("{}", i).c_str(), _selected_slot == i)) {
+                    _selected_slot = i;
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if(_selected_class.empty() || _selected_race.empty() || strlen(bufcharname) < 2 || _waiting_for_reply) {
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        }
+
+        bool pressed_this_frame = false;
+        if (ImGui::Button("Create")) {
+            _waiting_for_reply = true;
+            pressed_this_frame = true;
+            send_message<create_character_request>(manager, _selected_slot, bufcharname, _selected_race, _selected_class);
+        }
+
+        if (!pressed_this_frame && (_selected_class.empty() || _selected_race.empty() || strlen(bufcharname) < 2 || _waiting_for_reply))
+        {
+            ImGui::PopItemFlag();
+            ImGui::PopStyleVar();
         }
 
         if(!_selected_class.empty() && !_selected_race.empty()) {
@@ -141,6 +190,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint32_t typ
             }
 
             _closed = true;
+            break;
         }
         case character_select_response::type: {
             auto resp_msg = dynamic_cast<character_select_response*>(msg);
@@ -152,6 +202,33 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint32_t typ
             _races = resp_msg->races;
             _classes = resp_msg->classes;
             _waiting_for_select = false;
+            break;
+        }
+        case create_character_response::type: {
+            auto resp_msg = dynamic_cast<create_character_response*>(msg);
+
+            if(!resp_msg) {
+                return;
+            }
+
+            _characters.emplace_back(resp_msg->character);
+            _waiting_for_reply = false;
+            _show_create = false;
+            break;
+        }
+        case play_character_response::type: {
+            auto resp_msg = dynamic_cast<play_character_response*>(msg);
+
+            if(!resp_msg) {
+                return;
+            }
+
+            if(resp_msg->slot == _selected_play_slot) {
+                _closed = true;
+            } else {
+                spdlog::error("[{}] selected character slot {} does not match server's idea of slot {}", __FUNCTION__, _selected_play_slot, resp_msg->slot);
+            }
+            break;
         }
         case generic_error_response::type: {
             auto resp_msg = dynamic_cast<generic_error_response*>(msg);
@@ -161,7 +238,12 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint32_t typ
             }
 
             _waiting_for_select = false;
+            _waiting_for_reply = false;
             _error = resp_msg->error;
+            break;
+        }
+        default: {
+            break;
         }
     }
 }

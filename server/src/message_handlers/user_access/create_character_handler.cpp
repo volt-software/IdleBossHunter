@@ -43,6 +43,12 @@ namespace ibh {
 
         characters_repository<database_pool, database_transaction> player_repo(pool);
         character_stats_repository<database_pool, database_transaction> stats_repo(pool);
+
+        if(msg->slot > 4) {
+            SEND_ERROR("Slot has to be at least 0 and at most 3.", "", "", true);
+            return;
+        }
+
         auto transaction = player_repo.create_transaction();
         auto existing_character = player_repo.get_character_by_slot(msg->slot, user_data->user_id, transaction);
 

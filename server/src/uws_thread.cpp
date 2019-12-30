@@ -38,7 +38,7 @@
 #include <messages/chat/message_request.h>
 #include <messages/moderator/set_motd_request.h>
 #include <message_handlers/handler_macros.h>
-#include <messages/user_access/user_left_response.h>
+#include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
 #include <ecs/components.h>
 
@@ -208,10 +208,10 @@ void on_close(server* s, websocketpp::connection_hdl hdl) {
         }
         if (!user_data->second.username.empty()) {
             auto same_user_id_it = find_if(begin(user_connections), end(user_connections),
-                                           [&user_data](user_connections_type const &vt) noexcept { return vt.second.user_id == user_data->second.user_id; });
+                                           [&user_data](user_connections_type const &vt) noexcept { return vt.second.user_id == user_data->second.user_id && vt.second.connection_id != user_data->second.connection_id; });
 
             if (same_user_id_it == end(user_connections)) {
-                user_left_response join_msg(user_data->second.username);
+                user_left_game_response join_msg(user_data->second.username);
                 auto join_msg_str = join_msg.serialize();
                 for (auto &[conn_id, other_user_data] : user_connections) {
                     if (other_user_data.user_id != user_data->second.user_id) {

@@ -30,6 +30,7 @@ using namespace std;
 using namespace ibh;
 
 void rendering_system::update(entt::registry &es, TimeDelta dt) {
+    SDL_GL_MakeCurrent(_window, _context);
     glClear(GL_COLOR_BUFFER_BIT);
 
     auto view = es.view<atlas_component>();

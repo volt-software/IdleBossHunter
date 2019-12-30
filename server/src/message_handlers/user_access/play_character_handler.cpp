@@ -22,7 +22,6 @@
 #include <spdlog/spdlog.h>
 
 #include <messages/user_access/play_character_request.h>
-#include <messages/user_access/user_entered_game_response.h>
 #include <repositories/characters_repository.h>
 #include <repositories/character_stats_repository.h>
 #include "message_handlers/handler_macros.h"
@@ -30,6 +29,7 @@
 #include <uws_thread.h>
 #include <utf.h>
 #include <messages/user_access/character_select_response.h>
+#include <messages/user_access/play_character_response.h>
 
 using namespace std;
 
@@ -64,22 +64,8 @@ namespace ibh {
         user_data->playing_character_slot = msg->slot;
         auto db_stats = stats_repo.get_by_character_id(character->id, transaction);
 
-        user_entered_game_response enter_msg(user_data->username);
-        auto enter_msg_str = enter_msg.serialize();
-        {
-            shared_lock lock(user_connections_mutex);
-            for (auto &[conn_id, other_user_data] : user_connections) {
-                try {
-                    if(other_user_data.ws.expired()) {
-                        continue;
-                    }
-
-                    s->send(other_user_data.ws, enter_msg_str, websocketpp::frame::opcode::value::TEXT);
-                } catch (...) {
-                    continue;
-                }
-            }
-        }
+        play_character_response play_resp{msg->slot};
+        s->send(user_data->ws, play_resp.serialize(), websocketpp::frame::opcode::value::TEXT);
 
         // TODO move this calculation somewhere global
         auto race_it = find_if(begin(select_response.races), end(select_response.races), [&race = as_const(character->race)](character_race const &r){ return r.name == race;});

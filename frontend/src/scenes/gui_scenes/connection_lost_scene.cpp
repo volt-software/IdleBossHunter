@@ -28,7 +28,7 @@ void connection_lost_scene::update(iscene_manager *manager, TimeDelta dt) {
         return;
     }
 
-    if(ImGui::Begin("Connection lost")) {
+    if(ImGui::Begin("Connection lost", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Connection lost with the server. Please refresh the page.");
     }
     ImGui::End();

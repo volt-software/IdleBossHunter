@@ -28,7 +28,7 @@ void alpha_window_scene::update(iscene_manager *manager, TimeDelta dt) {
         return;
     }
 
-    if(ImGui::Begin("Alpha quality")) {
+    if(ImGui::Begin("Alpha quality", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("This build is alpha/beta quality, things may be broken or otherwise.");
         if (ImGui::Button("Gotcha")) {
             _closed = true;

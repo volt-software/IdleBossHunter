@@ -25,7 +25,8 @@ using namespace ibh;
 
 TEST_CASE("censor sensor tests") {
     SECTION( "marks words as profane" ) {
-        censor_sensor s("assets/profanity_locales/en.json");
+        censor_sensor s{};
+        s.add_dictionary("assets/profanity_locales/en.json");
 
         REQUIRE(s.is_profane("bollocks"));
         REQUIRE(s.is_profane("BoLloCKs"));
@@ -43,7 +44,8 @@ TEST_CASE("censor sensor tests") {
     }
 
     SECTION( "marks words as profane only when tier is enabled" ) {
-        censor_sensor s("assets/profanity_locales/en.json");
+        censor_sensor s{};
+        s.add_dictionary("assets/profanity_locales/en.json");
 
         s.disable_tier(4);
         REQUIRE(!s.is_profane("bollocks"));
@@ -63,7 +65,8 @@ TEST_CASE("censor sensor tests") {
     }
 
     SECTION( "clean profanity" ) {
-        censor_sensor s("assets/profanity_locales/en.json");
+        censor_sensor s{};
+        s.add_dictionary("assets/profanity_locales/en.json");
 
         REQUIRE(s.clean_profanity("this is bollocks") == "this is ********");
     }

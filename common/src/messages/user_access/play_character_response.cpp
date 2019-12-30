@@ -16,19 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "user_joined_response.h"
+#include "play_character_response.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-user_joined_response::user_joined_response(account_object user) noexcept
-        : user(move(user)) {
+play_character_response::play_character_response(uint32_t slot) noexcept : slot(slot) {
 
 }
 
-string user_joined_response::serialize() const {
+string play_character_response::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -37,24 +36,23 @@ string user_joined_response::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint(type);
 
-    write_account_object(writer, user);
+    writer.String(KEY_STRING("slot"));
+    writer.Uint(slot);
 
     writer.EndObject();
     return sb.GetString();
 }
 
-unique_ptr<user_joined_response> user_joined_response::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("is_game_master") || !d.HasMember("is_tester") || !d.HasMember("has_done_trial") ||
-        !d.HasMember("trial_ends_unix_timestamp") || !d.HasMember("subscription_tier") || !d.HasMember("username")) {
-        spdlog::warn("[user_joined_response] deserialize failed");
+unique_ptr<play_character_response> play_character_response::deserialize(rapidjson::Document const &d) {
+    if (!d.HasMember("type") || !d.HasMember("slot")) {
+        spdlog::warn("[play_character_response] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint() != type) {
-        spdlog::warn("[user_joined_response] deserialize failed wrong type");
+        spdlog::warn("[play_character_response] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<user_joined_response>(account_object(d["is_game_master"].GetBool(), d["is_tester"].GetBool(), d["has_done_trial"].GetBool(),
-            d["trial_ends_unix_timestamp"].GetUint64(), d["subscription_tier"].GetUint(), d["username"].GetString()));
+    return make_unique<play_character_response>(d["slot"].GetUint());
 }

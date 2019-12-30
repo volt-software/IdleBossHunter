@@ -25,9 +25,13 @@
 
 using namespace ibh;
 
-censor_sensor ibh::sensor("assets/profanity_locales/en.json");
+censor_sensor ibh::sensor{};
 
-censor_sensor::censor_sensor(string const &profanity_dictionary_path) : _word_tiers() {
+censor_sensor::censor_sensor() : _word_tiers(), _enabled_tiers() {
+
+}
+
+void censor_sensor::add_dictionary(string const &profanity_dictionary_path) {
     auto dict_contents = read_whole_file(profanity_dictionary_path);
     if(!dict_contents) {
         throw runtime_error("no dict_contents");

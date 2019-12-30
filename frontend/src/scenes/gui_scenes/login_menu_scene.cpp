@@ -17,6 +17,7 @@
 */
 
 #include "login_menu_scene.h"
+#include "chat_scene.h"
 #include "show_characters_scene.h"
 #include <rendering/imgui/imgui.h>
 #include <rendering/imgui/imgui_internal.h>
@@ -35,7 +36,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         return;
     }
 
-    if(ImGui::Begin("Login/Register", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if(ImGui::Begin("Login/Register", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if(_error.size() > 0) {
             ImGui::Text("%s", _error.c_str());
         }
@@ -97,9 +98,11 @@ void login_menu_scene::handle_message(iscene_manager *manager, uint32_t type, me
             }
 
             manager->add(new show_characters_scene(manager, resp_msg->characters));
+            manager->add(new chat_scene(resp_msg->online_users));
 
             _waiting_for_reply = false;
             _closed = true;
+            break;
         }
         case generic_error_response::type: {
             auto resp_msg = dynamic_cast<generic_error_response*>(msg);
@@ -111,6 +114,10 @@ void login_menu_scene::handle_message(iscene_manager *manager, uint32_t type, me
             _waiting_for_reply = false;
             _error = resp_msg->error;
             spdlog::warn("[{}] received error {}", __FUNCTION__, resp_msg->error);
+            break;
+        }
+        default: {
+            break;
         }
     }
 }

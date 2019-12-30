@@ -16,30 +16,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <string>
-#include <optional>
-#include <rapidjson/document.h>
-#include "messages/message.h"
+#include "../scene.h"
 #include "messages/objects/account_object.h"
+#include <vector>
 
 using namespace std;
 
 namespace ibh {
-    struct user_joined_response : message {
-        explicit user_joined_response(account_object user) noexcept;
+    class chat_scene : public scene  {
+    public:
+        explicit chat_scene(vector<account_object> online_users);
+        ~chat_scene() override = default;
 
-        ~user_joined_response() noexcept override = default;
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint32_t type, message* msg) override;
 
-        [[nodiscard]]
-        string serialize() const override;
-
-        [[nodiscard]]
-        static unique_ptr<user_joined_response> deserialize(rapidjson::Document const &d);
-
-        account_object user;
-
-        inline static constexpr uint32_t type = 14;
+    private:
+        vector<string> _messages;
+        vector<account_object> _online_users;
+        bool _first_frame;
     };
 }
