@@ -29,11 +29,11 @@ using namespace ibh;
 void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::MenuItem("Login")) {
-            manager->add(new login_menu_scene());
+            manager->add(make_unique<login_menu_scene>());
         }
 
         if (ImGui::MenuItem("Settings")) {
-            manager->add(new settings_menu_scene());
+            manager->add(make_unique<settings_menu_scene>());
         }
 
         ImGui::EndMainMenuBar();

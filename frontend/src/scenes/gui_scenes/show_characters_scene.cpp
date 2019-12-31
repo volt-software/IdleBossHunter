@@ -35,7 +35,7 @@
 using namespace std;
 using namespace ibh;
 
-show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true),
+show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : scene(6), _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true),
 _waiting_for_reply(false), _error(), _selected_race(), _selected_class(), _selected_slot(0), _selected_play_slot(-1) {
     send_message<character_select_request>(manager);
 }

@@ -29,7 +29,7 @@
 namespace ibh {
     class scene {
     public:
-        scene() : _id(0), _closed(false) {}
+        scene(unsigned int type) : _id(0), _type(type), _closed(false) {}
         virtual ~scene() = default;
 
         virtual void update(iscene_manager *manager, TimeDelta dt) = 0;
@@ -45,6 +45,7 @@ namespace ibh {
         }
 
         unsigned int _id;
+        unsigned int _type;
         bool _closed;
     };
 

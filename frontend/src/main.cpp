@@ -166,7 +166,7 @@ EM_BOOL WebSocketClose(int eventType, const EmscriptenWebSocketCloseEvent *e, vo
         }
 
         scene_system *manager = static_cast<scene_system *>(userData);
-        manager->force_goto_scene(new connection_lost_scene());
+        manager->force_goto_scene(make_unique<connection_lost_scene>());
     } catch (exception const &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
     }

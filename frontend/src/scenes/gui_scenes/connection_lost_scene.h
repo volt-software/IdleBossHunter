@@ -24,7 +24,7 @@
 namespace ibh {
     class connection_lost_scene : public scene  {
     public:
-        connection_lost_scene() = default;
+        connection_lost_scene() : scene(2) {}
         ~connection_lost_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;

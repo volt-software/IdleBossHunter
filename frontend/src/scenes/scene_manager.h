@@ -29,8 +29,8 @@ namespace ibh {
         virtual ~iscene_manager() = default;
 
         virtual void remove(scene *scene) = 0;
-        virtual void add(scene *scene) = 0;
-        virtual void force_goto_scene(scene *new_scene) = 0;
+        virtual void add(unique_ptr<scene> scene) = 0;
+        virtual void force_goto_scene(unique_ptr<scene> new_scene) = 0;
         virtual config * get_config() = 0;
         virtual entt::registry& get_entity_registry() = 0;
         virtual int get_socket() = 0;

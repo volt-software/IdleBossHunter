@@ -69,20 +69,27 @@ void scene_system::update(entt::registry &es, TimeDelta dt) {
 
 void scene_system::remove(scene *old_scene) {
     _scenes_to_erase.push_back(old_scene->_id);
+    // do not delete pointer
 }
 
-void scene_system::add(scene *scene) {
-    scene->_id = _id_counter++;
-    _scenes_to_add.emplace_back(scene);
+void scene_system::add(unique_ptr<scene> new_scene) {
+    for(auto &scene : _scenes) {
+        if(scene->_type == new_scene->_type) {
+            return;
+        }
+    }
+
+    new_scene->_id = _id_counter++;
+    _scenes_to_add.emplace_back(move(new_scene));
 }
 
-void scene_system::force_goto_scene(scene *new_scene) {
+void scene_system::force_goto_scene(unique_ptr<scene> new_scene) {
     if(_force_goto_scene) {
         spdlog::error("[{}] force goto scene wasn't empty", __FUNCTION__);
         throw runtime_error("force goto scene wasn't empty");
     }
 
-    _force_goto_scene.reset(new_scene);
+    _force_goto_scene = move(new_scene);
 }
 
 config * scene_system::get_config() {

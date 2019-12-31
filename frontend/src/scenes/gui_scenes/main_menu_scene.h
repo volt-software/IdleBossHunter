@@ -24,7 +24,7 @@
 namespace ibh {
     class main_menu_scene : public scene  {
     public:
-        main_menu_scene() = default;
+        main_menu_scene() : scene(4) {}
         ~main_menu_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;

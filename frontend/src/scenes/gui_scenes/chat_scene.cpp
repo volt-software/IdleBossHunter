@@ -28,7 +28,7 @@
 using namespace std;
 using namespace ibh;
 
-chat_scene::chat_scene(vector<account_object> online_users) : _online_users(move(online_users)), _first_frame(true) {
+chat_scene::chat_scene(vector<account_object> online_users) : scene(1), _messages(), _online_users(move(online_users)), _first_frame(true) {
 
 }
 

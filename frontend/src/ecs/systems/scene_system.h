@@ -42,8 +42,8 @@ namespace ibh {
 
         // iscene_manager
         void remove(scene *old_scene) override;
-        void add(scene *scene) override;
-        void force_goto_scene(scene *new_scene) override;
+        void add(unique_ptr<scene> scene) override;
+        void force_goto_scene(unique_ptr<scene> new_scene) override;
         config * get_config() override;
         entt::registry& get_entity_registry() override;
         int get_socket() override;
