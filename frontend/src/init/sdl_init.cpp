@@ -29,6 +29,10 @@
 #include <glm/ext.hpp>
 #include "spdlog/spdlog.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/html5.h>
+#endif
+
 void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam) {
     if(severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
         return;
@@ -74,6 +78,14 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
     }
 }
 
+EM_BOOL emscripten_window_resized_callback(int eventType, const void *reserved, void *userData){
+    double width, height;
+    emscripten_get_element_css_size("#canvas", &width, &height);
+    SDL_SetWindowSize(ibh::window, (int)width, (int)height);
+    return true;
+}
+
+
 void ibh::init_sdl(config &config) noexcept {
 #ifdef WINDOWS
     // see https://nlguillemot.wordpress.com/2016/12/11/high-dpi-rendering/
@@ -107,16 +119,29 @@ void ibh::init_sdl(config &config) noexcept {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+//config.auto_fullscreen = true;
+
     if (config.auto_fullscreen) {
         window = SDL_CreateWindow("IdleBossHunter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                  0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
+                                  0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
     } else {
         window = SDL_CreateWindow("IdleBossHunter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                  config.screen_width, config.screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+                                  config.screen_width, config.screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
     }
     if (window == nullptr) {
         spdlog::error("[{}] Couldn't initialize window: {}", __FUNCTION__, SDL_GetError());
         exit(1);
+    }
+
+    try {
+        EmscriptenFullscreenStrategy strategy;
+        strategy.scaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF;
+        strategy.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT;
+        strategy.canvasResizedCallback = emscripten_window_resized_callback;
+        strategy.canvasResizedCallbackUserData = nullptr;   // pointer to user data
+        emscripten_enter_soft_fullscreen("#canvas", &strategy);
+    } catch (std::exception &e) {
+        spdlog::info("[{}] canvas exception {}", e.what());
     }
 
     int w, h, draw_w, draw_h;

@@ -62,7 +62,7 @@ include_directories("${EXTERNAL_DIR}/pcg-cpp/include")
 include_directories("${EXTERNAL_DIR}/concurrentqueue")
 include_directories("${EXTERNAL_DIR}/cereal/include")
 
-set_target_properties(ibh_frontend.html PROPERTIES LINK_FLAGS "--no-heap-copy --preload-file ${TOP_DIR}/assets@/assets")
+set_target_properties(ibh_frontend.html PROPERTIES LINK_FLAGS "--no-heap-copy --preload-file ${TOP_DIR}/assets@/assets -s DISABLE_EXCEPTION_CATCHING=0")
 target_link_libraries(ibh_frontend.html PUBLIC -lpthread -lwebsocket.js)
 target_link_libraries(ibh_frontend.html PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_frontend.html PUBLIC ${OPENSSL_LIBRARIES})
