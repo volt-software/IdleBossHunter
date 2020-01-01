@@ -39,6 +39,6 @@ namespace ibh {
 
         string motd;
 
-        inline static constexpr uint32_t type = 2;
+        inline static constexpr uint64_t type = generate_type<set_motd_request>();
     };
 }

@@ -45,7 +45,7 @@ string character_select_response::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.String(KEY_STRING("classes"));
     writer.StartArray();
@@ -135,7 +135,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[character_select_response] deserialize failed wrong type");
         return nullptr;
     }

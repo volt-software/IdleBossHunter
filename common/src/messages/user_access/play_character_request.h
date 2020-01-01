@@ -39,6 +39,6 @@ namespace ibh {
 
         uint32_t slot;
 
-        inline static constexpr uint32_t type = 11;
+        inline static constexpr uint64_t type = generate_type<play_character_request>();
     };
 }

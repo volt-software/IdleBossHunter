@@ -34,7 +34,7 @@ string update_response::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
 
     writer.EndObject();
@@ -47,7 +47,7 @@ unique_ptr<update_response> update_response::deserialize(rapidjson::Document con
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[update_response] deserialize failed wrong type");
         return nullptr;
     }

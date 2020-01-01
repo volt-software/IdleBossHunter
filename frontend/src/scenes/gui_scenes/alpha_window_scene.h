@@ -24,7 +24,7 @@
 namespace ibh {
     class alpha_window_scene : public scene  {
     public:
-        alpha_window_scene() : scene(0) {}
+        alpha_window_scene() : scene(generate_type<alpha_window_scene>()) {}
         ~alpha_window_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;

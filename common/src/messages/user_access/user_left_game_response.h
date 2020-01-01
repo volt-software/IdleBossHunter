@@ -39,6 +39,6 @@ namespace ibh {
 
         string username;
 
-        inline static constexpr uint32_t type = 15;
+        inline static constexpr uint64_t type = generate_type<user_left_game_response>();
     };
 }

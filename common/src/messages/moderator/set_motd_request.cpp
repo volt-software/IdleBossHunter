@@ -35,7 +35,7 @@ string set_motd_request::serialize() const {
     writer.StartObject();
 
     writer.String("type");
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.String("motd");
     writer.String(motd.c_str(), motd.size());
@@ -51,7 +51,7 @@ unique_ptr<set_motd_request> set_motd_request::deserialize(rapidjson::Document c
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[set_motd_request] deserialize failed wrong type");
         return nullptr;
     }

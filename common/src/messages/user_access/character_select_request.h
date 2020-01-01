@@ -37,6 +37,6 @@ namespace ibh {
         [[nodiscard]]
         static unique_ptr<character_select_request> deserialize(rapidjson::Document const &d);
 
-        inline static constexpr uint32_t type = 4;
+        inline static constexpr uint64_t type = generate_type<character_select_request>();
     };
 }

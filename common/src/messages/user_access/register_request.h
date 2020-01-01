@@ -41,6 +41,6 @@ namespace ibh {
         string password;
         string email;
 
-        inline static constexpr uint32_t type = 12;
+        inline static constexpr uint64_t type = generate_type<register_request>();
     };
 }

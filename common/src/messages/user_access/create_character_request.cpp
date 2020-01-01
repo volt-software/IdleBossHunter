@@ -35,7 +35,7 @@ string create_character_request::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.String(KEY_STRING("slot"));
     writer.Uint(slot);
@@ -59,7 +59,7 @@ unique_ptr<create_character_request> create_character_request::deserialize(rapid
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[create_character_request] deserialize failed wrong type");
         return nullptr;
     }

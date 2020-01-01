@@ -35,7 +35,7 @@ string user_entered_game_response::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     write_account_object(writer, user);
 
@@ -50,7 +50,7 @@ unique_ptr<user_entered_game_response> user_entered_game_response::deserialize(r
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[user_entered_game_response] deserialize failed wrong type");
         return nullptr;
     }

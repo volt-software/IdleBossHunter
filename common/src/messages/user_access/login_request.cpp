@@ -34,7 +34,7 @@ string login_request::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.String(KEY_STRING("username"));
     writer.String(username.c_str(), username.size());
@@ -52,7 +52,7 @@ unique_ptr<login_request> login_request::deserialize(rapidjson::Document const &
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[login_request] deserialize failed wrong type");
         return nullptr;
     }

@@ -42,6 +42,6 @@ namespace ibh {
         string race;
         string baseclass;
 
-        inline static constexpr uint32_t type = 6;
+        inline static constexpr uint64_t type = generate_type<create_character_request>();
     };
 }

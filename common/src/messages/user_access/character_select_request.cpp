@@ -34,7 +34,7 @@ string character_select_request::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.EndObject();
     return sb.GetString();
@@ -46,7 +46,7 @@ unique_ptr<character_select_request> character_select_request::deserialize(rapid
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[character_select_request] deserialize failed wrong type");
         return nullptr;
     }

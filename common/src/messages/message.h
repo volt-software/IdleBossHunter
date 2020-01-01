@@ -20,15 +20,11 @@
 
 #include <string>
 #include <spdlog/spdlog.h>
+#include <constexpr_wyhash.h>
 
 using namespace std;
 
 namespace ibh {
-    int constexpr string_length(const char* str)
-    {
-        return *str ? 1 + string_length(str + 1) : 0;
-    }
-
 #define KEY_STRING(str) str, string_length(str)
 
     struct message {

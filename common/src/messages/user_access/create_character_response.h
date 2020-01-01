@@ -40,6 +40,6 @@ namespace ibh {
 
         character_object character;
 
-        inline static constexpr uint32_t type = 7;
+        inline static constexpr uint64_t type = generate_type<create_character_response>();
     };
 }

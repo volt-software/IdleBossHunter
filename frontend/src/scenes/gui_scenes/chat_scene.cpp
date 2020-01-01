@@ -44,6 +44,9 @@ void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         static char bufmsg[100];
 
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)) {
+            ImGui::SetKeyboardFocusHere(0);
+        }
         ImGui::PushItemWidth(-1);
         if(ImGui::InputTextWithHint("|chat message", "<message>", bufmsg, 100, ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue)) {
             send_message<message_request>(manager, string{bufmsg});

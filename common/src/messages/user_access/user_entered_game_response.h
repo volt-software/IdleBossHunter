@@ -40,6 +40,6 @@ namespace ibh {
 
         account_object user;
 
-        inline static constexpr uint32_t type = 13;
+        inline static constexpr uint64_t type = generate_type<user_entered_game_response>();
     };
 }

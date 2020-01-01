@@ -42,6 +42,6 @@ namespace ibh {
         string source;
         uint64_t unix_timestamp;
 
-        inline static constexpr uint32_t type = 1;
+        inline static constexpr uint64_t type = generate_type<message_response>();
     };
 }

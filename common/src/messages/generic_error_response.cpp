@@ -35,7 +35,7 @@ string generic_error_response::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.String(KEY_STRING("error"));
     writer.String(error.c_str(), error.size());
@@ -63,7 +63,7 @@ unique_ptr<generic_error_response> generic_error_response::deserialize(rapidjson
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[generic_error_response] deserialize failed wrong type");
         return nullptr;
     }

@@ -46,6 +46,6 @@ namespace ibh {
         string email;
         string motd;
 
-        inline static constexpr uint32_t type = 10;
+        inline static constexpr uint64_t type = generate_type<login_response>();
     };
 }

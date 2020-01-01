@@ -40,6 +40,6 @@ namespace ibh {
         string username;
         string password;
 
-        inline static constexpr uint32_t type = 9;
+        inline static constexpr uint64_t type = generate_type<login_request>();
     };
 }

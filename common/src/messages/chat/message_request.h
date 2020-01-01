@@ -39,6 +39,6 @@ namespace ibh {
 
         string content;
 
-        inline static constexpr uint32_t type = 0;
+        inline static constexpr uint64_t type = generate_type<message_request>();
     };
 }

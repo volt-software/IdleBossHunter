@@ -34,7 +34,7 @@ string create_character_response::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     write_character_object(writer, character);
 
@@ -48,7 +48,7 @@ unique_ptr<create_character_response> create_character_response::deserialize(rap
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[create_character_response] deserialize failed wrong type");
         return nullptr;
     }

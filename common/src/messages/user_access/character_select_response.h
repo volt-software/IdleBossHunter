@@ -62,6 +62,6 @@ namespace ibh {
         vector<character_race> races;
         vector<character_class> classes;
 
-        inline static constexpr uint32_t type = 5;
+        inline static constexpr uint64_t type = generate_type<character_select_response>();
     };
 }

@@ -35,7 +35,7 @@ string register_request::serialize() const {
     writer.StartObject();
 
     writer.String(KEY_STRING("type"));
-    writer.Uint(type);
+    writer.Uint64(type);
 
     writer.String(KEY_STRING("username"));
     writer.String(username.c_str(), username.size());
@@ -56,7 +56,7 @@ unique_ptr<register_request> register_request::deserialize(rapidjson::Document c
         return nullptr;
     }
 
-    if(d["type"].GetUint() != type) {
+    if(d["type"].GetUint64() != type) {
         spdlog::warn("[register_request] deserialize failed wrong type");
         return nullptr;
     }
