@@ -180,7 +180,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void show_characters_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
+void show_characters_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
     switch (type) {
         case update_response::type: {
             auto resp_msg = dynamic_cast<update_response*>(msg);

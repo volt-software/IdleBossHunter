@@ -101,7 +101,7 @@ void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void chat_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
+void chat_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
     switch (type) {
         case message_response::type: {
             auto resp_msg = dynamic_cast<message_response*>(msg);

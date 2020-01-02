@@ -107,7 +107,7 @@ void scene_system::init_main_menu() {
     _scenes.push_back(move(alpha_window));
 }
 
-unique_ptr<message> deserialize_message(uint32_t &type, rapidjson::Document &d) {
+unique_ptr<message> deserialize_message(uint64_t &type, rapidjson::Document &d) {
     switch(type){
         case login_response::type: {
             return login_response::deserialize(d);
@@ -142,7 +142,7 @@ unique_ptr<message> deserialize_message(uint32_t &type, rapidjson::Document &d) 
 }
 
 void scene_system::handle_message(rapidjson::Document &d) {
-    auto type = d["type"].GetUint();
+    auto type = d["type"].GetUint64();
     auto msg = deserialize_message(type, d);
 
     if(!msg) {

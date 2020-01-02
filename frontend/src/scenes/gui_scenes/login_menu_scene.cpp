@@ -87,7 +87,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void login_menu_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
+void login_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
     spdlog::trace("[{}] received message {}", __FUNCTION__, type);
     switch (type) {
         case login_response::type: {

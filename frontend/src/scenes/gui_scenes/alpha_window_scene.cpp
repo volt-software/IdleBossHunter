@@ -38,6 +38,6 @@ void alpha_window_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void alpha_window_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
+void alpha_window_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
 
 }

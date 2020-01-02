@@ -33,7 +33,7 @@ namespace ibh {
         virtual ~scene() = default;
 
         virtual void update(iscene_manager *manager, TimeDelta dt) = 0;
-        virtual void handle_message(iscene_manager *manager, uint32_t type, message* msg) = 0;
+        virtual void handle_message(iscene_manager *manager, uint64_t type, message* msg) = 0;
 
         template <class TemplateClass, typename... Args>
         void send_message(iscene_manager *manager, Args&&... args)

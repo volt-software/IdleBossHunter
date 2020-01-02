@@ -40,6 +40,6 @@ void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
 }
 
-void main_menu_scene::handle_message(iscene_manager *manager, uint32_t type, message *msg) {
+void main_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
 
 }
