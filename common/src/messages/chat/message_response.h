@@ -26,7 +26,7 @@
 using namespace std;
 
 namespace ibh {
-    struct message_response : public message {
+    struct message_response : message {
         message_response(string user, string content, string source, uint64_t unix_timestamp) noexcept;
 
         ~message_response() noexcept override = default;

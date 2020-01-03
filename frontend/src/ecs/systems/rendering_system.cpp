@@ -35,7 +35,7 @@ void rendering_system::update(entt::registry &es, TimeDelta dt) {
 
     auto view = es.view<atlas_component>();
     for(auto entity : view) {
-        atlas_component &atlas_comp = view.get(entity);
+        atlas_component const &atlas_comp = view.get(entity);
         atlas_comp.atlas->render();
     }
 

@@ -32,9 +32,9 @@ TEST_CASE("random_helper tests") {
             REQUIRE(ret2 >= -5);
             REQUIRE(ret2 <= 5);
 
-            auto ret3 = ibh::random.generate_single(-0.5f, .5f);
-            REQUIRE(ret3 >= -0.5f);
-            REQUIRE(ret3 <= .5f);
+            auto ret3 = ibh::random.generate_single(-0.5F, .5F);
+            REQUIRE(ret3 >= -0.5F);
+            REQUIRE(ret3 <= .5F);
 
             auto ret4 = ibh::random.generate_single(-0.5, .5);
             REQUIRE(ret4 >= -0.5);

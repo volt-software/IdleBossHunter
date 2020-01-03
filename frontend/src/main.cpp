@@ -284,7 +284,7 @@ int main(int argc, char* argv[]) {
     config.music_to_play = 1;
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop([]{}, 0, 0);
+    emscripten_set_main_loop([]{ /* Only setting main loop so that an emscripten warning gets quenched */ }, 0, 0);
 #endif
 
     entt::registry es{};
@@ -296,7 +296,7 @@ int main(int argc, char* argv[]) {
     init_sdl_mixer();
 
     set_threads_config(config);
-    auto& io = init_imgui();
+    /*auto& io =*/ init_imgui();
 
     timer<microseconds> fps_timer{};
     timer<microseconds> tick_timer{};
@@ -360,8 +360,8 @@ int main(int argc, char* argv[]) {
                             config.screen_width = e.window.data1;
                             config.screen_height = e.window.data2;
                             spdlog::info("Resize to {}x{}", config.screen_width, config.screen_height);
-                            projection = glm::ortho(0.0f, (float) config.screen_width, (float) config.screen_height,
-                                                    0.0f, -1.0f, 1.0f);
+                            projection = glm::ortho(0.0F, (float) config.screen_width, (float) config.screen_height,
+                                                    0.0F, -1.0F, 1.0F);
                         }
                         break;
                     }
@@ -370,17 +370,17 @@ int main(int argc, char* argv[]) {
                             spdlog::info("userevent {}", e.user.code);
                             switch (e.user.code) {
                                 case 0: {
-                                    projection = glm::ortho(0.0f, 1280.f, 720.f, 0.0f, -1.0f, 1.0f);
+                                    projection = glm::ortho(0.0F, 1280.F, 720.F, 0.0F, -1.0F, 1.0F);
                                     SDL_SetWindowSize(window, 1280, 720);
                                     break;
                                 }
                                 case 1: {
-                                    projection = glm::ortho(0.0f, 1600.f, 900.f, 0.0f, -1.0f, 1.0f);
+                                    projection = glm::ortho(0.0F, 1600.F, 900.F, 0.0F, -1.0F, 1.0F);
                                     SDL_SetWindowSize(window, 1600, 900);
                                     break;
                                 }
                                 case 2: {
-                                    projection = glm::ortho(0.0f, 1920.f, 1080.f, 0.0f, -1.0f, 1.0f);
+                                    projection = glm::ortho(0.0F, 1920.F, 1080.F, 0.0F, -1.0F, 1.0F);
                                     SDL_SetWindowSize(window, 1920, 1080);
                                     break;
                                 }
@@ -407,6 +407,8 @@ int main(int argc, char* argv[]) {
                                     config.music_to_play = *val;
                                     delete val;
                                 }
+                                default:
+                                    break;
                             }
                         }
                         break;
@@ -432,9 +434,9 @@ int main(int argc, char* argv[]) {
             auto fps_ticks = fps_timer.get_ticks();
             if (config.log_fps && fps_ticks > 1'000'000) {
                 spdlog::info("[main] FPS {}-{} - frame times max/avg/min: {} / {} / {} µs", counted_frames,
-                             counted_frames / (fps_ticks / 1'000'000.f),
+                             counted_frames / (fps_ticks / 1'000'000.F),
                              *max_element(begin(frame_times), end(frame_times)),
-                             accumulate(begin(frame_times), end(frame_times), 0ul) / frame_times.size(),
+                             accumulate(begin(frame_times), end(frame_times), 0UL) / frame_times.size(),
                              *min_element(begin(frame_times), end(frame_times)));
                 fps_timer.start();
                 frame_times.clear();

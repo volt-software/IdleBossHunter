@@ -25,7 +25,7 @@
 using namespace std;
 
 namespace ibh {
-#define KEY_STRING(str) str, string_length(str)
+#define KEY_STRING(str) (str), string_length((str))
 
     struct message {
         virtual ~message() = default;

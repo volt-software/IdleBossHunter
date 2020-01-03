@@ -37,8 +37,8 @@ scene_system::scene_system(config *config, entt::registry &es)
         : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), es(es), _id_counter(0) {
 }
 
-void scene_system::update(entt::registry &es, TimeDelta dt) {
-    for(auto& scene : _scenes) {
+void scene_system::update(entt::registry &unused, TimeDelta dt) {
+    for(auto const & scene : _scenes) {
         scene->update(this, dt);
         if(scene->_closed) {
             remove(scene.get());
@@ -56,8 +56,8 @@ void scene_system::update(entt::registry &es, TimeDelta dt) {
         return;
     }
 
-    for(auto &scene_id : _scenes_to_erase) {
-        _scenes.erase(remove_if(begin(_scenes), end(_scenes), [=](const unique_ptr<scene> &sc) noexcept { return sc->_id == scene_id; }), end(_scenes));
+    for(auto const &scene_id : _scenes_to_erase) {
+        _scenes.erase(remove_if(begin(_scenes), end(_scenes), [scene_id](const unique_ptr<scene> &sc) noexcept { return sc->_id == scene_id; }), end(_scenes));
     }
 
     _scenes.reserve(_scenes.size() + _scenes_to_add.size());
@@ -73,7 +73,7 @@ void scene_system::remove(scene *old_scene) {
 }
 
 void scene_system::add(unique_ptr<scene> new_scene) {
-    for(auto &scene : _scenes) {
+    for(auto const &scene : _scenes) {
         if(scene->_type == new_scene->_type) {
             return;
         }
@@ -107,41 +107,32 @@ void scene_system::init_main_menu() {
     _scenes.push_back(move(alpha_window));
 }
 
-unique_ptr<message> deserialize_message(uint64_t &type, rapidjson::Document &d) {
+unique_ptr<message> deserialize_message(uint64_t const &type, rapidjson::Document const &d) {
     switch(type){
-        case login_response::type: {
+        case login_response::type:
             return login_response::deserialize(d);
-        }
-        case generic_error_response::type: {
+        case generic_error_response::type:
             return generic_error_response::deserialize(d);
-        }
-        case generic_ok_response::type: {
+        case generic_ok_response::type:
             return generic_ok_response::deserialize(d);
-        }
-        case character_select_response::type: {
+        case character_select_response::type:
             return character_select_response::deserialize(d);
-        }
-        case create_character_response::type: {
+        case create_character_response::type:
             return create_character_response::deserialize(d);
-        }
-        case user_entered_game_response::type: {
+        case user_entered_game_response::type:
             return user_entered_game_response::deserialize(d);
-        }
-        case user_left_game_response::type: {
+        case user_left_game_response::type:
             return user_left_game_response::deserialize(d);
-        }
-        case message_response::type: {
+        case message_response::type:
             return message_response::deserialize(d);
-        }
-        case play_character_response::type: {
+        case play_character_response::type:
             return play_character_response::deserialize(d);
-        }
         default:
             return nullptr;
     }
 }
 
-void scene_system::handle_message(rapidjson::Document &d) {
+void scene_system::handle_message(rapidjson::Document const &d) {
     auto type = d["type"].GetUint64();
     auto msg = deserialize_message(type, d);
 
@@ -152,7 +143,7 @@ void scene_system::handle_message(rapidjson::Document &d) {
 
     spdlog::trace("[{}] Handling message type {} for {} scenes", __FUNCTION__, type, _scenes.size());
 
-    for(auto& scene : _scenes) {
+    for(auto const & scene : _scenes) {
         scene->handle_message(this, type, msg.get());
     }
 }
@@ -164,7 +155,7 @@ entt::registry &scene_system::get_entity_registry() {
 int scene_system::get_socket() {
     auto view = es.view<socket_component>();
     for (auto entity : view) {
-        socket_component &socket = view.get<socket_component>(entity);
+        socket_component const &socket = view.get<socket_component>(entity);
         return socket.socket;
     }
 

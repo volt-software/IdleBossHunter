@@ -60,7 +60,7 @@ void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
         if(_first_frame) {
             ImGui::SetColumnWidth(-1, 500.0F);
         }
-        for(auto &msg : _messages) {
+        for(auto const &msg : _messages) {
             ImGui::Text("%s", msg.c_str());
         }
         ImGui::NextColumn();
@@ -69,12 +69,12 @@ void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
             ImGui::SetColumnWidth(-1, 100.0F);
             _first_frame = false;
         }
-        for(auto &user : _online_users) {
+        for(auto const &user : _online_users) {
             if(user.is_game_master) {
-                ImGui::PushStyleColor(ImGuiCol_Text,  ImVec4(1.0F, 0.4f, 0.4f, 1.0F));
+                ImGui::PushStyleColor(ImGuiCol_Text,  ImVec4(1.0F, 0.4F, 0.4F, 1.0F));
             }
             if(user.is_tester) {
-                ImGui::PushStyleColor(ImGuiCol_Text,  ImVec4(0.4F, 1.0f, 0.4f, 1.0F));
+                ImGui::PushStyleColor(ImGuiCol_Text,  ImVec4(0.4F, 1.0F, 0.4F, 1.0F));
             }
 
             ImGui::Text("%s", user.username.c_str());

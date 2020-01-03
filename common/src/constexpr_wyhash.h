@@ -23,9 +23,9 @@ using namespace std;
 
 #pragma once
 namespace ibh {
-    static inline constexpr uint64_t constexpr_wyrotr(uint64_t v, unsigned k) { return (v >> k) | (v << (64 - k)); }
+    static constexpr uint64_t constexpr_wyrotr(uint64_t v, unsigned k) { return (v >> k) | (v << (64 - k)); }
 
-    static inline constexpr uint64_t constexpr_wymum(uint64_t A, uint64_t B) {
+    static constexpr uint64_t constexpr_wymum(uint64_t A, uint64_t B) {
 #ifdef    WYHASH32
         uint64_t	hh=(A>>32)*(B>>32),	hl=(A>>32)*(unsigned)B,	lh=(unsigned)A*(B>>32),	ll=(uint64_t)(unsigned)A*(unsigned)B;
         return	constexpr_wyrotr(hl,32)^constexpr_wyrotr(lh,32)^hh^ll;
@@ -45,7 +45,7 @@ namespace ibh {
     }
 
     template<typename T>
-    static inline constexpr uint64_t constexpr_wyr8(const T *p) {
+    static constexpr uint64_t constexpr_wyr8(const T *p) {
         uint64_t v = 0;
         v = ((uint64_t) p[0] << 56) | ((uint64_t) p[1] << 48) | ((uint64_t) p[2] << 40) | ((uint64_t) p[3] << 32) |
             (p[4] << 24) | (p[5] << 16) | (p[6] << 8) | p[7];
@@ -53,19 +53,19 @@ namespace ibh {
     }
 
     template<typename T>
-    static inline constexpr uint64_t constexpr_wyr4(const T *p) {
+    static constexpr uint64_t constexpr_wyr4(const T *p) {
         uint32_t v = 0;
         v = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
         return v;
     }
 
     template<typename T>
-    static inline constexpr uint64_t constexpr_wyr3(const T *p, unsigned k) {
+    static constexpr uint64_t constexpr_wyr3(const T *p, unsigned k) {
         return (((uint64_t) p[0]) << 16) | (((uint64_t) p[k >> 1]) << 8) | p[k - 1];
     }
 
     template<typename T>
-    static inline constexpr uint64_t constexpr_wyhash(const T *key, uint64_t len, uint64_t seed) {
+    static constexpr uint64_t constexpr_wyhash(const T *key, uint64_t len, uint64_t seed) {
         static_assert(sizeof(T) == 1, "T must be a char or uint8_t kind type");
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
         if (__builtin_expect(!len, 0)) return 0;
@@ -139,7 +139,9 @@ namespace ibh {
 
     template<typename T>
     constexpr auto type_name() {
-        string_view name, prefix, suffix;
+        string_view name;
+        string_view prefix;
+        string_view suffix;
 #ifdef __clang__
         name = __PRETTY_FUNCTION__;
         prefix = "auto type_name() [T = ";

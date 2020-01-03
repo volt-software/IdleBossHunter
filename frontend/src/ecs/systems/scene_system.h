@@ -31,7 +31,7 @@
 #include <optional>
 
 namespace ibh {
-    class scene_system : public ecs_system, iscene_manager  {
+    class scene_system : public ecs_system, public iscene_manager  {
     public:
         explicit scene_system(config *config, entt::registry &es);
 
@@ -52,7 +52,7 @@ namespace ibh {
         void init_main_menu();
 
         // message handling
-        void handle_message(rapidjson::Document &d);
+        void handle_message(rapidjson::Document const &d);
     private:
         config *_config;
         vector<unique_ptr<scene>> _scenes;

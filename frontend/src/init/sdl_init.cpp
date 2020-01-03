@@ -79,7 +79,8 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
 }
 
 EM_BOOL emscripten_window_resized_callback(int eventType, const void *reserved, void *userData){
-    double width, height;
+    double width;
+    double height;
     emscripten_get_element_css_size("#canvas", &width, &height);
     SDL_SetWindowSize(ibh::window, (int)width, (int)height);
     return true;
@@ -119,8 +120,6 @@ void ibh::init_sdl(config &config) noexcept {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-//config.auto_fullscreen = true;
-
     if (config.auto_fullscreen) {
         window = SDL_CreateWindow("IdleBossHunter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                   0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
@@ -140,11 +139,14 @@ void ibh::init_sdl(config &config) noexcept {
         strategy.canvasResizedCallback = emscripten_window_resized_callback;
         strategy.canvasResizedCallbackUserData = nullptr;   // pointer to user data
         emscripten_enter_soft_fullscreen("#canvas", &strategy);
-    } catch (std::exception &e) {
+    } catch (std::exception const &e) {
         spdlog::info("[{}] canvas exception {}", e.what());
     }
 
-    int w, h, draw_w, draw_h;
+    int w;
+    int h;
+    int draw_w;
+    int draw_h;
     SDL_GetWindowSize(window, &w, &h);
     config.screen_width = w;
     config.screen_height = h;
@@ -203,7 +205,7 @@ void ibh::init_sdl(config &config) noexcept {
 
     spdlog::info("[{}] display properties: {}x{}@{}", __FUNCTION__, current.w, current.h, current.refresh_rate);
 
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(0.F, 0.F, 0.F, 1.F);
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -234,7 +236,7 @@ void ibh::init_sdl(config &config) noexcept {
 
     SDL_StartTextInput();
 
-    projection = glm::ortho(0.0f, (float) config.screen_width, (float) config.screen_height, 0.0f, -1.0f, 1.0f);
+    projection = glm::ortho(0.0F, (float) config.screen_width, (float) config.screen_height, 0.0F, -1.0F, 1.0F);
 
     config.user_event_type = SDL_RegisterEvents(1);
     if(config.user_event_type == std::numeric_limits<uint32_t>::max()){

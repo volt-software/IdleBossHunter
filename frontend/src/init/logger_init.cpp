@@ -25,8 +25,6 @@
 void ibh::reconfigure_logger(config const& config) noexcept {
     auto console_sink = make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
-    auto time_since_epoch = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
-
     auto logger = make_shared<spdlog::logger>("multi_sink"s, spdlog::sinks_init_list{console_sink});
 
     if(!config.debug_level.empty()) {

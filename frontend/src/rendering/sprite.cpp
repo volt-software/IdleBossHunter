@@ -52,13 +52,13 @@ array<GLfloat, 24> ibh::sprite::get_vertex_data() {
     float h = _position.w;
 
     array<GLfloat, 24> vertex_data = {
-            x, y, 0.0f, 0.0f,
-            x+w, y, 1.0f, 0.0f,
-            x, y+h, 0.0f, 1.0f,
+            x, y, 0.0F, 0.0F,
+            x+w, y, 1.0F, 0.0F,
+            x, y+h, 0.0F, 1.0F,
 
-            x+w, y, 1.0f, 0.0f,
-            x, y+h, 0.0f, 1.0f,
-            x+w, y+h, 1.0f, 1.0f
+            x+w, y, 1.0F, 0.0F,
+            x, y+h, 0.0F, 1.0F,
+            x+w, y+h, 1.0F, 1.0F
     };
 
     if(_clip) {

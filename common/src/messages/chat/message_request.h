@@ -26,7 +26,7 @@
 using namespace std;
 
 namespace ibh {
-    struct message_request : public message {
+    struct message_request : message {
         explicit message_request(string content) noexcept;
 
         ~message_request() noexcept override = default;
