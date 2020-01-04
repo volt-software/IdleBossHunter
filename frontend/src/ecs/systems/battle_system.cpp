@@ -1,5 +1,5 @@
 /*
-    IdleBossHunter
+    RealmOfAesir
     Copyright (C) 2020 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,4 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
-#include <game_queue_messages/messages.h>
-
-using namespace std;
-
-namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_register(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-                         per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
-}
+#include "battle_system.h"

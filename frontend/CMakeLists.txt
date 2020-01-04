@@ -30,7 +30,7 @@ file(GLOB ZstdCommonSources ${LIBRARY_DIR}/common/*.c)
 file(GLOB ZstdCompressSources ${LIBRARY_DIR}/compress/*.c)
 file(GLOB ZstdDecompressSources ${LIBRARY_DIR}/decompress/*.c)
 file(GLOB ZstdDictBuilderSources ${LIBRARY_DIR}/dictBuilder/*.c)
-add_executable(ibh_frontend.html ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES} ${ZstdCommonSources} ${ZstdCompressSources} ${ZstdDecompressSources} ${ZstdDictBuilderSources})
+add_executable(ibh_frontend.html ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES} ${ZstdCommonSources} ${ZstdCompressSources} ${ZstdDecompressSources} ${ZstdDictBuilderSources} src/ecs/systems/battle_system.cpp src/ecs/systems/battle_system.h)
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
