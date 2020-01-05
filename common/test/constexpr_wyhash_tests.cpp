@@ -1,5 +1,5 @@
 /*
-    RealmOfAesir
+    IdleBossHunter
     Copyright (C) 2020 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -16,4 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ai_system.h"
+#include <catch2/catch.hpp>
+#include "constexpr_wyhash.h"
+
+using namespace std;
+using namespace ibh;
+
+namespace ibh {
+    class test_class {
+
+    };
+}
+
+TEST_CASE("constexpr_wyhash tests") {
+    SECTION("typename should return correct name") {
+        auto name = type_name<test_class>();
+        REQUIRE(name == "ibh::test_class");
+    }
+}

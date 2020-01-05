@@ -38,6 +38,7 @@
 #include <asset_loading/load_assets.h>
 //#include <ai/default_ai.h>
 #include <messages/generic_error_response.h>
+#include <random_helper.h>
 
 using namespace std;
 using namespace ibh;
@@ -266,6 +267,22 @@ void bench_rapidjson_with_strlen() {
     spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
+void bench_random_helper() {
+    if(quit) {
+        return;
+    }
+
+    auto start = chrono::system_clock::now();
+
+    for(int64_t i = 0; i < 1'000'000; i++) {
+        ibh::random.generate_single(0L, i);
+    }
+
+    auto end = chrono::system_clock::now();
+
+    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
+}
+
 int main(int argc, char **argv) {
     set_cwd(get_selfpath());
     ::signal(SIGINT, on_sigint);
@@ -307,14 +324,15 @@ int main(int argc, char **argv) {
 //        return 1;
 //    }
 
-    bench_censor_sensor();
+//    bench_censor_sensor();
 //    bench_fov(m.value());
-    bench_hashing();
-    bench_hash_verify();
+//    bench_hashing();
+//    bench_hash_verify();
 //    bench_a_star(m.value());
 //    bench_default_ai(m.value());
-    bench_serialization();
-    bench_serialization_cereal();
+//    bench_serialization();
+//    bench_serialization_cereal();
 //    bench_rapidjson_without_strlen();
 //    bench_rapidjson_with_strlen();
+    bench_random_helper();
 }

@@ -54,7 +54,7 @@ namespace ibh {
             shared_lock lock(user_connections_mutex);
             for (auto &[conn_id, other_user_data] : user_connections) {
                 if (other_user_data.connection_id != user_data->connection_id && other_user_data.user_id == user_data->user_id &&
-                    other_user_data.playing_character_slot == msg->slot) {
+                    other_user_data.playing_character_slot == static_cast<int32_t>(msg->slot)) {
                     SEND_ERROR("Already playing that slot on another connection", "", "", true);
                     return;
                 }

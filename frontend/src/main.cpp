@@ -53,6 +53,7 @@
 #include "init/sdl_init.h"
 #include "init/logger_init.h"
 #include "scenes/gui_scenes/connection_lost_scene.h"
+#include <messages/user_access/login_request.h>
 
 using namespace std;
 using namespace ibh;
@@ -201,7 +202,7 @@ EM_BOOL WebSocketMessage(int eventType, const EmscriptenWebSocketMessageEvent *e
         rapidjson::Document d{};
         d.Parse(reinterpret_cast<char *>(e->data), e->numBytes);
 
-        if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsUint()) {
+        if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsUint64()) {
             spdlog::warn("[{}] deserialize failed", __FUNCTION__);
             return 0;
         }

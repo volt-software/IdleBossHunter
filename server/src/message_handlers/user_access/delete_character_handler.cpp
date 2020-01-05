@@ -17,13 +17,13 @@
 */
 
 
-#include "create_character_handler.h"
+#include "delete_character_handler.h"
 
 #include <spdlog/spdlog.h>
 
 #include <messages/user_access/delete_character_request.h>
+#include <messages/user_access/delete_character_response.h>
 #include <repositories/characters_repository.h>
-#include <messages/generic_ok_response.h>
 #include <uws_thread.h>
 #include "message_handlers/handler_macros.h"
 
@@ -40,7 +40,7 @@ namespace ibh {
             shared_lock lock(user_connections_mutex);
             for (auto &[conn_id, other_user_data] : user_connections) {
                 if (other_user_data.user_id == user_data->user_id && other_user_data.playing_character_slot >= 0 &&
-                    other_user_data.playing_character_slot == msg->slot) {
+                    other_user_data.playing_character_slot == static_cast<int32_t>(msg->slot)) {
                     SEND_ERROR("Already playing that slot on another connection", "", "", true);
                     return;
                 }
@@ -52,7 +52,7 @@ namespace ibh {
         player_repo.delete_character_by_slot(msg->slot, user_data->user_id, transaction);
         transaction->commit();
 
-        generic_ok_response response{fmt::format("Character in slot {} deleted", msg->slot)};
+        delete_character_response response{msg->slot};
         auto response_msg = response.serialize();
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
     }

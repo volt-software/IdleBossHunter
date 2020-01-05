@@ -24,6 +24,7 @@
 #include <messages/user_access/login_response.h>
 #include <messages/user_access/character_select_response.h>
 #include <messages/user_access/create_character_response.h>
+#include <messages/user_access/delete_character_response.h>
 #include <messages/user_access/user_entered_game_response.h>
 #include <messages/user_access/user_left_game_response.h>
 #include <messages/user_access/play_character_response.h>
@@ -119,6 +120,8 @@ unique_ptr<message> deserialize_message(uint64_t const &type, rapidjson::Documen
             return character_select_response::deserialize(d);
         case create_character_response::type:
             return create_character_response::deserialize(d);
+        case delete_character_response::type:
+            return delete_character_response::deserialize(d);
         case user_entered_game_response::type:
             return user_entered_game_response::deserialize(d);
         case user_left_game_response::type:

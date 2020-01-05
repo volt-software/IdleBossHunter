@@ -43,14 +43,14 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
         return {};
     }
 
-    vector<stat_component> stats;
+    ibh_flat_map<string, stat_component> stats;
     stats.reserve(d["stats"].MemberCount());
 
     for (auto const &stat : stat_names) {
         if(d["stats"].HasMember(stat.c_str())) {
-            stats.emplace_back(stat, d["stats"][stat.c_str()].GetInt64());
+            stats.insert(ibh_flat_map<string, stat_component>::value_type{stat, stat_component{stat, d["stats"][stat.c_str()].GetInt64()}});
         }
     }
 
-    return monster_definition_component(d["name"].GetString(), d["min_level"].GetUint64(), d["max_level"].GetUint64(), move(stats), {});
+    return monster_definition_component(d["name"].GetString(), d["min_level"].GetUint64(), d["max_level"].GetUint64(), move(stats));
 }

@@ -1,7 +1,7 @@
 {
   "name": "Servant",
   "min_level": 2,
-  "max_level": 2,
+  "max_level": 10,
   "stats": {
     "strength": 20,
     "agility": 10,

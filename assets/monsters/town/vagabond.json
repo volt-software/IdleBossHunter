@@ -1,7 +1,7 @@
 {
   "name": "Vagabond",
   "min_level": 1,
-  "max_level": 1,
+  "max_level": 5,
   "stats": {
     "strength": 10,
     "agility": 5,

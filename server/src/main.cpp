@@ -44,6 +44,8 @@
 #include "repositories/characters_repository.h"
 #include "working_directory_manipulation.h"
 
+#include "ecs/battle_system.h"
+
 #include "uws_thread.h"
 using namespace std;
 using namespace ibh;
@@ -94,9 +96,10 @@ int main() {
     characters_repository<database_pool, database_transaction> player_repo(pool);
     server_handle s_handle{}; // The documentation in uWS is appalling and the attitude the guy has is impossible to deal with. Had to search the issues of the github to find a method to close/stop uWS.
 
-    entt::registry registry;
+    entt::registry es;
+    battle_system bs{};
 
-    load_assets(registry, quit);
+    load_assets(es, quit);
     auto char_sel = load_character_select("assets/charselect.json");
 
     if(!char_sel) {
@@ -133,9 +136,11 @@ int main() {
             unique_ptr<queue_message> msg(nullptr);
             while (game_loop_queue.try_dequeue(msg)) {
                 spdlog::trace("[{}] got game loop msg with type {}", __FUNCTION__, msg->type);
-                game_queue_message_router[msg->type](msg.get(), registry, outward_queue);
+                game_queue_message_router[msg->type](msg.get(), es, outward_queue);
             }
         }
+
+        bs.do_tick(es);
 
 /*        for(auto m_entity : map_view) {
             map_component &m = map_view.get(m_entity);
@@ -173,7 +178,7 @@ int main() {
             }
 
             remove_dead_npcs(m.npcs);
-            fill_spawners(m, m.npcs, registry);
+            fill_spawners(m, m.npcs, es);
 
             for(auto &npc : m.npcs) {
                 run_ai_on(npc, m, player_location_map);

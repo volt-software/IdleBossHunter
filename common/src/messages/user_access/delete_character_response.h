@@ -1,5 +1,5 @@
 /*
-    RealmOfAesir
+    IdleBossHunter
     Copyright (C) 2020 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #pragma once
 
-namespace ibh {
-    class ai_system {
+#include <string>
+#include <optional>
+#include <rapidjson/document.h>
+#include "messages/message.h"
 
+using namespace std;
+
+namespace ibh {
+    struct delete_character_response : message {
+        explicit delete_character_response(uint32_t slot) noexcept;
+
+        ~delete_character_response() noexcept override = default;
+
+        [[nodiscard]]
+        string serialize() const override;
+
+        [[nodiscard]]
+        static unique_ptr<delete_character_response> deserialize(rapidjson::Document const &d);
+
+        uint32_t slot;
+
+        inline static constexpr uint64_t type = generate_type<delete_character_response>();
     };
 }

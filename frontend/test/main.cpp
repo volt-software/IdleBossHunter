@@ -1,5 +1,5 @@
 /*
-    RealmOfAesir
+    IdleBossHunter
     Copyright (C) 2020 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -16,4 +16,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "battle_system.h"
+#define CATCH_CONFIG_RUNNER
+
+#include <catch2/catch.hpp>
+#include <spdlog/spdlog.h>
+#include <working_directory_manipulation.h>
+
+using namespace std;
+using namespace ibh;
+
+int main(int argc, char **argv) {
+    set_cwd(get_selfpath());
+    locale::global(locale("en_US.UTF-8"));
+    spdlog::set_level(spdlog::level::trace);
+
+    int result = Catch::Session().run( argc, argv );
+    // global clean-up...
+
+    return ( result < 0xff ? result : 0xff );
+}

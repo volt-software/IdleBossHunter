@@ -94,13 +94,13 @@ namespace ibh {
         uint64_t min_level;
         uint64_t max_level;
 
-        vector<stat_component> stats;
-        vector<random_stat_component> random_stats;
+        ibh_flat_map<string, stat_component> stats;
+        //vector<random_stat_component> random_stats;
         //vector<item_component> items;
         //vector<skill_component> skills;
 
-        monster_definition_component(string name, uint64_t min_level, uint64_t max_level, vector<stat_component> stats, vector<random_stat_component> random_stats) :
-        name(move(name)), min_level(min_level), max_level(max_level), stats(move(stats)), random_stats(move(random_stats)) {}
+        monster_definition_component(string name, uint64_t min_level, uint64_t max_level, ibh_flat_map<string, stat_component> stats) :
+        name(move(name)), min_level(min_level), max_level(max_level), stats(move(stats)) {}
     };
 
     struct monster_special_definition_component {
@@ -136,6 +136,15 @@ namespace ibh {
         vector<stat_component> stats;
     };
 
+    struct battle_component {
+        string monster_name;
+        uint32_t monster_level;
+        ibh_flat_map<string, stat_component> monster_stats;
+        ibh_flat_map<string, stat_component> total_player_stats;
+
+        battle_component(string monster_name, uint32_t monster_level, ibh_flat_map<string, stat_component> monster_stats) : monster_name(move(monster_name)), monster_level(monster_level), monster_stats(move(monster_stats)) {}
+    };
+
     struct pc_component {
         uint64_t id;
         uint64_t connection_id;
@@ -148,11 +157,13 @@ namespace ibh {
         uint64_t level;
         uint64_t skill_points;
 
-        ibh_flat_map<string, uint64_t> stats;
+        optional<battle_component> battle;
+
+        ibh_flat_map<string, int64_t> stats;
         ibh_flat_map<string, item_component> items;
         ibh_flat_map<string, skill_component> skills;
 
-        pc_component() : id(), name(), race(), dir(), _class(), spawn_message(),
+        pc_component() : id(), connection_id(), name(), race(), dir(), _class(), spawn_message(),
                           level(), skill_points(), stats(), items(), skills() {}
     };
 

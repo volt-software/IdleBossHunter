@@ -8,7 +8,7 @@ CMakeFiles/
 CMakeCache.txt
 Makefile
 cmake_install.cmake
-freshprinceofbijlmer.cbp
+*.cbp
 node_modules/
 package-lock.json
 *.js

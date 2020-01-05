@@ -25,10 +25,10 @@ using namespace ibh;
 TEST_CASE("random_helper tests") {
     SECTION("quickcheck generate within bounds") {
         for(uint32_t i = 0; i < 1'000; i++) {
-            auto ret = ibh::random.generate_single((uint64_t)0, 3);
+            auto ret = ibh::random.generate_single(0UL, 3UL);
             REQUIRE(ret <= 3);
 
-            auto ret2 = ibh::random.generate_single((int64_t)-5, 5);
+            auto ret2 = ibh::random.generate_single(-5L, 5L);
             REQUIRE(ret2 >= -5);
             REQUIRE(ret2 <= 5);
 

@@ -17,29 +17,23 @@
 */
 
 #include <catch2/catch.hpp>
-#include "test_helpers/startup_helper.h"
-#include <random_helper.h>
+#include "constexpr_wyhash.h"
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("random_helper tests") {
-    SECTION("quickcheck generate within bounds") {
-        for(uint32_t i = 0; i < 1'000; i++) {
-            auto ret = ibh::random.generate_single((uint64_t)0, 3);
-            REQUIRE(ret <= 3);
+namespace ibh {
+    class test_class {
 
-            auto ret2 = ibh::random.generate_single((int64_t)-5, 5);
-            REQUIRE(ret2 >= -5);
-            REQUIRE(ret2 <= 5);
+    };
+}
 
-            auto ret3 = ibh::random.generate_single(-0.5f, .5f);
-            REQUIRE(ret3 >= -0.5f);
-            REQUIRE(ret3 <= .5f);
+// Also do this test on the frontend, since using a different compiler might lead to a different typename
+// which would then lead to different message types and an inability to communicate with the server.
 
-            auto ret4 = ibh::random.generate_single(-0.5, .5);
-            REQUIRE(ret4 >= -0.5);
-            REQUIRE(ret4 <= .5);
-        }
+TEST_CASE("constexpr_wyhash tests") {
+    SECTION("typename should return correct name") {
+        auto name = type_name<test_class>();
+        REQUIRE(name == "ibh::test_class");
     }
 }

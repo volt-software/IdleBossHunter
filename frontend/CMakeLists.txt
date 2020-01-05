@@ -30,20 +30,20 @@ file(GLOB ZstdCommonSources ${LIBRARY_DIR}/common/*.c)
 file(GLOB ZstdCompressSources ${LIBRARY_DIR}/compress/*.c)
 file(GLOB ZstdDecompressSources ${LIBRARY_DIR}/decompress/*.c)
 file(GLOB ZstdDictBuilderSources ${LIBRARY_DIR}/dictBuilder/*.c)
-add_executable(ibh_frontend.html ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES} ${ZstdCommonSources} ${ZstdCompressSources} ${ZstdDecompressSources} ${ZstdDictBuilderSources} src/ecs/systems/battle_system.cpp src/ecs/systems/battle_system.h)
+add_executable(ibh_frontend.html ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES} ${ZstdCommonSources} ${ZstdCompressSources} ${ZstdDecompressSources} ${ZstdDictBuilderSources})
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
 file(GLOB_RECURSE PROJECT_TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-add_executable(ibh_frontend_test ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_TEST_SOURCES})
-add_test(NAME MyTest COMMAND ibh_frontend_test)
+add_executable(ibh_frontend_test.html ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_TEST_SOURCES})
+add_test(NAME MyTest COMMAND ibh_frontend_test.html)
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
 file(GLOB PROJECT_BENCHMARK_SOURCES ${PROJECT_SOURCE_DIR}/benchmark/*.cpp ${PROJECT_SOURCE_DIR}/benchmark/benchmark_helpers/*.cpp)
-add_executable(ibh_frontend_benchmark ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_BENCHMARK_SOURCES})
+add_executable(ibh_frontend_benchmark.html ${SPDLOG_SOURCE} ${PROJECT_SOURCES_WITHOUT_MAIN} ${COMMON_SOURCES} ${PROJECT_BENCHMARK_SOURCES})
 
-target_compile_definitions(ibh_frontend_test PRIVATE TEST_CODE=1)
+target_compile_definitions(ibh_frontend_test.html PRIVATE TEST_CODE=1)
 
 include_directories("${TOP_DIR}/common/src")
 include_directories("${TOP_DIR}/frontend/src")
@@ -68,15 +68,15 @@ target_link_libraries(ibh_frontend.html PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_frontend.html PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_frontend.html PUBLIC -static-libgcc -static-libstdc++)
 
-target_link_libraries(ibh_frontend_test PUBLIC -lpthread -lwebsocket.js)
-target_link_libraries(ibh_frontend_test PUBLIC ${ZLIB_LIBRARIES} )
-target_link_libraries(ibh_frontend_test PUBLIC ${OPENSSL_LIBRARIES})
-target_link_libraries(ibh_frontend_test PUBLIC -static-libgcc -static-libstdc++)
+target_link_libraries(ibh_frontend_test.html PUBLIC -lpthread -lwebsocket.js)
+target_link_libraries(ibh_frontend_test.html PUBLIC ${ZLIB_LIBRARIES} )
+target_link_libraries(ibh_frontend_test.html PUBLIC ${OPENSSL_LIBRARIES})
+target_link_libraries(ibh_frontend_test.html PUBLIC -static-libgcc -static-libstdc++)
 
-target_link_libraries(ibh_frontend_benchmark PUBLIC -lpthread -lwebsocket.js)
-target_link_libraries(ibh_frontend_benchmark PUBLIC ${ZLIB_LIBRARIES} )
-target_link_libraries(ibh_frontend_benchmark PUBLIC ${OPENSSL_LIBRARIES})
-target_link_libraries(ibh_frontend_benchmark PUBLIC -static-libgcc -static-libstdc++)
+target_link_libraries(ibh_frontend_benchmark.html PUBLIC -lpthread -lwebsocket.js)
+target_link_libraries(ibh_frontend_benchmark.html PUBLIC ${ZLIB_LIBRARIES} )
+target_link_libraries(ibh_frontend_benchmark.html PUBLIC ${OPENSSL_LIBRARIES})
+target_link_libraries(ibh_frontend_benchmark.html PUBLIC -static-libgcc -static-libstdc++)
 
 add_custom_command(
         TARGET ibh_frontend.html POST_BUILD
@@ -85,7 +85,7 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/assets)
 
 add_custom_command(
-        TARGET ibh_frontend_test POST_BUILD
+        TARGET ibh_frontend_test.html POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets/
         ${CMAKE_BINARY_DIR}/assets)

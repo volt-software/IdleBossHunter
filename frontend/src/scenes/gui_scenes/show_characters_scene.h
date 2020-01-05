@@ -39,6 +39,7 @@ namespace ibh {
         vector<character_race> _races;
         vector<character_class> _classes;
         bool _show_create;
+        bool _show_delete;
         bool _waiting_for_select;
         bool _waiting_for_reply;
         string _error;

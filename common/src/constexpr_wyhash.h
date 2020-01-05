@@ -137,6 +137,7 @@ namespace ibh {
         return *str ? 1 + string_length(str + 1) : 0;
     }
 
+    // type_name() requires T to be in the ibh namespace and nothing else. No sub-namespaces, nada.
     template<typename T>
     constexpr auto type_name() {
         string_view name;
@@ -144,13 +145,14 @@ namespace ibh {
         string_view suffix;
 #ifdef __clang__
         name = __PRETTY_FUNCTION__;
-        prefix = "auto type_name() [T = ";
+        prefix = "auto ibh::type_name() [T = ";
         suffix = "]";
 #elif defined(__GNUC__)
         name = __PRETTY_FUNCTION__;
-        prefix = "constexpr auto type_name() [with T = ";
+        prefix = "constexpr auto ibh::type_name() [with T = ";
         suffix = "]";
 #elif defined(_MSC_VER)
+        // this probably requires checking, don't have easy access to MSVC myself
         name = __FUNCSIG__;
         prefix = "auto __cdecl type_name<";
         suffix = ">(void)";

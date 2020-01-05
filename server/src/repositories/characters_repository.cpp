@@ -96,6 +96,7 @@ void characters_repository<pool_T, transaction_T>::update_character(db_character
 
 template<typename pool_T, typename transaction_T>
 void characters_repository<pool_T, transaction_T>::delete_character_by_slot(uint32_t slot, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const {
+    transaction->execute(fmt::format("DELETE FROM character_stats s USING characters c WHERE s.character_id = c.id AND c.slot = {} AND c.user_id = {}", slot, user_id));
     transaction->execute(fmt::format("DELETE FROM characters WHERE slot = {} AND user_id = {}", slot, user_id));
 
     spdlog::debug("[{}] deleted db_character {} for user {}", __FUNCTION__, slot, user_id);

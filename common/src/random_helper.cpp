@@ -25,67 +25,28 @@ using namespace ibh;
 
 //#define EXTREME_RANDOM_LOGGING
 
-random_helper::random_helper() : _rng64(pcg_extras::seed_seq_from<random_device>()), _rng32(pcg_extras::seed_seq_from<random_device>()) { }
+random_helper::random_helper() : _rng64(pcg_extras::seed_seq_from<random_device>()) { }
 
-uint64_t random_helper::generate_single_fast(uint64_t end) {
-    return _rng64(end);
-}
+template<typename T>
+T random_helper::generate_single(T from, T end) {
+    if(from == end) {
+        return from;
+    }
 
-uint32_t random_helper::generate_single_fast(uint32_t end) {
-    return _rng32(end);
-}
-
-uint64_t random_helper::generate_single(uint64_t from, uint64_t end) {
-    uniform_int_distribution<decltype(from)> uniform_dist(from, end);
-    decltype(from) ret = uniform_dist(_rng64);
+    typedef typename conditional<is_floating_point<T>::value, uniform_real_distribution<T>, uniform_int_distribution<T>>::type dist_type;
+    dist_type uniform_dist(from, end);
+    T ret = uniform_dist(_rng64);
 #ifdef EXTREME_RANDOM_LOGGING
     spdlog::trace("[{}] ret {}", __FUNCTION__, ret);
 #endif
     return ret;
 }
 
-uint64_t random_helper::generate_single_uint64() {
-    uniform_int_distribution<decltype(random_helper::generate_single_uint64())> uniform_dist(
-            numeric_limits<decltype(random_helper::generate_single_uint64())>::min(),
-            numeric_limits<decltype(random_helper::generate_single_uint64())>::max());
-    decltype(random_helper::generate_single_uint64()) ret = uniform_dist(_rng64);
-#ifdef EXTREME_RANDOM_LOGGING
-    spdlog::trace("[{}] ret {}", __FUNCTION__, ret);
-#endif
-    return ret;
-}
-int64_t random_helper::generate_single(int64_t from, int64_t end) {
-    uniform_int_distribution<decltype(from)> uniform_dist(from, end);
-    decltype(from) ret = uniform_dist(_rng64);
-#ifdef EXTREME_RANDOM_LOGGING
-    spdlog::trace("[{}] ret {}", __FUNCTION__, ret);
-#endif
-    return ret;
-}
-
-int64_t random_helper::generate_single_int64() {
-    uniform_int_distribution<decltype(random_helper::generate_single_int64())> uniform_dist(
-            numeric_limits<decltype(random_helper::generate_single_int64())>::min(),
-            numeric_limits<decltype(random_helper::generate_single_int64())>::max());
-    decltype(random_helper::generate_single_int64()) ret = uniform_dist(_rng64);
-#ifdef EXTREME_RANDOM_LOGGING
-    spdlog::trace("[{}] ret {}", __FUNCTION__, ret);
-#endif
-    return ret;
-}
-
-float random_helper::generate_single(float from, float end) {
-    uniform_real_distribution<decltype(from)> uniform_dist(from, end);
-    decltype(from) ret = uniform_dist(_rng64);
-#ifdef EXTREME_RANDOM_LOGGING
-    spdlog::trace("[{}] ret {}", __FUNCTION__, ret);
-#endif
-    return ret;
-}
-
-double random_helper::generate_single(double from, double end) {
-    uniform_real_distribution<decltype(from)> uniform_dist(from, end);
-    decltype(from) ret = uniform_dist(_rng64);
+template<typename T>
+T random_helper::generate_single() {
+    typedef typename conditional<is_floating_point<T>::value, uniform_real_distribution<T>, uniform_int_distribution<T>>::type dist_type;
+    dist_type uniform_dist(numeric_limits<T>::min(), numeric_limits<T>::max());
+    T ret = uniform_dist(_rng64);
 #ifdef EXTREME_RANDOM_LOGGING
     spdlog::trace("[{}] ret {}", __FUNCTION__, ret);
 #endif
@@ -93,6 +54,10 @@ double random_helper::generate_single(double from, double end) {
 }
 
 bool random_helper::one_in_x(uint32_t x) {
+    if(x == 0) {
+        return true;
+    }
+
     uniform_int_distribution<uint32_t> uniform_dist(0, x);
     bool ret = uniform_dist(_rng64) == 0;
 #ifdef EXTREME_RANDOM_LOGGING
@@ -102,3 +67,13 @@ bool random_helper::one_in_x(uint32_t x) {
 }
 
 thread_local random_helper ibh::random;
+template int64_t random_helper::generate_single();
+template uint64_t random_helper::generate_single();
+template float random_helper::generate_single();
+template double random_helper::generate_single();
+template int64_t random_helper::generate_single(int64_t from, int64_t end);
+template uint64_t random_helper::generate_single(uint64_t from, uint64_t end);
+template float random_helper::generate_single(float from, float end);
+template double random_helper::generate_single(double from, double end);
+
+

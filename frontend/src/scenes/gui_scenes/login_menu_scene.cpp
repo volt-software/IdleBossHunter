@@ -44,11 +44,18 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
         static char bufpass[64];
         static char bufuser[64];
         static char bufmail[128];
-        ImGui::InputTextWithHint("username", "<username>", bufuser, 64, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
-        ImGui::InputTextWithHint("password", "<password>", bufpass, 64, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank);
 
+        if (!_focus_on_open_flag) {
+            ImGui::SetKeyboardFocusHere(0);
+            _focus_on_open_flag = true;
+        }
+
+        ImGui::InputTextWithHint("username", "<username>", bufuser, 64, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+        bool login_fasttrack = ImGui::InputTextWithHint("password", "<password>", bufpass, 64, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_EnterReturnsTrue);
+
+        bool register_fasttrack = false;
         if(_show_register) {
-            ImGui::InputTextWithHint("email", "<email>", bufmail, 128, ImGuiInputTextFlags_CharsNoBlank);
+            register_fasttrack = ImGui::InputTextWithHint("email", "<email>", bufmail, 128, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_EnterReturnsTrue);
         }
 
         if (_waiting_for_reply)
@@ -57,7 +64,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
         }
 
-        if (ImGui::Button("Register")) {
+        if (ImGui::Button("Register") || register_fasttrack) {
             if(_show_register) {
                 if(strlen(bufpass) >= 4 && strlen(bufuser) >= 2 && strlen(bufmail) >= 4) {
                     send_message<register_request>(manager, bufuser, bufpass, bufmail);
@@ -69,12 +76,12 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             }
         }
 
-        if (ImGui::Button("Login")) {
+        if (ImGui::Button("Login") || login_fasttrack) {
             _show_register = false;
-            if(strlen(bufpass) >= 4 && strlen(bufuser) >= 2) {
+            if(strlen(bufpass) >= 8 && strlen(bufuser) >= 2) {
                 send_message<login_request>(manager, bufuser, bufpass);
             } else {
-                _error = "Input not correct";
+                _error = "Username needs to be at least 2 characters and password at least 8";
             }
         }
 

@@ -40,12 +40,11 @@
 #include <message_handlers/handler_macros.h>
 #include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
-#include <ecs/components.h>
 
 using namespace std;
 using namespace ibh;
 
-using message_router_type = ibh_flat_map<uint32_t, function<void(server*, rapidjson::Document const &, shared_ptr<database_pool>, per_socket_data<websocketpp::connection_hdl>*,
+using message_router_type = ibh_flat_map<uint64_t, function<void(server*, rapidjson::Document const &, shared_ptr<database_pool>, per_socket_data<websocketpp::connection_hdl>*,
                                                                moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &)>>;
 
 using websocketpp::lib::placeholders::_1;
@@ -62,13 +61,6 @@ string ibh::motd;
 character_select_response ibh::select_response{{}, {}};
 shared_mutex ibh::user_connections_mutex;
 atomic<bool> init_done = false;
-
-// See https://wiki.mozilla.org/Security/Server_Side_TLS for more details about
-// the TLS modes. The code below demonstrates how to implement both the modern
-enum tls_mode {
-    MOZILLA_INTERMEDIATE = 1,
-    MOZILLA_MODERN = 2
-};
 
 string get_password(config& config, size_t max_len, asio::ssl::context::password_purpose purpose) {
     return config.certificate_password;
@@ -165,13 +157,13 @@ void on_message(shared_ptr<database_pool> pool, message_router_type &message_rou
     rapidjson::Document d{};
     d.Parse(&message[0], message.size());
 
-    if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsUint()) {
+    if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsUint64()) {
         spdlog::warn("[{}] conn {} deserialize failed", __FUNCTION__, id_map_it->second);
         SEND_ERROR("Unrecognized message", "", "", true);
         return;
     }
 
-    auto type = d["type"].GetUint();
+    auto type = d["type"].GetUint64();
 
     auto handler = message_router.find(type);
     if (handler != message_router.end()) {
@@ -179,9 +171,11 @@ void on_message(shared_ptr<database_pool> pool, message_router_type &message_rou
             handler->second(s, d, pool, user_data, game_loop_queue, user_connections);
         } catch (exception const &e) {
             spdlog::error("[{}] some exception {} message_type {} user_id {} connection_id {} hdl_id {}", __FUNCTION__, e.what(), type, user_data->user_id, user_data->connection_id, id_map_it->second);
+            SEND_ERROR("Server error, please report this as a bug.", "", "", true);
         }
     } else {
         spdlog::trace("[{}] conn {} no handler for type {}", __FUNCTION__, id_map_it->second, type);
+        SEND_ERROR("Unknown message type", "", "", true);
     }
 }
 

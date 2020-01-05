@@ -21,6 +21,8 @@
 #include "messages/user_access/play_character_response.h"
 #include "messages/user_access/create_character_request.h"
 #include "messages/user_access/create_character_response.h"
+#include "messages/user_access/delete_character_request.h"
+#include "messages/user_access/delete_character_response.h"
 #include "messages/user_access/character_select_request.h"
 #include "messages/user_access/character_select_response.h"
 #include "messages/generic_error_response.h"
@@ -46,9 +48,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
 
     if(_waiting_for_select) {
-        if(ImGui::Begin("Waiting for server", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-
-        }
+        ImGui::Begin("Waiting for server", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::End();
         return;
     }
@@ -72,7 +72,11 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         if(_selected_play_slot < 0 || _waiting_for_reply) {
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
+        }
+
+        if (ImGui::Button("Delete Character")) {
+            _show_delete = true;
         }
 
         bool pressed_this_frame = false;
@@ -90,6 +94,44 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
     ImGui::End();
 
+    if(_show_delete) {
+        if(ImGui::Begin("Delete Character", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            if(_error.size() > 0) {
+                ImGui::Text("%s", _error.c_str());
+            }
+
+            for(auto& character : _characters) {
+                if(character.slot == _selected_slot) {
+                    ImGui::Text("Are you sure you want to delete character %s in slot %i?", _error.c_str(), _selected_slot);
+                    break;
+                }
+            }
+
+            if(_waiting_for_reply) {
+                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
+            }
+
+            bool pressed_this_frame = false;
+            if (ImGui::Button("Yes")) {
+                send_message<delete_character_request>(manager, static_cast<uint32_t>(_selected_play_slot));
+                _waiting_for_reply = true;
+                pressed_this_frame = true;
+            }
+
+            if (ImGui::Button("No")) {
+                _show_delete = false;
+            }
+
+            if (!pressed_this_frame && _waiting_for_reply)
+            {
+                ImGui::PopItemFlag();
+                ImGui::PopStyleVar();
+            }
+        }
+        ImGui::End();
+    }
+
     if(!_show_create) {
         return;
     }
@@ -104,7 +146,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         if (ImGui::BeginCombo("Race", _selected_race.c_str()))
         {
-            for(auto &race : _races) {
+            for(auto const &race : _races) {
                 if (ImGui::Selectable(race.name.c_str(), _selected_race == race.name)) {
                     _selected_race = race.name;
                 }
@@ -114,7 +156,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         if (ImGui::BeginCombo("Class", _selected_class.c_str()))
         {
-            for(auto &c : _classes) {
+            for(auto const &c : _classes) {
                 if (ImGui::Selectable(c.name.c_str(), _selected_class == c.name)) {
                     _selected_class = c.name;
                 }
@@ -134,7 +176,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         if(_selected_class.empty() || _selected_race.empty() || strlen(bufcharname) < 2 || _waiting_for_reply) {
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
         }
 
         bool pressed_this_frame = false;
@@ -162,17 +204,17 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
                 return;
             }
 
-            for(auto &stat : r->level_stat_mods) {
+            for(auto const &stat : r->level_stat_mods) {
                 ImGui::Text("%s %s: %lli", r->name.c_str(), stat.name.c_str(), stat.value);
                 combined_stats[stat.name] += stat.value;
             }
 
-            for(auto &stat : c->stat_mods) {
+            for(auto const &stat : c->stat_mods) {
                 ImGui::Text("%s %s: %lli", c->name.c_str(), stat.name.c_str(), stat.value);
                 combined_stats[stat.name] += stat.value;
             }
 
-            for(auto &stat : c->stat_mods) {
+            for(auto const &stat : c->stat_mods) {
                 ImGui::Text("%s: %lli", stat.name.c_str(), combined_stats[stat.name]);
             }
         }
@@ -183,9 +225,9 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 void show_characters_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
     switch (type) {
         case update_response::type: {
-            auto resp_msg = dynamic_cast<update_response*>(msg);
+            auto resp_msg = dynamic_cast<update_response *>(msg);
 
-            if(!resp_msg) {
+            if (!resp_msg) {
                 return;
             }
 
@@ -193,9 +235,9 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case character_select_response::type: {
-            auto resp_msg = dynamic_cast<character_select_response*>(msg);
+            auto resp_msg = dynamic_cast<character_select_response *>(msg);
 
-            if(!resp_msg) {
+            if (!resp_msg) {
                 return;
             }
 
@@ -205,15 +247,27 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case create_character_response::type: {
-            auto resp_msg = dynamic_cast<create_character_response*>(msg);
+            auto resp_msg = dynamic_cast<create_character_response *>(msg);
 
-            if(!resp_msg) {
+            if (!resp_msg) {
                 return;
             }
 
             _characters.emplace_back(resp_msg->character);
             _waiting_for_reply = false;
             _show_create = false;
+            break;
+        }
+        case delete_character_response::type: {
+            auto resp_msg = dynamic_cast<delete_character_response*>(msg);
+
+            if(!resp_msg) {
+                return;
+            }
+
+            _characters.erase(remove_if(begin(_characters), end(_characters), [slot = resp_msg->slot](const character_object &c) noexcept { return c.slot == slot; }), end(_characters));
+            _waiting_for_reply = false;
+            _show_delete = false;
             break;
         }
         case play_character_response::type: {
@@ -242,8 +296,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             _error = resp_msg->error;
             break;
         }
-        default: {
+        default:
             break;
-        }
     }
 }

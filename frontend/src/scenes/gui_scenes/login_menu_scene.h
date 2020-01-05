@@ -28,7 +28,7 @@ using namespace std;
 namespace ibh {
     class login_menu_scene : public scene  {
     public:
-        login_menu_scene() : scene(3), _error(), _show_register(), _waiting_for_reply() {}
+        login_menu_scene() : scene(3), _error(), _show_register(), _waiting_for_reply(), _focus_on_open_flag() {}
         ~login_menu_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
@@ -38,5 +38,6 @@ namespace ibh {
         string _error;
         bool _show_register;
         bool _waiting_for_reply;
+        bool _focus_on_open_flag;
     };
 }

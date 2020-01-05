@@ -1,5 +1,5 @@
 /*
-    RealmOfAesir
+    IdleBossHunter
     Copyright (C) 2020 Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #pragma once
+
+#include <entt/entity/registry.hpp>
 
 namespace ibh {
     class battle_system {
+    public:
+        battle_system() : _tick_count(0) {}
+        void do_tick(entt::registry &es);
 
+    private:
+        uint32_t _tick_count;
     };
 }
