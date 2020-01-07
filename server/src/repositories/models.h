@@ -19,7 +19,7 @@
 #pragma once
 
 namespace ibh {
-    struct user {
+    struct db_user {
         uint64_t id;
         string username;
         string password;
@@ -29,41 +29,30 @@ namespace ibh {
         uint16_t max_characters;
         uint16_t is_game_master;
 
-        user() : id(), username(), password(), email(), login_attempts(), verification_code(), max_characters(), is_game_master() {}
-        user(uint64_t id, string username, string password, string email, uint16_t login_attempts, string verification_code, uint16_t no_of_players, uint16_t admin)
+        db_user() : id(), username(), password(), email(), login_attempts(), verification_code(), max_characters(), is_game_master() {}
+        db_user(uint64_t id, string username, string password, string email, uint16_t login_attempts, string verification_code, uint16_t no_of_players, uint16_t admin)
         : id(id), username(move(username)), password(move(password)), email(move(email)), login_attempts(login_attempts), verification_code(move(verification_code)), max_characters(no_of_players), is_game_master(admin) {}
     };
 
-    struct banned_user {
+    struct db_banned_user {
         uint64_t id;
         string ip;
-        optional<user> _user;
+        optional<db_user> _user;
         optional<chrono::system_clock::time_point> until;
 
-        banned_user() : id(), ip(), _user(), until() {}
-        banned_user(uint64_t id, string ip, optional<user> _user, optional<chrono::system_clock::time_point> until)
+        db_banned_user() : id(), ip(), _user(), until() {}
+        db_banned_user(uint64_t id, string ip, optional<db_user> _user, optional<chrono::system_clock::time_point> until)
         : id(id), ip(move(ip)), _user(move(_user)), until(until) {}
     };
 
-    struct character_stat {
+    struct db_character_stat {
         uint64_t id;
         uint64_t character_id;
         string name;
         int64_t value;
 
-        character_stat() : id(), character_id(), name(), value() {}
-        character_stat(uint64_t id, uint64_t character_id, string name, int64_t value) : id(id), character_id(character_id), name(move(name)), value(value) {}
-    };
-
-    struct db_item {
-        uint64_t id;
-        uint64_t character_id;
-        string name;
-        string slot;
-        string equip_slot;
-
-        db_item() : id(), character_id(), name(), slot() , equip_slot(){}
-        db_item(uint64_t id, uint64_t character_id, string name, string slot, string equip_slot) : id(id), character_id(character_id), name(move(name)), slot(move(slot)), equip_slot(move(equip_slot)) {}
+        db_character_stat() : id(), character_id(), name(), value() {}
+        db_character_stat(uint64_t id, uint64_t character_id, string name, int64_t value) : id(id), character_id(character_id), name(move(name)), value(value) {}
     };
 
     struct db_item_stat {
@@ -74,6 +63,18 @@ namespace ibh {
 
         db_item_stat() : id(), item_id(), name(), value() {}
         db_item_stat(uint64_t id, uint64_t item_id, string name, int64_t value) : id(id), item_id(item_id), name(move(name)), value(value) {}
+    };
+
+    struct db_item {
+        uint64_t id;
+        uint64_t character_id;
+        string name;
+        string slot;
+        string equip_slot;
+        vector<db_item_stat> stats;
+
+        db_item() : id(), character_id(), name(), slot() , equip_slot(), stats() {}
+        db_item(uint64_t id, uint64_t character_id, string name, string slot, string equip_slot) : id(id), character_id(character_id), name(move(name)), slot(move(slot)), equip_slot(move(equip_slot)), stats() {}
     };
 
     struct db_character {
@@ -90,11 +91,11 @@ namespace ibh {
         string race;
         string _class;
         string map;
-        vector<character_stat> stats;
+        vector<db_character_stat> stats;
         vector<db_item> items;
 
         db_character() : id(), user_id(), slot(), level(), gold(), xp(), skill_points(), x(), y(), name(), race(), _class(), map(), stats(), items() {}
-        db_character(uint64_t id, uint64_t user_id, uint32_t slot, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points, uint32_t x, uint32_t y, string name, string race, string _class, string map, vector<character_stat> stats, vector<db_item> items)
+        db_character(uint64_t id, uint64_t user_id, uint32_t slot, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points, uint32_t x, uint32_t y, string name, string race, string _class, string map, vector<db_character_stat> stats, vector<db_item> items)
         : id(id), user_id(user_id), slot(slot), level(level), gold(gold), xp(xp), skill_points(skill_points), x(x), y(y), name(move(name)), race(move(race)),
         _class(move(_class)), map(move(map)), stats(move(stats)), items(move(items)) {}
     };

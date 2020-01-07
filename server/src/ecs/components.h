@@ -72,20 +72,24 @@ namespace ibh {
         string desc;
         string type;
         uint64_t value;
-        uint64_t sprite;
+//        uint64_t sprite;
         uint64_t quality;
         uint64_t enchant_level;
         uint64_t required_level;
         uint64_t tier;
         bool binds;
         bool tells_bind;
-        optional<item_effect_component> effect;
-        //optional<random_stat_component> random_trait_levels;
-        //vector<string> random_trait_names;
-        vector<string> required_professions;
-        //vector<item_required_skill_component> required_skills;
+//        optional<item_effect_component> effect;
+//        optional<random_stat_component> random_trait_levels;
+//        vector<string> random_trait_names;
+//        vector<string> required_professions;
+//        vector<item_required_skill_component> required_skills;
         vector<stat_component> stats;
-        //vector<random_stat_component> random_stats;
+//        vector<random_stat_component> random_stats;
+
+        item_component() : name(), desc(), type(), value(), quality(), enchant_level(), required_level(), tier(), binds(), tells_bind(), stats() {}
+        item_component(string name, string desc, string type, uint64_t value, uint64_t quality, uint64_t enchant_level, uint64_t required_level, uint64_t tier, bool binds, bool tells_bind, vector<stat_component> stats)
+        : name(move(name)), desc(move(desc)), type(move(type)), value(value), quality(quality), enchant_level(enchant_level), required_level(required_level), tier(tier), binds(binds), tells_bind(tells_bind), stats(move(stats)) {}
     };
 
     struct monster_definition_component {
@@ -160,11 +164,15 @@ namespace ibh {
         optional<battle_component> battle;
 
         ibh_flat_map<string, int64_t> stats;
-        ibh_flat_map<string, item_component> items;
+        ibh_flat_map<string, item_component> equipped_items;
+        vector<item_component> inventory;
         ibh_flat_map<string, skill_component> skills;
 
         pc_component() : id(), connection_id(), name(), race(), dir(), _class(), spawn_message(),
-                          level(), skill_points(), stats(), items(), skills() {}
+                          level(), skill_points(), stats(), equipped_items(), inventory(), skills() {}
+        pc_component(uint64_t id, uint64_t connection_id, string name, string race, string dir, string _class, string spawn_message, uint64_t level, uint64_t skill_points, ibh_flat_map<string, int64_t> stats, ibh_flat_map<string, item_component> equipped_items, vector<item_component> inventory, ibh_flat_map<string, skill_component> skills)
+        : id(id), connection_id(connection_id), name(move(name)), race(move(race)), dir(move(dir)), _class(move(_class)), spawn_message(move(spawn_message)),
+                          level(level), skill_points(skill_points), stats(move(stats)), equipped_items(move(equipped_items)), inventory(move(inventory)), skills(move(skills)) {}
     };
 
     struct user_component {

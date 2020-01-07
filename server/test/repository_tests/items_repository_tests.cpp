@@ -34,7 +34,7 @@ TEST_CASE("items repository tests") {
 
     SECTION("item inserted correctly" ) {
         auto transaction = items_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};
@@ -55,7 +55,7 @@ TEST_CASE("items repository tests") {
 
     SECTION( "update item equip_slot" ) {
         auto transaction = items_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};
@@ -79,7 +79,7 @@ TEST_CASE("items repository tests") {
 
     SECTION( "update item npc/character ids" ) {
         auto transaction = items_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};
@@ -109,7 +109,7 @@ TEST_CASE("items repository tests") {
 
     SECTION( "delete item" ) {
         auto transaction = items_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};
@@ -128,7 +128,7 @@ TEST_CASE("items repository tests") {
 
     SECTION( "get items by character id" ) {
         auto transaction = items_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};

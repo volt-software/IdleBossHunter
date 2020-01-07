@@ -119,7 +119,7 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
                                            result[0][8].as(uint32_t{}),
                                            result[0][9].as(string{}), result[0][10].as(string{}),
                                            result[0][11].as(string{}),
-                                           result[0][12].as(string{}), vector<character_stat>{}, vector<db_item>{});
+                                           result[0][12].as(string{}), vector<db_character_stat>{}, vector<db_item>{});
 
     spdlog::debug("[{}] found db_character by name {} with id {}", __FUNCTION__, name, ret->id);
 
@@ -143,7 +143,7 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
                                            result[0][8].as(uint32_t{}),
                                            result[0][9].as(string{}), result[0][10].as(string{}),
                                            result[0][11].as(string{}),
-                                           result[0][12].as(string{}), vector<character_stat>{}, vector<db_item>{});
+                                           result[0][12].as(string{}), vector<db_character_stat>{}, vector<db_item>{});
 
     spdlog::debug("[{}] found db_character by id {}", __FUNCTION__, id);
 
@@ -168,7 +168,7 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
                                            result[0][8].as(uint32_t{}),
                                            result[0][9].as(string{}), result[0][10].as(string{}),
                                            result[0][11].as(string{}),
-                                           result[0][12].as(string{}), vector<character_stat>{}, vector<db_item>{});
+                                           result[0][12].as(string{}), vector<db_character_stat>{}, vector<db_item>{});
 
     spdlog::debug("[{}] found db_character by slot {} for user {}", __FUNCTION__, slot, user_id);
 

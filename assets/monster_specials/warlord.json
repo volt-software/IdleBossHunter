@@ -1,16 +1,16 @@
 {
   "name": "warlord",
   "multipliers": {
-    "xp": 3,
-    "gold": 1,
-    "item": 1.25,
-    "hp": 2,
-    "mp": 1,
-    "strength": 2,
-    "agility": 1.25,
-    "psi": 2,
-    "vitality": 1.25,
-    "speed": 1.25
+    "xp": 300,
+    "gold": 100,
+    "item": 125,
+    "hp": 200,
+    "mp": 100,
+    "strength": 200,
+    "agility": 125,
+    "psi": 200,
+    "vitality": 125,
+    "speed": 125
   },
   "teleport_when_beat": false
 }

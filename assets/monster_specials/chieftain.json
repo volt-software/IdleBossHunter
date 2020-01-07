@@ -1,16 +1,16 @@
 {
   "name": "chieftain",
   "multipliers": {
-    "xp": 1.25,
-    "gold": 1.25,
-    "item": 1.25,
-    "hp": 1.25,
-    "mp": 1.25,
-    "strength": 1.25,
-    "agility": 1.25,
-    "psi": 1.25,
-    "vitality": 1.25,
-    "speed": 1.25
+    "xp": 125,
+    "gold": 125,
+    "item": 125,
+    "hp": 125,
+    "mp": 125,
+    "strength": 125,
+    "agility": 125,
+    "psi": 125,
+    "vitality": 125,
+    "speed": 125
   },
   "teleport_when_beat": true
 }

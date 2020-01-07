@@ -74,6 +74,6 @@ void ibh::load_assets(entt::registry &registry, atomic<bool> const &quit) {
     spdlog::info("[{}] {:n} monster specials loaded in {:n} µs", __FUNCTION__, monster_specials_count, chrono::duration_cast<chrono::microseconds>(loading_end - specials_loading_start).count());
 //    spdlog::info("[{}] {:n} maps loaded in {:n} µs", __FUNCTION__, map_count, chrono::duration_cast<chrono::microseconds>(entity_spawning_start - spawners_loading_start).count());
 //    spdlog::info("[{}] {:n} entities spawned in {:n} µs", __FUNCTION__, entity_count, chrono::duration_cast<chrono::microseconds>(loading_end - entity_spawning_start).count());
-    spdlog::info("[{}] everything loaded in {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(loading_end - loading_start).count());
+    spdlog::info("[{}] assets loaded in {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(loading_end - loading_start).count());
 }
 

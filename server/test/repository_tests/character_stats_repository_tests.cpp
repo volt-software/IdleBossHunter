@@ -34,13 +34,13 @@ TEST_CASE("character stats repository tests") {
 
     SECTION("character stats inserted correctly" ) {
         auto transaction = stat_repo.create_transaction();
-        user usr{0, "test", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "test", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id > 0);
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
         characters_repo.insert(character, transaction);
         REQUIRE(character.id > 0);
-        character_stat stat{0, character.id, "test", 2};
+        db_character_stat stat{0, character.id, "test", 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -53,13 +53,13 @@ TEST_CASE("character stats repository tests") {
 
     SECTION( "update stats" ) {
         auto transaction = stat_repo.create_transaction();
-        user usr{0, "test", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "test", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id > 0);
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
         characters_repo.insert(character, transaction);
         REQUIRE(character.id > 0);
-        character_stat stat{0, character.id, "test", 2};
+        db_character_stat stat{0, character.id, "test", 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -75,16 +75,16 @@ TEST_CASE("character stats repository tests") {
 
     SECTION( "get all for character stats" ) {
         auto transaction = stat_repo.create_transaction();
-        user usr{0, "test", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "test", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id > 0);
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
         characters_repo.insert(character, transaction);
         REQUIRE(character.id > 0);
-        character_stat stat{0, character.id, "test", 20};
+        db_character_stat stat{0, character.id, "test", 20};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        character_stat stat2{0, character.id, "test2", 30};
+        db_character_stat stat2{0, character.id, "test2", 30};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 

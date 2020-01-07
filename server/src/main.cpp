@@ -26,6 +26,7 @@
 
 #include <entt/entt.hpp>
 #include <asset_loading/load_assets.h>
+#include <asset_loading/load_from_database.h>
 #include <game_logic/logic_helpers.h>
 #include <game_logic/censor_sensor.h>
 #include <sodium.h>
@@ -100,6 +101,7 @@ int main() {
     battle_system bs{};
 
     load_assets(es, quit);
+    load_from_database(es, pool, quit);
     auto char_sel = load_character_select("assets/charselect.json");
 
     if(!char_sel) {

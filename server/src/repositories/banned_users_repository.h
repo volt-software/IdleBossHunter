@@ -34,10 +34,10 @@ namespace ibh {
         explicit banned_users_repository(shared_ptr<pool_T> database_pool);
 
         unique_ptr<transaction_T> create_transaction();
-        bool insert_if_not_exists(banned_user& usr, unique_ptr<transaction_T> const &transaction) const;
-        void update(banned_user const &usr, unique_ptr<transaction_T> const &transaction) const;
-        optional<banned_user> get(int id, unique_ptr<transaction_T> const &transaction) const;
-        optional<banned_user> is_username_or_ip_banned(optional<string> username, optional<string> ip, unique_ptr<transaction_T> const &transaction) const;
+        bool insert_if_not_exists(db_banned_user& usr, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_banned_user const &usr, unique_ptr<transaction_T> const &transaction) const;
+        optional<db_banned_user> get(int id, unique_ptr<transaction_T> const &transaction) const;
+        optional<db_banned_user> is_username_or_ip_banned(optional<string> username, optional<string> ip, unique_ptr<transaction_T> const &transaction) const;
     private:
         shared_ptr<pool_T> _database_pool;
     };

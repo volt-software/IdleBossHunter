@@ -36,7 +36,7 @@ TEST_CASE("item stats repository tests") {
 
     SECTION("item stats inserted correctly" ) {
         auto transaction = stat_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};
@@ -59,7 +59,7 @@ TEST_CASE("item stats repository tests") {
 
     SECTION( "update stats" ) {
         auto transaction = stat_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};
@@ -85,7 +85,7 @@ TEST_CASE("item stats repository tests") {
 
     SECTION( "get all for character stats" ) {
         auto transaction = stat_repo.create_transaction();
-        user u{};
+        db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
         db_character c{};

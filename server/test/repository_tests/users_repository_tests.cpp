@@ -21,16 +21,18 @@
 #include <catch2/catch.hpp>
 #include "../test_helpers/startup_helper.h"
 #include "repositories/users_repository.h"
+#include "repositories/banned_users_repository.h"
 
 using namespace std;
 using namespace ibh;
 
 TEST_CASE("users repository tests") {
     users_repository<database_pool, database_transaction> user_repo(db_pool);
+    banned_users_repository<database_pool, database_transaction> banned_user_repo(db_pool);
 
     SECTION( "user inserted correctly" ) {
         auto transaction = user_repo.create_transaction();
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
         
@@ -52,7 +54,7 @@ TEST_CASE("users repository tests") {
     
     SECTION( "update user" ) {
         auto transaction = user_repo.create_transaction();
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
         
@@ -73,6 +75,35 @@ TEST_CASE("users repository tests") {
         REQUIRE(usr2->login_attempts == usr.login_attempts);
         REQUIRE(usr2->is_game_master == usr.is_game_master);
         REQUIRE(usr2->max_characters == usr.max_characters);
+    }
+
+    SECTION( "get all users" ) {
+        auto transaction = user_repo.create_transaction();
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr2{0, "user2", "pass", "email", 0, "code", 0, 0};
+        user_repo.insert_if_not_exists(usr, transaction);
+        user_repo.insert_if_not_exists(usr2, transaction);
+        REQUIRE(usr.id != 0);
+        REQUIRE(usr2.id != 0);
+
+        auto usrs = user_repo.get_all(transaction);
+        REQUIRE(usrs.size() == 2);
+    }
+
+    SECTION( "get all users without banned" ) {
+        auto transaction = user_repo.create_transaction();
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr2{0, "user2", "pass", "email", 0, "code", 0, 0};
+        user_repo.insert_if_not_exists(usr, transaction);
+        user_repo.insert_if_not_exists(usr2, transaction);
+        REQUIRE(usr.id != 0);
+        REQUIRE(usr2.id != 0);
+        db_banned_user busr{0, "", usr, {}};
+        banned_user_repo.insert_if_not_exists(busr, transaction);
+        REQUIRE(busr.id != 0);
+
+        auto usrs = user_repo.get_all(transaction);
+        REQUIRE(usrs.size() == 1);
     }
 }
 

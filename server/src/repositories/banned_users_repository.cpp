@@ -35,7 +35,7 @@ unique_ptr<transaction_T> banned_users_repository<pool_T, transaction_T>::create
 }
 
 template<typename pool_T, typename transaction_T>
-bool banned_users_repository<pool_T, transaction_T>::insert_if_not_exists(banned_user &usr, unique_ptr<transaction_T> const &transaction) const {
+bool banned_users_repository<pool_T, transaction_T>::insert_if_not_exists(db_banned_user &usr, unique_ptr<transaction_T> const &transaction) const {
     string ip = !usr.ip.empty() ? "'" + transaction->escape(usr.ip) + "'" : "NULL";
     string user_id = usr._user ? to_string(usr._user->id) : "NULL";
     string until = usr.until ? to_string(usr.until->time_since_epoch().count()) : "NULL";
@@ -55,7 +55,7 @@ bool banned_users_repository<pool_T, transaction_T>::insert_if_not_exists(banned
 }
 
 template<typename pool_T, typename transaction_T>
-void banned_users_repository<pool_T, transaction_T>::update(banned_user const &usr, unique_ptr<transaction_T> const &transaction) const {
+void banned_users_repository<pool_T, transaction_T>::update(db_banned_user const &usr, unique_ptr<transaction_T> const &transaction) const {
     string ip = !usr.ip.empty() ? "'" + transaction->escape(usr.ip) + "'" : "NULL";
     string user_id = usr._user ? to_string(usr._user->id) : "NULL";
     string until = usr.until ? to_string(usr.until->time_since_epoch().count()) : "NULL";
@@ -66,7 +66,7 @@ void banned_users_repository<pool_T, transaction_T>::update(banned_user const &u
 }
 
 template<typename pool_T, typename transaction_T>
-optional<banned_user> banned_users_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
+optional<db_banned_user> banned_users_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT id, ip, user_id, until FROM banned_users WHERE id = {}", id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -76,7 +76,7 @@ optional<banned_user> banned_users_repository<pool_T, transaction_T>::get(int id
     }
 
     string ip;
-    optional<user> _user;
+    optional<db_user> _user;
     optional<system_clock::time_point> until;
 
     if(!result[0]["ip"].is_null()) {
@@ -84,18 +84,18 @@ optional<banned_user> banned_users_repository<pool_T, transaction_T>::get(int id
     }
 
     if(!result[0]["user_id"].is_null()) {
-        _user = make_optional<user>({result[0]["user_id"].as(uint64_t{}), {}, {}, {}, 0, {}, 0, 0});
+        _user = make_optional<db_user>({result[0]["user_id"].as(uint64_t{}), {}, {}, {}, 0, {}, 0, 0});
     }
 
     if(!result[0]["until"].is_null()) {
         until = system_clock::time_point(nanoseconds(result[0]["until"].as(int64_t{})));
     }
 
-    return make_optional<banned_user>(result[0]["id"].as(uint64_t{}), ip, _user, until);
+    return make_optional<db_banned_user>(result[0]["id"].as(uint64_t{}), ip, _user, until);
 }
 
 template<typename pool_T, typename transaction_T>
-optional<banned_user> banned_users_repository<pool_T, transaction_T>::is_username_or_ip_banned(optional<string> username, optional<string> ip, unique_ptr<transaction_T> const &transaction) const {
+optional<db_banned_user> banned_users_repository<pool_T, transaction_T>::is_username_or_ip_banned(optional<string> username, optional<string> ip, unique_ptr<transaction_T> const &transaction) const {
     if(!username && !ip) {
         spdlog::error("[{}] called without arguments", __FUNCTION__);
         return {};
@@ -168,5 +168,5 @@ optional<banned_user> banned_users_repository<pool_T, transaction_T>::is_usernam
         usr_id = result[0]["id"].as(uint64_t{});
     }
 
-    return make_optional<banned_user>(usr_id, ip_ret, user{}, until);
+    return make_optional<db_banned_user>(usr_id, ip_ret, db_user{}, until);
 }

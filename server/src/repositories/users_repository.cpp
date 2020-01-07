@@ -34,7 +34,7 @@ unique_ptr<transaction_T> users_repository<pool_T, transaction_T>::create_transa
 }
 
 template<typename pool_T, typename transaction_T>
-bool users_repository<pool_T, transaction_T>::insert_if_not_exists(user &usr, unique_ptr<transaction_T> const &transaction) const {
+bool users_repository<pool_T, transaction_T>::insert_if_not_exists(db_user &usr, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format(
             "INSERT INTO users (username, password, email, login_attempts, verification_code, is_game_master, max_characters) VALUES ('{}', '{}', '{}', {}, '{}', {}, {}) ON CONFLICT DO NOTHING RETURNING id",
             transaction->escape(usr.username), transaction->escape(usr.password), transaction->escape(usr.email), usr.login_attempts, transaction->escape(usr.verification_code), usr.is_game_master, usr.max_characters));
@@ -52,7 +52,7 @@ bool users_repository<pool_T, transaction_T>::insert_if_not_exists(user &usr, un
 }
 
 template<typename pool_T, typename transaction_T>
-void users_repository<pool_T, transaction_T>::update(user const &usr, unique_ptr<transaction_T> const &transaction) const {
+void users_repository<pool_T, transaction_T>::update(db_user const &usr, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("UPDATE users SET username = '{}', password = '{}', email = '{}', login_attempts = {}, verification_code = '{}', is_game_master = {}, max_characters = {} WHERE id = {}",
                                                    transaction->escape(usr.username), transaction->escape(usr.password), transaction->escape(usr.email), usr.login_attempts, transaction->escape(usr.verification_code), usr.is_game_master, usr.max_characters, usr.id));
 
@@ -60,7 +60,7 @@ void users_repository<pool_T, transaction_T>::update(user const &usr, unique_ptr
 }
 
 template<typename pool_T, typename transaction_T>
-optional<user> users_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
+optional<db_user> users_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT * FROM users WHERE id = {}", id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -69,14 +69,14 @@ optional<user> users_repository<pool_T, transaction_T>::get(int id, unique_ptr<t
         return {};
     }
 
-    return make_optional<user>(result[0]["id"].as(uint64_t{}), result[0]["username"].as(string{}),
-                               result[0]["password"].as(string{}), result[0]["email"].as(string{}),
-                               result[0]["login_attempts"].as(uint16_t{}), result[0]["verification_code"].as(string{}),
-                               result[0]["max_characters"].as(uint16_t{}), result[0]["is_game_master"].as(uint16_t{}));
+    return make_optional<db_user>(result[0]["id"].as(uint64_t{}), result[0]["username"].as(string{}),
+                                  result[0]["password"].as(string{}), result[0]["email"].as(string{}),
+                                  result[0]["login_attempts"].as(uint16_t{}), result[0]["verification_code"].as(string{}),
+                                  result[0]["max_characters"].as(uint16_t{}), result[0]["is_game_master"].as(uint16_t{}));
 }
 
 template<typename pool_T, typename transaction_T>
-optional<user> users_repository<pool_T, transaction_T>::get(string const &username, unique_ptr<transaction_T> const &transaction) const {
+optional<db_user> users_repository<pool_T, transaction_T>::get(string const &username, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT * FROM users WHERE username = '{}'", transaction->escape(username)));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -85,8 +85,28 @@ optional<user> users_repository<pool_T, transaction_T>::get(string const &userna
         return {};
     }
 
-    return make_optional<user>(result[0]["id"].as(uint64_t{}), result[0]["username"].as(string{}),
-                               result[0]["password"].as(string{}), result[0]["email"].as(string{}),
-                               result[0]["login_attempts"].as(uint16_t{}), result[0]["verification_code"].as(string{}),
-                               result[0]["max_characters"].as(uint16_t{}), result[0]["is_game_master"].as(uint16_t{}));
+    return make_optional<db_user>(result[0]["id"].as(uint64_t{}), result[0]["username"].as(string{}),
+                                  result[0]["password"].as(string{}), result[0]["email"].as(string{}),
+                                  result[0]["login_attempts"].as(uint16_t{}), result[0]["verification_code"].as(string{}),
+                                  result[0]["max_characters"].as(uint16_t{}), result[0]["is_game_master"].as(uint16_t{}));
+}
+
+template<typename pool_T, typename transaction_T>
+vector<db_user> users_repository<pool_T, transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
+    pqxx::result result = transaction->execute(fmt::format("SELECT * FROM users u LEFT JOIN banned_users bu ON bu.user_id = u.id WHERE bu.id IS NULL"));
+
+    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+
+    vector<db_user> users;
+    users.reserve(result.size());
+
+    for(auto const & res : result) {
+        db_user user{res["id"].as(uint64_t{}), res["username"].as(string{}),
+                     res["password"].as(string{}), res["email"].as(string{}),
+                     res["login_attempts"].as(uint16_t{}), res["verification_code"].as(string{}),
+                     res["max_characters"].as(uint16_t{}), res["is_game_master"].as(uint16_t{})};
+        users.push_back(move(user));
+    }
+
+    return users;
 }

@@ -140,7 +140,7 @@ namespace ibh {
         }
 
         for(auto const &stat : player_stats) {
-            character_stat char_stat{0, new_player.id, stat.name, stat.value};
+            db_character_stat char_stat{0, new_player.id, stat.name, stat.value};
             stats_repo.insert(char_stat, transaction);
             player_stats.emplace_back(stat.name, stat.value);
         }

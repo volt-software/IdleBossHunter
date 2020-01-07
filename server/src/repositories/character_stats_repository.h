@@ -33,10 +33,10 @@ namespace ibh {
 
         unique_ptr<transaction_T> create_transaction();
 
-        void insert(character_stat &stat, unique_ptr<transaction_T> const &transaction) const;
-        void update(character_stat const &stat, unique_ptr<transaction_T> const &transaction) const;
-        optional<character_stat> get(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
-        vector<character_stat> get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
+        void insert(db_character_stat &stat, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_character_stat const &stat, unique_ptr<transaction_T> const &transaction) const;
+        optional<db_character_stat> get(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
+        vector<db_character_stat> get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
     private:
         shared_ptr<pool_T> _database_pool;
     };

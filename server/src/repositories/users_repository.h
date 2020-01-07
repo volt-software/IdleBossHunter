@@ -34,10 +34,11 @@ namespace ibh {
         explicit users_repository(shared_ptr<pool_T> database_pool);
 
         unique_ptr<transaction_T> create_transaction();
-        bool insert_if_not_exists(user& usr, unique_ptr<transaction_T> const &transaction) const;
-        void update(user const &usr, unique_ptr<transaction_T> const &transaction) const;
-        optional<user> get(int id, unique_ptr<transaction_T> const &transaction) const;
-        optional<user> get(string const &username, unique_ptr<transaction_T> const &transaction) const;
+        bool insert_if_not_exists(db_user& usr, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_user const &usr, unique_ptr<transaction_T> const &transaction) const;
+        vector<db_user> get_all(unique_ptr<transaction_T> const &transaction) const;
+        optional<db_user> get(int id, unique_ptr<transaction_T> const &transaction) const;
+        optional<db_user> get(string const &username, unique_ptr<transaction_T> const &transaction) const;
     private:
         shared_ptr<pool_T> _database_pool;
     };

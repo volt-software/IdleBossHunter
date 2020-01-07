@@ -34,7 +34,7 @@ TEST_CASE("characters repository tests") {
 
 
     SECTION( "db_character inserted correctly" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -58,7 +58,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "db_character only for user" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -70,7 +70,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "db_character updated correctly" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -102,7 +102,7 @@ TEST_CASE("characters repository tests") {
     }
     
     SECTION( "db_character get by name with location working correctly" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -134,7 +134,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "Can't insert db_character twice" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -161,7 +161,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "multiple characters retrieved correctly" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -181,7 +181,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "Get character by slot" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -221,7 +221,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "Get character by slot with location" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
@@ -261,7 +261,7 @@ TEST_CASE("characters repository tests") {
     }
 
     SECTION( "Delete character by slot" ) {
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
 
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};

@@ -21,10 +21,15 @@
 
 #include <repositories/item_stats_repository.h>
 #include <repositories/items_repository.h>
+#include <repositories/item_stats_repository.h>
+#include <repositories/users_repository.h>
 #include <repositories/characters_repository.h>
+#include <repositories/character_stats_repository.h>
 #include <repositories/clans_repository.h>
 #include <repositories/clan_buildings_repository.h>
 #include <repositories/clan_stats_repository.h>
+#include <iterator>
+#include <ecs/components.h>
 
 using namespace std;
 using namespace ibh;
@@ -32,10 +37,55 @@ using namespace ibh;
 void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool> db_pool, atomic<bool> const &quit) {
     item_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
     items_repository<database_pool, database_transaction> items_repo(db_pool);
+    item_stats_repository<database_pool, database_transaction> item_stats_repo(db_pool);
+    users_repository<database_pool, database_transaction> user_repo(db_pool);
     characters_repository<database_pool, database_transaction> char_repo(db_pool);
+    character_stats_repository<database_pool, database_transaction> char_stats_repo(db_pool);
     auto loading_start = chrono::system_clock::now();
 
+    auto transaction = user_repo.create_transaction();
+    auto users = user_repo.get_all(transaction);
+    vector<db_character> all_characters;
+
+    for(auto &user : users) {
+        auto characters = char_repo.get_by_user_id(user.id, transaction);
+        all_characters.reserve(all_characters.size() + characters.size());
+
+        for(auto &character : characters) {
+            character.stats = char_stats_repo.get_by_character_id(character.id, transaction);
+            character.items = items_repo.get_by_character_id(character.id, transaction);
+            for(auto &item : character.items) {
+                item.stats = item_stats_repo.get_by_item_id(item.id, transaction);
+            }
+        }
+
+        all_characters.insert(end(all_characters), make_move_iterator(begin(characters)), make_move_iterator(end(characters)));
+    }
+
+    for(auto &character : all_characters) {
+        auto new_entity = registry.create();
+        ibh_flat_map<string, int64_t> stats;
+        vector<item_component> items;
+
+        for(auto &stat : character.stats) {
+            stats.insert(ibh_flat_map<string, int64_t>::value_type{stat.name, stat.value});
+        }
+
+        for(auto &item : character.items) {
+            vector<stat_component> item_stats;
+            item_stats.reserve(item.stats.size());
+            for(auto &stat : item.stats) {
+                item_stats.emplace_back(stat.name, stat.value);
+            }
+            items.emplace_back(item.name, "", item.slot, 0, 0, 0, 0, 0, false, false, move(item_stats));
+        }
+
+        spdlog::trace("[{}] loaded character id {} name {} no. of items {} no. of stats {}", __FUNCTION__, character.id, character.name, items.size(), stats.size());
+
+        registry.assign<pc_component>(new_entity, pc_component{character.id, 0, character.name, character.race, "", character._class, "", character.level, character.skill_points, move(stats), ibh_flat_map<string, item_component>{}, move(items), ibh_flat_map<string, skill_component>{}});
+    }
+
     auto loading_end = chrono::system_clock::now();
-    spdlog::info("[{}] loaded in {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(loading_end - loading_start).count());
+    spdlog::info("[{}] database to game loaded in {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(loading_end - loading_start).count());
 }
 

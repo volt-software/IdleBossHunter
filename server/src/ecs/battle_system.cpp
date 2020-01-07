@@ -97,9 +97,9 @@ void ibh::battle_system::do_tick(entt::registry &es) {
                     }
 
                     for(auto &slot_name : slot_names) {
-                        auto item = pc.items.find(slot_name);
+                        auto item = pc.equipped_items.find(slot_name);
 
-                        if(item == end(pc.items)) {
+                        if(item == end(pc.equipped_items)) {
                             continue;
                         }
 

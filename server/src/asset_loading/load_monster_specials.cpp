@@ -37,17 +37,17 @@ optional<monster_special_definition_component> ibh::load_monster_specials(string
     Document d;
     d.Parse(env_contents->c_str(), env_contents->size());
 
-    if(!d.IsObject() || !d.HasMember("name") || !d.HasMember("stats") || !d.HasMember("teleport_when_beat")) {
+    if(!d.IsObject() || !d.HasMember("name") || !d.HasMember("multipliers") || !d.HasMember("teleport_when_beat")) {
         spdlog::trace("[{}] couldn't load, missing members file {}", __FUNCTION__, file);
         return {};
     }
 
     vector<stat_component> stats;
-    stats.reserve(d["stats"].Size());
+    stats.reserve(d["multipliers"].MemberCount());
 
     for (auto const &stat : stat_names) {
-        if(d["stats"].HasMember(stat.c_str())) {
-            stats.emplace_back(stat, d["stats"][stat.c_str()].GetInt64());
+        if(d["multipliers"].HasMember(stat.c_str())) {
+            stats.emplace_back(stat, d["multipliers"][stat.c_str()].GetInt64());
         }
     }
 

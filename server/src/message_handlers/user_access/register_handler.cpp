@@ -114,7 +114,7 @@ namespace ibh {
                 return;
             }
 
-            user new_usr{0, msg->username, string(hashed_password), msg->email, 0, "", 0, 0};
+            db_user new_usr{0, msg->username, string(hashed_password), msg->email, 0, "", 0, 0};
             auto inserted = user_repo.insert_if_not_exists(new_usr, transaction);
 
             if (!inserted) {

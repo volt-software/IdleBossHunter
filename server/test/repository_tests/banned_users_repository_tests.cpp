@@ -32,12 +32,12 @@ TEST_CASE("banned users repository tests") {
 
     SECTION( "banned user inserted correctly" ) {
         auto transaction = user_repo.create_transaction();
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
 
         auto now = chrono::system_clock::now();
-        banned_user busr{0, "ip", usr, now};
+        db_banned_user busr{0, "ip", usr, now};
         
         auto inserted = banned_user_repo.insert_if_not_exists(busr, transaction);
         REQUIRE(inserted);
@@ -52,16 +52,16 @@ TEST_CASE("banned users repository tests") {
 
     SECTION( "update banned user" ) {
         auto transaction = user_repo.create_transaction();
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
 
-        user usr2{0, "user2", "pass", "email", 0, "code", 0, 0};
+        db_user usr2{0, "user2", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr2, transaction);
         REQUIRE(usr2.id != 0);
 
         auto now = chrono::system_clock::now();
-        banned_user busr{0, "ip", usr, now};
+        db_banned_user busr{0, "ip", usr, now};
 
         auto inserted = banned_user_repo.insert_if_not_exists(busr, transaction);
         REQUIRE(inserted);
@@ -82,12 +82,12 @@ TEST_CASE("banned users repository tests") {
 
     SECTION( "banned user is banned" ) {
         auto transaction = user_repo.create_transaction();
-        user usr{0, "user", "pass", "email", 0, "code", 0, 0};
+        db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
 
         auto now = chrono::system_clock::now() + 200s;
-        banned_user busr{0, "ip", usr, now};
+        db_banned_user busr{0, "ip", usr, now};
 
         auto inserted = banned_user_repo.insert_if_not_exists(busr, transaction);
         REQUIRE(inserted);
