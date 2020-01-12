@@ -248,6 +248,7 @@ int main() {
                     try {
                         s_handle.s->send(user_data->second.ws, msg.msg->serialize(), websocketpp::frame::opcode::value::TEXT);
                     } catch (...) {
+                        spdlog::warn("[{}] socket expired, wanted to send outward message", __FUNCTION__, msg.conn_id);
                         continue;
                     }
                 } else {

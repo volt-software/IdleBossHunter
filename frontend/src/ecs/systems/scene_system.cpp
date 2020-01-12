@@ -30,6 +30,10 @@
 #include <messages/user_access/play_character_response.h>
 #include <messages/generic_error_response.h>
 #include <messages/generic_ok_response.h>
+#include <messages/battle/new_battle_response.h>
+#include <messages/battle/level_up_response.h>
+#include <messages/battle/battle_update_response.h>
+#include <messages/battle/battle_finished_response.h>
 
 using namespace std;
 using namespace ibh;
@@ -130,6 +134,14 @@ unique_ptr<message> deserialize_message(uint64_t const &type, rapidjson::Documen
             return message_response::deserialize(d);
         case play_character_response::type:
             return play_character_response::deserialize(d);
+        case new_battle_response::type:
+            return new_battle_response::deserialize(d);
+        case level_up_response::type:
+            return level_up_response::deserialize(d);
+        case battle_update_response::type:
+            return battle_update_response::deserialize(d);
+        case battle_finished_response::type:
+            return battle_finished_response::deserialize(d);
         default:
             return nullptr;
     }

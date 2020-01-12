@@ -38,7 +38,7 @@ namespace ibh {
         for(auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
 
-            if(pc.connection_id != enter_msg->connection_id) {
+            if(pc.id != enter_msg->character_id) {
                 continue;
             }
 

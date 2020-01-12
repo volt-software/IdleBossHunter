@@ -36,13 +36,9 @@ void battle_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(_first_frame) {
         ImGui::SetNextWindowSize(ImVec2{550.0F, 280.0F}, ImGuiCond_Once);
     }
-    if(ImGui::Begin("Chat Window")) {
+    if(ImGui::Begin("Battle Log")) {
         ImGui::BeginChild("Battle Log", ImVec2(0.0F, 250.0F), true, ImGuiWindowFlags_None);
         ImGui::Columns(1);
-
-        if(_first_frame) {
-            ImGui::SetColumnWidth(-1, 500.0F);
-        }
         for(auto const &msg : _battle_log) {
             ImGui::Text("%s", msg.c_str());
         }
