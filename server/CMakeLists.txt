@@ -86,7 +86,6 @@ target_link_libraries(ibh_backend PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_backend PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_backend PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_backend PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_backend PUBLIC /usr/lib/x86_64-linux-gnu/libm.a)
 
 target_link_libraries(ibh_server_test PUBLIC ${PQXX_LIBRARY} -lpq)
 target_link_libraries(ibh_server_test PUBLIC -lpthread -lstdc++fs)
