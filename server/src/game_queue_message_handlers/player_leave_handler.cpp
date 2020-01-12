@@ -32,6 +32,7 @@ namespace ibh {
             return;
         }
 
+        bool player_found = false;
         auto pc_view = registry.view<pc_component>();
         for(auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
@@ -40,7 +41,13 @@ namespace ibh {
                 continue;
             }
 
+            spdlog::trace("[{}] found pc {} for connection id {}", __FUNCTION__, pc.name, pc.connection_id);
             pc.connection_id = 0;
+            player_found = true;
+        }
+
+        if(!player_found) {
+            throw std::runtime_error("Could not find player");
         }
     }
 }
