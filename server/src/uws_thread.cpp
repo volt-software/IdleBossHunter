@@ -57,7 +57,7 @@ atomic<uint64_t> connection_id_counter = 1;
 ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> ibh::user_connections;
 ibh_flat_map<websocketpp::connection_hdl, uint64_t> handle_to_connection_id_map;
 moodycamel::ConcurrentQueue<unique_ptr<queue_message>> ibh::game_loop_queue;
-string ibh::motd;
+string ibh::motd = "";
 character_select_response ibh::select_response{{}, {}};
 shared_mutex ibh::user_connections_mutex;
 atomic<bool> init_done = false;
@@ -250,9 +250,6 @@ void add_routes(message_router_type &message_router) {
 }
 
 thread ibh::run_uws(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {
-    connection_id_counter = 0;
-    motd = "";
-
     auto t = thread([&config, pool, &s_handle, &quit] {
         server roa_server;
         s_handle.s = &roa_server;
