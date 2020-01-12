@@ -33,6 +33,7 @@
 #include "spdlog/spdlog.h"
 #include <SDL.h>
 #include <algorithm>
+#include "battle_scene.h"
 
 using namespace std;
 using namespace ibh;
@@ -60,7 +61,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         ImGui::ListBoxHeader("Characters", _characters.size(), 4);
         for(auto& character : _characters) {
-            if(ImGui::Selectable(fmt::format("{} {}", character.name, character.level).c_str(), _selected_play_slot == character.slot)) {
+            if(ImGui::Selectable(fmt::format("{} {}", character.name, character.level).c_str(), static_cast<uint32_t>(_selected_play_slot) == character.slot)) {
                 _selected_play_slot = character.slot;
             }
         }
@@ -277,7 +278,9 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
                 return;
             }
 
-            if(resp_msg->slot == _selected_play_slot) {
+            if(resp_msg->slot == static_cast<uint32_t>(_selected_play_slot)) {
+                manager->add(make_unique<battle_scene>());
+                _waiting_for_reply = false;
                 _closed = true;
             } else {
                 spdlog::error("[{}] selected character slot {} does not match server's idea of slot {}", __FUNCTION__, _selected_play_slot, resp_msg->slot);

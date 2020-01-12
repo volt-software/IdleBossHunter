@@ -32,6 +32,15 @@ namespace ibh {
             return;
         }
 
-        // TODO
+        auto pc_view = registry.view<pc_component>();
+        for(auto entity : pc_view) {
+            auto &pc = pc_view.get(entity);
+
+            if(pc.connection_id != leave_message->connection_id) {
+                continue;
+            }
+
+            pc.connection_id = 0;
+        }
     }
 }

@@ -18,21 +18,10 @@
 
 #pragma once
 
-#include <string>
+#define MEASURE_TIME_OF_FUNCTION()  auto start = chrono::system_clock::now(); \
+                                    auto func_name = __FUNCTION__; \
+                                    auto time_scope_guard = on_leaving_scope([start, func_name] { \
+                                        auto end = chrono::system_clock::now(); \
+                                        spdlog::trace("[{}] finished in {} µs", func_name, chrono::duration_cast<chrono::microseconds>(end-start).count()); \
+                                    });
 
-using namespace std;
-
-namespace ibh {
-    struct config {
-        string address;
-        uint16_t port;
-        string debug_level;
-        string connection_string;
-        string certificate_file;
-        string private_key_file;
-        string certificate_password;
-        uint32_t tick_length;
-        uint32_t battle_system_each_n_ticks;
-        bool log_tick_times;
-    };
-}

@@ -26,6 +26,7 @@
 #include "message_handlers/handler_macros.h"
 #include <ecs/components.h>
 #include <uws_thread.h>
+#include "macros.h"
 
 using namespace std;
 

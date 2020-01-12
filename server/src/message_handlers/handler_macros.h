@@ -76,10 +76,3 @@
                                                     SEND_ERROR("Unrecognized message", "", "", true); \
                                                     return; \
                                                 }
-
-#define MEASURE_TIME_OF_FUNCTION()  auto start = chrono::system_clock::now(); \
-                                    auto func_name = __FUNCTION__; \
-                                    auto time_scope_guard = on_leaving_scope([start, func_name] { \
-                                        auto end = chrono::system_clock::now(); \
-                                        spdlog::trace("[{}] finished in {} µs", func_name, chrono::duration_cast<chrono::microseconds>(end-start).count()); \
-                                    });

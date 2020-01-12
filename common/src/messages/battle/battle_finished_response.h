@@ -19,20 +19,33 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <optional>
+#include <rapidjson/document.h>
+#include <common_components.h>
+#include "../message.h"
 
 using namespace std;
 
 namespace ibh {
-    struct config {
-        string address;
-        uint16_t port;
-        string debug_level;
-        string connection_string;
-        string certificate_file;
-        string private_key_file;
-        string certificate_password;
-        uint32_t tick_length;
-        uint32_t battle_system_each_n_ticks;
-        bool log_tick_times;
+    struct character_component;
+
+    struct battle_finished_response : message {
+        battle_finished_response(bool mob_died, bool player_died, uint64_t xp_gained, uint64_t money_gained) noexcept;
+
+        ~battle_finished_response() noexcept override = default;
+
+        [[nodiscard]]
+        string serialize() const override;
+
+        [[nodiscard]]
+        static unique_ptr<battle_finished_response> deserialize(rapidjson::Document const &d);
+
+        bool mob_died;
+        bool player_died;
+        uint64_t xp_gained;
+        uint64_t money_gained;
+
+        inline static constexpr uint64_t type = generate_type<battle_finished_response>();
     };
 }

@@ -39,6 +39,7 @@ namespace ibh {
     };
 
     struct player_enter_message : queue_message {
+        uint64_t character_id;
         string character_name;
         string race;
         string baseclass;
@@ -49,7 +50,7 @@ namespace ibh {
         uint64_t skill_points;
         static uint32_t const _type;
 
-        player_enter_message(string character_name, string race, string baseclass, vector<stat_component> player_stats, uint64_t connection_id, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points);
+        player_enter_message(uint64_t character_id, string character_name, string race, string baseclass, vector<stat_component> player_stats, uint64_t connection_id, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points);
     };
 
     struct player_leave_message : queue_message {

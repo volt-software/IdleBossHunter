@@ -16,19 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "update_motd_response.h"
+#include "new_battle_response.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-update_motd_response::update_motd_response(string motd) noexcept
-        : motd(move(motd)) {
+new_battle_response::new_battle_response(string mob_name, uint64_t mob_level, uint64_t mob_hp) noexcept : mob_name(move(mob_name)), mob_level(mob_level), mob_hp(mob_hp) {
 
 }
 
-string update_motd_response::serialize() const {
+string new_battle_response::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -37,24 +36,30 @@ string update_motd_response::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String(KEY_STRING("motd"));
-    writer.String(motd.c_str(), motd.size());
+    writer.String(KEY_STRING("mob_name"));
+    writer.String(mob_name.c_str(), mob_name.size());
+
+    writer.String(KEY_STRING("mob_level"));
+    writer.Uint64(mob_level);
+
+    writer.String(KEY_STRING("mob_hp"));
+    writer.Uint64(mob_hp);
+
 
     writer.EndObject();
     return sb.GetString();
 }
 
-unique_ptr<update_motd_response> update_motd_response::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") ||
-        !d.HasMember("motd")) {
-        spdlog::warn("[update_motd_response] deserialize failed");
+unique_ptr<new_battle_response> new_battle_response::deserialize(rapidjson::Document const &d) {
+    if (!d.HasMember("type") || !d.HasMember("mob_name") || !d.HasMember("mob_level") || !d.HasMember("mob_hp")) {
+        spdlog::warn("[new_battle_response] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[update_motd_response] deserialize failed wrong type");
+        spdlog::warn("[new_battle_response] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<update_motd_response>(d["motd"].GetString());
+    return make_unique<new_battle_response>(d["mob_name"].GetString(), d["mob_level"].GetUint64(), d["mob_hp"].GetUint64());
 }

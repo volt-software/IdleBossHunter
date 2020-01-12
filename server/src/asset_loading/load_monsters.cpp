@@ -37,7 +37,7 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
     Document d;
     d.Parse(env_contents->c_str(), env_contents->size());
 
-    if(!d.IsObject() || !d.HasMember("name") || !d.HasMember("min_level") || !d.HasMember("max_level") ||
+    if(!d.IsObject() || !d.HasMember("name") ||
             !d.HasMember("stats") || !d["stats"].IsObject()) {
         spdlog::trace("[{}] couldn't load monster due to missing members {}!", __FUNCTION__, file);
         return {};
@@ -45,12 +45,16 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
 
     ibh_flat_map<string, stat_component> stats;
     stats.reserve(d["stats"].MemberCount());
+    string name = d["name"].GetString();
 
     for (auto const &stat : stat_names) {
         if(d["stats"].HasMember(stat.c_str())) {
             stats.insert(ibh_flat_map<string, stat_component>::value_type{stat, stat_component{stat, d["stats"][stat.c_str()].GetInt64()}});
+            spdlog::trace("[{}] monster {} found stat {}", __FUNCTION__, name, stat);
+        } else {
+            spdlog::trace("[{}] monster {} missing stat {}", __FUNCTION__, name, stat);
         }
     }
 
-    return monster_definition_component(d["name"].GetString(), d["min_level"].GetUint64(), d["max_level"].GetUint64(), move(stats));
+    return monster_definition_component(name, move(stats));
 }

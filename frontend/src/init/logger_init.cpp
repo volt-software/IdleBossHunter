@@ -44,6 +44,7 @@ void ibh::reconfigure_logger(config const& config) noexcept {
     }
 
     spdlog::set_default_logger(logger);
+    spdlog::set_pattern("[%C-%m-%d %H:%M:%S.%e] [%L] %v");
 
     spdlog::info("[{}] debug level: {}", __FUNCTION__, config.debug_level);
 }

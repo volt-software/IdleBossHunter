@@ -30,6 +30,7 @@
 #include <utf.h>
 #include <messages/user_access/character_select_response.h>
 #include <messages/user_access/play_character_response.h>
+#include "macros.h"
 
 using namespace std;
 
@@ -106,7 +107,7 @@ namespace ibh {
             player_stats.emplace_back(stat.name, stat.value);
         }
         spdlog::debug("[{}] enqueing character {} slot {}", __FUNCTION__, character->name, character->slot);
-        q.enqueue(make_unique<player_enter_message>(character->name, character->race, character->_class, move(player_stats),
+        q.enqueue(make_unique<player_enter_message>(character->id, character->name, character->race, character->_class, move(player_stats),
                 user_data->connection_id, character->level, character->gold, character->xp, character->skill_points));
     }
 

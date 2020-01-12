@@ -95,24 +95,21 @@ namespace ibh {
     struct monster_definition_component {
         string name;
 
-        uint64_t min_level;
-        uint64_t max_level;
-
         ibh_flat_map<string, stat_component> stats;
         //vector<random_stat_component> random_stats;
         //vector<item_component> items;
         //vector<skill_component> skills;
 
-        monster_definition_component(string name, uint64_t min_level, uint64_t max_level, ibh_flat_map<string, stat_component> stats) :
-        name(move(name)), min_level(min_level), max_level(max_level), stats(move(stats)) {}
+        monster_definition_component(string name, ibh_flat_map<string, stat_component> stats) :
+        name(move(name)), stats(move(stats)) {}
     };
 
     struct monster_special_definition_component {
         string name;
-        vector<stat_component> stat_multipliers;
+        ibh_flat_map<string, stat_component> stats;
         bool teleport_when_beat;
 
-        monster_special_definition_component(string name, vector<stat_component> stats, bool teleport) : name(move(name)), stat_multipliers(move(stats)), teleport_when_beat(teleport) {}
+        monster_special_definition_component(string name, ibh_flat_map<string, stat_component> stats, bool teleport) : name(move(name)), stats(move(stats)), teleport_when_beat(teleport) {}
     };
 
     struct monster_component {
@@ -163,14 +160,14 @@ namespace ibh {
 
         optional<battle_component> battle;
 
-        ibh_flat_map<string, int64_t> stats;
+        ibh_flat_map<string, stat_component> stats;
         ibh_flat_map<string, item_component> equipped_items;
         vector<item_component> inventory;
         ibh_flat_map<string, skill_component> skills;
 
         pc_component() : id(), connection_id(), name(), race(), dir(), _class(), spawn_message(),
                           level(), skill_points(), stats(), equipped_items(), inventory(), skills() {}
-        pc_component(uint64_t id, uint64_t connection_id, string name, string race, string dir, string _class, string spawn_message, uint64_t level, uint64_t skill_points, ibh_flat_map<string, int64_t> stats, ibh_flat_map<string, item_component> equipped_items, vector<item_component> inventory, ibh_flat_map<string, skill_component> skills)
+        pc_component(uint64_t id, uint64_t connection_id, string name, string race, string dir, string _class, string spawn_message, uint64_t level, uint64_t skill_points, ibh_flat_map<string, stat_component> stats, ibh_flat_map<string, item_component> equipped_items, vector<item_component> inventory, ibh_flat_map<string, skill_component> skills)
         : id(id), connection_id(connection_id), name(move(name)), race(move(race)), dir(move(dir)), _class(move(_class)), spawn_message(move(spawn_message)),
                           level(level), skill_points(skill_points), stats(move(stats)), equipped_items(move(equipped_items)), inventory(move(inventory)), skills(move(skills)) {}
     };

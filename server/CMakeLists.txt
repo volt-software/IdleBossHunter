@@ -19,13 +19,14 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-variable -Wno-long-long -Wno-unused-parameter -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -pedantic -Wformat -Wformat-security ") #-fsanitize=undefined -fsanitize=thread ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -maes -mpclmul -mpopcnt -msse4.1 -msse4.2 -mrdrnd -mf16c -mfsgsbase -mfxsr -mxsave -mxsaveopt -fstack-protector-strong -fstack-clash-protection -fcf-protection -fPIE -fsanitize=undefined")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -maes -mpclmul -mpopcnt -msse4.1 -msse4.2 -mrdrnd -mf16c -mfsgsbase -mfxsr -mxsave -mxsaveopt -fstack-protector-strong -fstack-clash-protection -fcf-protection -fPIE -fsanitize=address")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -ggdb -Og")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG")
 
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-O1 -Wl,-z,defs -Wl,-z,now -Wl,-z,relro -Wl,-pie -Wl,-z,noexecstack")
+SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
 
 # define targets
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -85,21 +86,19 @@ target_link_libraries(ibh_backend PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_backend PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_backend PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_backend PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_backend PUBLIC -static-libgcc -static-libstdc++)
+target_link_libraries(ibh_backend PUBLIC /usr/lib/x86_64-linux-gnu/libm.a)
 
 target_link_libraries(ibh_server_test PUBLIC ${PQXX_LIBRARY} -lpq)
 target_link_libraries(ibh_server_test PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_server_test PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_server_test PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_server_test PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_server_test PUBLIC -static-libgcc -static-libstdc++)
 
 target_link_libraries(ibh_benchmark PUBLIC ${PQXX_LIBRARY} -lpq)
 target_link_libraries(ibh_benchmark PUBLIC -lpthread -lstdc++fs)
 target_link_libraries(ibh_benchmark PUBLIC ${ZLIB_LIBRARIES} )
 target_link_libraries(ibh_benchmark PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_benchmark PUBLIC ${SODIUM_LIBRARY})
-target_link_libraries(ibh_benchmark PUBLIC -static-libgcc -static-libstdc++)
 
 add_custom_command(
         TARGET ibh_backend POST_BUILD

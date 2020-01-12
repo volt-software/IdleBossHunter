@@ -53,7 +53,7 @@ using websocketpp::lib::bind;
 
 using context_ptr = websocketpp::lib::shared_ptr<websocketpp::lib::asio::ssl::context>;
 
-atomic<uint64_t> connection_id_counter = 0;
+atomic<uint64_t> connection_id_counter = 1;
 ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> ibh::user_connections;
 ibh_flat_map<websocketpp::connection_hdl, uint64_t> handle_to_connection_id_map;
 moodycamel::ConcurrentQueue<unique_ptr<queue_message>> ibh::game_loop_queue;

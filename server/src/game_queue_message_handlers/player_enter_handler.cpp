@@ -34,50 +34,16 @@ namespace ibh {
             return;
         }
 
-        // TODO
-        /*auto map_view = registry.view<map_component>();
+        auto pc_view = registry.view<pc_component>();
+        for(auto entity : pc_view) {
+            auto &pc = pc_view.get(entity);
 
-        for(auto m_entity : map_view) {
-            map_component const &m = map_view.get(m_entity);
-
-            if(ranges::any_of(m.players, [&](pc_component const &pc){ return pc.name == enter_msg->character_name; })) {
-                spdlog::warn("[{}] character already in game {} {}", __FUNCTION__, enter_msg->character_name, enter_msg->connection_id);
-                outward_queue.enqueue(outward_message{enter_msg->connection_id, make_unique<generic_error_response>("already playing that character", "already playing that character", "already playing that character", true)});
-                return;
-            }
-        }
-
-        for(auto m_entity : map_view) {
-            map_component &m = map_view.get(m_entity);
-
-            if(m.name != enter_msg->map_name) {
+            if(pc.connection_id != enter_msg->connection_id) {
                 continue;
             }
 
-            if(enter_msg->x >= m.width || enter_msg->y >= m.height) {
-                spdlog::error("[{}] wrong coordinates {} {} {} {}", __FUNCTION__, enter_msg->map_name, enter_msg->x, enter_msg->y, enter_msg->connection_id);
-                outward_queue.enqueue(outward_message{enter_msg->connection_id, make_unique<generic_error_response>("Wrong coordinates", "Wrong coordinates", "Wrong coordinates", true)});
-                return;
-            }
-
-            pc_component pc{};
-            pc.name = enter_msg->character_name;
-            pc.level = enter_msg->level;
-            pc.gold = enter_msg->gold;
-            pc.loc = make_tuple(enter_msg->x, enter_msg->y);
             pc.connection_id = enter_msg->connection_id;
-            pc.gender = enter_msg->gender;
-            pc.race = enter_msg->race;
-            pc.character_class = enter_msg->baseclass;
-
-            for(auto &stat : enter_msg->player_stats) {
-                pc.stats[stat.name] = stat.value;
-            }
-
-            m.players.emplace_back(pc);
-
-            spdlog::info("[{}] character {} entered game {}", __FUNCTION__, pc.name, enter_msg->connection_id);
             break;
-        }*/
+        }
     }
 }

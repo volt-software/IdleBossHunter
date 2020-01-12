@@ -42,12 +42,12 @@ optional<monster_special_definition_component> ibh::load_monster_specials(string
         return {};
     }
 
-    vector<stat_component> stats;
+    ibh_flat_map<string, stat_component> stats;
     stats.reserve(d["multipliers"].MemberCount());
 
     for (auto const &stat : stat_names) {
         if(d["multipliers"].HasMember(stat.c_str())) {
-            stats.emplace_back(stat, d["multipliers"][stat.c_str()].GetInt64());
+            stats.insert(ibh_flat_map<string, stat_component>::value_type{stat, stat_component{stat, d["multipliers"][stat.c_str()].GetInt64()}});
         }
     }
 

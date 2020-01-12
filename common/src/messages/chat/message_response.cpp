@@ -33,19 +33,19 @@ string message_response::serialize() const {
 
     writer.StartObject();
 
-    writer.String("type");
+    writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String("user");
+    writer.String(KEY_STRING("user"));
     writer.String(user.c_str(), user.size());
 
-    writer.String("content");
+    writer.String(KEY_STRING("content"));
     writer.String(content.c_str(), content.size());
 
-    writer.String("source");
+    writer.String(KEY_STRING("source"));
     writer.String(source.c_str(), source.size());
 
-    writer.String("unix_timestamp");
+    writer.String(KEY_STRING("unix_timestamp"));
     writer.Uint64(unix_timestamp);
 
     writer.EndObject();

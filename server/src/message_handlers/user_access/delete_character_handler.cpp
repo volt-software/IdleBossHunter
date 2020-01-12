@@ -26,6 +26,7 @@
 #include <repositories/characters_repository.h>
 #include <uws_thread.h>
 #include "message_handlers/handler_macros.h"
+#include "macros.h"
 
 using namespace std;
 

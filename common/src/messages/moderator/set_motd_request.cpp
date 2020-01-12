@@ -34,10 +34,10 @@ string set_motd_request::serialize() const {
 
     writer.StartObject();
 
-    writer.String("type");
+    writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String("motd");
+    writer.String(KEY_STRING("motd"));
     writer.String(motd.c_str(), motd.size());
 
     writer.EndObject();

@@ -19,20 +19,33 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <optional>
+#include <rapidjson/document.h>
+#include <common_components.h>
+#include "../message.h"
+#include "../../ibh_containers.h"
 
 using namespace std;
 
 namespace ibh {
-    struct config {
-        string address;
-        uint16_t port;
-        string debug_level;
-        string connection_string;
-        string certificate_file;
-        string private_key_file;
-        string certificate_password;
-        uint32_t tick_length;
-        uint32_t battle_system_each_n_ticks;
-        bool log_tick_times;
+    struct character_component;
+
+    struct level_up_response : message {
+        level_up_response(ibh_flat_map<string, stat_component> added_stats, uint64_t new_xp_goal, uint64_t current_xp) noexcept;
+
+        ~level_up_response() noexcept override = default;
+
+        [[nodiscard]]
+        string serialize() const override;
+
+        [[nodiscard]]
+        static unique_ptr<level_up_response> deserialize(rapidjson::Document const &d);
+
+        ibh_flat_map<string, stat_component> added_stats;
+        uint64_t new_xp_goal;
+        uint64_t current_xp;
+
+        inline static constexpr uint64_t type = generate_type<level_up_response>();
     };
 }

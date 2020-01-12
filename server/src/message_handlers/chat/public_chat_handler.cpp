@@ -26,6 +26,7 @@
 #include "message_handlers/handler_macros.h"
 #include <game_logic/censor_sensor.h>
 #include <uws_thread.h>
+#include "macros.h"
 
 using namespace std;
 using namespace chrono;

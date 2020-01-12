@@ -63,12 +63,11 @@ void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool>
     }
 
     for(auto &character : all_characters) {
-        auto new_entity = registry.create();
-        ibh_flat_map<string, int64_t> stats;
+        ibh_flat_map<string, stat_component> stats;
         vector<item_component> items;
 
         for(auto &stat : character.stats) {
-            stats.insert(ibh_flat_map<string, int64_t>::value_type{stat.name, stat.value});
+            stats.insert(ibh_flat_map<string, stat_component>::value_type{stat.name, stat_component{stat.name, stat.value}});
         }
 
         for(auto &item : character.items) {
@@ -81,8 +80,12 @@ void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool>
         }
 
         spdlog::trace("[{}] loaded character id {} name {} no. of items {} no. of stats {}", __FUNCTION__, character.id, character.name, items.size(), stats.size());
-
-        registry.assign<pc_component>(new_entity, pc_component{character.id, 0, character.name, character.race, "", character._class, "", character.level, character.skill_points, move(stats), ibh_flat_map<string, item_component>{}, move(items), ibh_flat_map<string, skill_component>{}});
+        auto new_entity = registry.create();
+        registry.assign<pc_component>(new_entity, pc_component{character.id, 0, character.name, character.race, "",
+                                                               character._class, "", character.level,
+                                                               character.skill_points, (stats),
+                                                               ibh_flat_map<string, item_component>{}, (items),
+                                                               ibh_flat_map<string, skill_component>{}});
     }
 
     auto loading_end = chrono::system_clock::now();

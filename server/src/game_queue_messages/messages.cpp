@@ -24,8 +24,8 @@ namespace ibh {
     uint32_t const player_leave_message::_type = 2;
     uint32_t const player_move_message::_type  = 3;
 
-    player_enter_message::player_enter_message(string character_name, string race, string baseclass, vector <stat_component> player_stats, uint64_t connection_id, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points)
-            : queue_message(_type, connection_id), character_name(move(character_name)), race(move(race)), baseclass(move(baseclass)),
+    player_enter_message::player_enter_message(uint64_t character_id, string character_name, string race, string baseclass, vector <stat_component> player_stats, uint64_t connection_id, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points)
+            : queue_message(_type, connection_id), character_id(character_id), character_name(move(character_name)), race(move(race)), baseclass(move(baseclass)),
             player_stats(move(player_stats)), level(level), gold(gold), xp(xp), skill_points(skill_points) {}
 
     player_leave_message::player_leave_message(uint64_t connection_id)

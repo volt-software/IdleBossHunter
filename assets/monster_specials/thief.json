@@ -6,11 +6,11 @@
     "item": 100,
     "hp": 100,
     "mp": 100,
-    "strength": 100,
-    "agility": 150,
+    "str": 100,
+    "agi": 150,
     "psi": 100,
-    "vitality": 10,
-    "speed": 150
+    "vit": 10,
+    "spd": 150
   },
   "teleport_when_beat": false
 }

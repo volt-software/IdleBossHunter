@@ -19,14 +19,20 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
+#include "components.h"
 
 namespace ibh {
     class battle_system {
     public:
-        battle_system() : _tick_count(0) {}
+        battle_system(uint32_t every_n_ticks, outward_queues *outward_queue, vector<monster_definition_component> monsters, vector<monster_special_definition_component> monster_specials) :
+        _tick_count(0), _every_n_ticks(every_n_ticks), _outward_queue(outward_queue), _monsters(move(monsters)), _monster_specials(move(monster_specials)) {}
         void do_tick(entt::registry &es);
 
     private:
         uint32_t _tick_count;
+        uint32_t _every_n_ticks;
+        outward_queues *_outward_queue;
+        vector<monster_definition_component> _monsters;
+        vector<monster_special_definition_component> _monster_specials;
     };
 }

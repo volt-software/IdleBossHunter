@@ -31,6 +31,7 @@
 #include <utf.h>
 #include <uws_thread.h>
 #include <messages/user_access/character_select_response.h>
+#include "macros.h"
 
 using namespace std;
 

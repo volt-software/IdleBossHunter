@@ -33,10 +33,10 @@ string message_request::serialize() const {
 
     writer.StartObject();
 
-    writer.String("type");
+    writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String("content");
+    writer.String(KEY_STRING("content"));
     writer.String(content.c_str(), content.size());
 
     writer.EndObject();

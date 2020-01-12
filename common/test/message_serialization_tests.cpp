@@ -36,8 +36,10 @@
 #include <messages/update_response.h>
 #include <messages/generic_error_response.h>
 #include <messages/generic_ok_response.h>
-
-#include <ecs/components.h>
+#include <messages/battle/battle_update_response.h>
+#include <messages/battle/level_up_response.h>
+#include <messages/battle/new_battle_response.h>
+#include <messages/battle/battle_finished_response.h>
 
 using namespace std;
 using namespace ibh;
@@ -247,6 +249,59 @@ TEST_CASE("message serialization tests") {
     SECTION("update motd response") {
         SERDE(update_motd_response, "motd");
         REQUIRE(msg.motd == msg2->motd);
+    }
+
+    // battle
+
+    SECTION("battle update response") {
+        SERDE(battle_update_response, 1, 2, 3, 4, 5, 6);
+        REQUIRE(msg2->mob_turns == 1);
+        REQUIRE(msg2->player_turns == 2);
+        REQUIRE(msg2->mob_hits == 3);
+        REQUIRE(msg2->player_hits == 4);
+        REQUIRE(msg2->mob_damage == 5);
+        REQUIRE(msg2->player_damage == 6);
+    }
+
+    SECTION("level up response") {
+        ibh_flat_map<string, stat_component> stats;
+        stats.insert(ibh_flat_map<string, stat_component>::value_type{"s1", stat_component{"s1", 10}});
+        stats.insert(ibh_flat_map<string, stat_component>::value_type{"s2", stat_component{"s2", 20}});
+        SERDE(level_up_response, stats, 1, 2);
+        REQUIRE(msg2->added_stats.size() == 2);
+        auto as1 = msg2->added_stats.find("s1");
+        auto as2 = msg2->added_stats.find("s2");
+        auto s1 = stats.find("s1");
+        auto s2 = stats.find("s2");
+        REQUIRE(as1->second.name == s1->second.name);
+        REQUIRE(as1->second.value == s1->second.value);
+        REQUIRE(as2->second.name == s2->second.name);
+        REQUIRE(as2->second.value == s2->second.value);
+        REQUIRE(msg2->new_xp_goal == 1);
+        REQUIRE(msg2->current_xp == 2);
+    }
+
+    SECTION("new battle response") {
+        SERDE(new_battle_response, "battle", 1, 2);
+        REQUIRE(msg2->mob_name == "battle");
+        REQUIRE(msg2->mob_level == 1);
+        REQUIRE(msg2->mob_hp == 2);
+    }
+
+    SECTION("battle finished response") {
+        SERDE(battle_finished_response, false, false, 1, 2);
+        REQUIRE(msg2->mob_died == false);
+        REQUIRE(msg2->player_died == false);
+        REQUIRE(msg2->xp_gained == 1);
+        REQUIRE(msg2->money_gained == 2);
+    }
+
+    SECTION("battle finished response2") {
+        SERDE(battle_finished_response, true, true, 3, 4);
+        REQUIRE(msg2->mob_died == true);
+        REQUIRE(msg2->player_died == true);
+        REQUIRE(msg2->xp_gained == 3);
+        REQUIRE(msg2->money_gained == 4);
     }
 
     // misc

@@ -35,6 +35,7 @@
 #include <messages/user_access/user_entered_game_response.h>
 #include <uws_thread.h>
 #include <ecs/components.h>
+#include "macros.h"
 
 #ifdef TEST_CODE
 #include "../../../test/custom_server.h"

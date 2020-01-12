@@ -1,13 +1,13 @@
 {
   "name": "Slime",
-  "min_level": 9,
-  "max_level": 11,
   "stats": {
-    "strength": 100,
-    "agility": 50,
-    "psi": 10,
-    "vitality": 50,
-    "speed": 50,
+    "hp": 200,
+    "mp": 100,
+    "str": 50,
+    "agi": 50,
+    "psi": 50,
+    "vit": 50,
+    "spd": 50,
     "gold": 100,
     "xp": 100
   }

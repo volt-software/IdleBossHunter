@@ -25,6 +25,7 @@
 #include <uws_thread.h>
 #include <messages/moderator/update_motd_response.h>
 #include "message_handlers/handler_macros.h"
+#include "macros.h"
 
 using namespace std;
 

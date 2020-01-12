@@ -48,6 +48,7 @@
 #include "ecs/battle_system.h"
 
 #include "uws_thread.h"
+
 using namespace std;
 using namespace ibh;
 
@@ -95,10 +96,9 @@ int main() {
     users_repository<database_pool, database_transaction> user_repo(pool);
     banned_users_repository<database_pool, database_transaction> banned_user_repo(pool);
     characters_repository<database_pool, database_transaction> player_repo(pool);
-    server_handle s_handle{}; // The documentation in uWS is appalling and the attitude the guy has is impossible to deal with. Had to search the issues of the github to find a method to close/stop uWS.
+    server_handle s_handle{};
 
     entt::registry es;
-    battle_system bs{};
 
     load_assets(es, quit);
     load_from_database(es, pool, quit);
@@ -110,6 +110,53 @@ int main() {
 
     select_response = char_sel.value();
 
+    vector<monster_definition_component> mob_defs;
+    vector<monster_special_definition_component> special_defs;
+    auto mob_def_view = es.view<monster_definition_component>();
+    auto special_def_view = es.view<monster_special_definition_component>();
+    for(auto entity : mob_def_view) {
+        auto const &c = mob_def_view.get<monster_definition_component>(entity);
+
+        for(auto &stat_name :stat_names) {
+            auto stat_it = c.stats.find(stat_name);
+
+            if(stat_it == end(c.stats)) {
+                continue;
+            }
+
+            if(stat_it->second.value >= 300) {
+                spdlog::error("[{}] mob {} has stat {} more than 300", __FUNCTION__, c.name, stat_name);
+            }
+        }
+
+        mob_defs.push_back(c);
+    }
+    for(auto entity : special_def_view) {
+        auto const &c = special_def_view.get<monster_special_definition_component>(entity);
+
+        for(auto &stat_name :stat_names) {
+            auto stat_it = c.stats.find(stat_name);
+
+            if(stat_it == end(c.stats)) {
+                continue;
+            }
+
+            if(stat_it->second.value >= 500) {
+                spdlog::error("[{}] mob special {} has stat {} more than 300", __FUNCTION__, c.name, stat_name);
+            }
+        }
+
+        special_defs.push_back(c);
+    }
+
+    if(mob_defs.empty() || special_defs.empty()) {
+        spdlog::error("[{}] monster init failure", __FUNCTION__);
+        return 1;
+    }
+
+    outward_queues outward_queue;
+    battle_system bs{config.battle_system_each_n_ticks, &outward_queue, move(mob_defs), move(special_defs)};
+
     if(quit) {
         spdlog::warn("[{}] quitting program", __FUNCTION__);
         return 0;
@@ -117,7 +164,7 @@ int main() {
 
     auto uws_thread = run_uws(config, pool, s_handle, quit);
 
-    outward_queues outward_queue;
+
     vector<uint64_t> frame_times;
     auto next_tick = chrono::system_clock::now() + chrono::milliseconds(config.tick_length);
     auto next_log_tick_times = chrono::system_clock::now() + chrono::seconds(1);
@@ -144,7 +191,7 @@ int main() {
 
         bs.do_tick(es);
 
-/*        for(auto m_entity : map_view) {
+/*        for(auto m_entity : map_viewc) {
             map_component &m = map_view.get(m_entity);
             lotr_player_location_map player_location_map;
 

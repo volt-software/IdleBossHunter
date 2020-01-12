@@ -16,23 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <string>
-
-using namespace std;
+#include "../scene.h"
 
 namespace ibh {
-    struct config {
-        string address;
-        uint16_t port;
-        string debug_level;
-        string connection_string;
-        string certificate_file;
-        string private_key_file;
-        string certificate_password;
-        uint32_t tick_length;
-        uint32_t battle_system_each_n_ticks;
-        bool log_tick_times;
+    class battle_scene : public scene  {
+    public:
+        battle_scene() : scene(generate_type<battle_scene>()), _battle_log(), _mob_name(), _first_frame(true) {}
+        ~battle_scene() override = default;
+
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
+
+    private:
+        vector<string> _battle_log;
+        string _mob_name;
+        bool _first_frame;
     };
 }
