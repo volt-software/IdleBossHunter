@@ -44,7 +44,10 @@ scene_system::scene_system(config *config, entt::registry &es)
 
 void scene_system::update(entt::registry &unused, TimeDelta dt) {
     for(auto const & scene : _scenes) {
-        scene->update(this, dt);
+        {
+            scoped_lock sg(scene->_m);
+            scene->update(this, dt);
+        }
         if(scene->_closed) {
             remove(scene.get());
         }
@@ -159,6 +162,7 @@ void scene_system::handle_message(rapidjson::Document const &d) {
     spdlog::trace("[{}] Handling message type {} for {} scenes", __FUNCTION__, type, _scenes.size());
 
     for(auto const & scene : _scenes) {
+        scoped_lock sg(scene->_m);
         scene->handle_message(this, type, msg.get());
     }
 }

@@ -27,8 +27,6 @@
 using namespace std;
 
 namespace ibh {
-    struct character_component;
-
     struct update_response : message {
         update_response() noexcept;
 

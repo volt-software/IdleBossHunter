@@ -23,7 +23,7 @@
 using namespace ibh;
 using namespace rapidjson;
 
-new_battle_response::new_battle_response(string mob_name, uint64_t mob_level, uint64_t mob_hp) noexcept : mob_name(move(mob_name)), mob_level(mob_level), mob_hp(mob_hp) {
+new_battle_response::new_battle_response(string mob_name, uint64_t mob_level, uint64_t mob_hp, uint64_t mob_max_hp, uint64_t player_hp, uint64_t player_max_hp) noexcept : mob_name(move(mob_name)), mob_level(mob_level), mob_hp(mob_hp), mob_max_hp(mob_max_hp), player_hp(player_hp), player_max_hp(player_max_hp) {
 
 }
 
@@ -45,13 +45,21 @@ string new_battle_response::serialize() const {
     writer.String(KEY_STRING("mob_hp"));
     writer.Uint64(mob_hp);
 
+    writer.String(KEY_STRING("mob_max_hp"));
+    writer.Uint64(mob_max_hp);
+
+    writer.String(KEY_STRING("player_hp"));
+    writer.Uint64(player_hp);
+
+    writer.String(KEY_STRING("player_max_hp"));
+    writer.Uint64(player_max_hp);
 
     writer.EndObject();
     return sb.GetString();
 }
 
 unique_ptr<new_battle_response> new_battle_response::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("mob_name") || !d.HasMember("mob_level") || !d.HasMember("mob_hp")) {
+    if (!d.HasMember("type") || !d.HasMember("mob_name") || !d.HasMember("mob_level") || !d.HasMember("mob_hp") || !d.HasMember("mob_max_hp") || !d.HasMember("player_hp") || !d.HasMember("player_max_hp")) {
         spdlog::warn("[new_battle_response] deserialize failed");
         return nullptr;
     }
@@ -61,5 +69,5 @@ unique_ptr<new_battle_response> new_battle_response::deserialize(rapidjson::Docu
         return nullptr;
     }
 
-    return make_unique<new_battle_response>(d["mob_name"].GetString(), d["mob_level"].GetUint64(), d["mob_hp"].GetUint64());
+    return make_unique<new_battle_response>(d["mob_name"].GetString(), d["mob_level"].GetUint64(), d["mob_hp"].GetUint64(), d["mob_max_hp"].GetUint64(), d["player_hp"].GetUint64(), d["player_max_hp"].GetUint64());
 }

@@ -22,6 +22,7 @@
 #include <ecs/components.h>
 #include <range/v3/algorithm/any_of.hpp>
 #include <messages/generic_error_response.h>
+#include <messages/battle/new_battle_response.h>
 
 using namespace std;
 
@@ -46,6 +47,16 @@ namespace ibh {
             pc.connection_id = enter_msg->connection_id;
             spdlog::trace("[{}] found pc {} for connection id {}", __FUNCTION__, pc.name, pc.connection_id);
             player_found = true;
+
+            if(pc.battle) {
+                auto mob_hp = pc.battle->monster_stats.find(stat_hp);
+                auto mob_max_hp = pc.battle->monster_stats.find(stat_max_hp);
+                auto player_hp = pc.battle->total_player_stats.find(stat_hp);
+                auto player_max_hp = pc.battle->total_player_stats.find(stat_max_hp);
+                auto new_battle_msg = make_unique<new_battle_response>(pc.battle->monster_name, pc.battle->monster_level, mob_hp->second.value, mob_max_hp->second.value, player_hp->second.value, player_max_hp->second.value);
+                outward_queue.enqueue({pc.connection_id, move(new_battle_msg)});
+            }
+
             break;
         }
 

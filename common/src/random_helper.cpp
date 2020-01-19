@@ -29,6 +29,8 @@ random_helper::random_helper() : _rng64(pcg_extras::seed_seq_from<random_device>
 
 template<typename T>
 T random_helper::generate_single(T from, T end) {
+    static_assert(is_arithmetic_v<T>);
+
     if(from == end) {
         return from;
     }
@@ -44,6 +46,8 @@ T random_helper::generate_single(T from, T end) {
 
 template<typename T>
 T random_helper::generate_single() {
+    static_assert(is_arithmetic_v<T>);
+
     typedef typename conditional<is_floating_point<T>::value, uniform_real_distribution<T>, uniform_int_distribution<T>>::type dist_type;
     dist_type uniform_dist(numeric_limits<T>::min(), numeric_limits<T>::max());
     T ret = uniform_dist(_rng64);

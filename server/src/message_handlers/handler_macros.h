@@ -29,7 +29,8 @@
                                             spdlog::warn("[{}}] deserialize failed", __FUNCTION__); \
                                             SEND_ERROR("Unrecognized message", "", "", true); \
                                             return; \
-                                        }
+                                        } \
+                                        static_assert(true, "") // force usage of semicolon
 
 #define DESERIALIZE_WITH_LOGIN_CHECK(type)  if(user_data->username.empty()) { \
                                                 return; \
@@ -39,7 +40,8 @@
                                                 spdlog::warn("[{}] deserialize failed", __FUNCTION__); \
                                                 SEND_ERROR("Unrecognized message", "", "", true); \
                                                 return; \
-                                            }
+                                            } \
+                                            static_assert(true, "") // force usage of semicolon
 
 #define DESERIALIZE_WITH_NOT_LOGIN_CHECK(type) if(!user_data->username.empty()) { \
                                                     return; \
@@ -49,7 +51,8 @@
                                                     spdlog::warn("[{}] deserialize failed", __FUNCTION__); \
                                                     SEND_ERROR("Unrecognized message", "", "", true); \
                                                     return; \
-                                                }
+                                                } \
+                                                static_assert(true, "") // force usage of semicolon
 
 #define DESERIALIZE_WITH_PLAYING_CHECK(type)    if(user_data->playing_character_slot < 0) { \
                                                     SEND_ERROR("Not playing character", "", "", true); \
@@ -60,7 +63,8 @@
                                                     spdlog::warn("[{}] deserialize failed", __FUNCTION__); \
                                                     SEND_ERROR("Unrecognized message", "", "", true); \
                                                     return; \
-                                                }
+                                                } \
+                                                static_assert(true, "") // force usage of semicolon
 
 #define DESERIALIZE_WITH_NOT_PLAYING_CHECK(type) if(user_data->username.empty()) { \
                                                     SEND_ERROR("Not logged in", "", "", true); \
@@ -75,4 +79,5 @@
                                                     spdlog::warn("[{}] deserialize failed", __FUNCTION__); \
                                                     SEND_ERROR("Unrecognized message", "", "", true); \
                                                     return; \
-                                                }
+                                                } \
+                                                static_assert(true, "") // force usage of semicolon

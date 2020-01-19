@@ -28,8 +28,6 @@
 using namespace std;
 
 namespace ibh {
-    struct character_component;
-
     struct battle_finished_response : message {
         battle_finished_response(bool mob_died, bool player_died, uint64_t xp_gained, uint64_t money_gained) noexcept;
 

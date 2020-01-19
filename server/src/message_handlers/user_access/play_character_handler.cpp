@@ -38,8 +38,8 @@ namespace ibh {
     template <class Server, class WebSocket>
     void handle_play_character(Server *s, rapidjson::Document const &d,
                                shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
-        MEASURE_TIME_OF_FUNCTION()
-        DESERIALIZE_WITH_NOT_PLAYING_CHECK(play_character_request)
+        MEASURE_TIME_OF_FUNCTION();
+        DESERIALIZE_WITH_NOT_PLAYING_CHECK(play_character_request);
 
         characters_repository<database_pool, database_transaction> character_repo(pool);
         character_stats_repository<database_pool, database_transaction> stats_repo(pool);

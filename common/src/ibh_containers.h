@@ -19,8 +19,13 @@
 #pragma once
 
 #include <robin_hood.h>
+
+#ifdef USE_WYHASH
 #include <wyhash.h>
+#else
 #include <xxh3.h>
+#endif
+
 #include <string>
 #include <memory>
 #include <unordered_set>
@@ -39,8 +44,9 @@ namespace ibh {
         return !lhs.owner_before(rhs) && !rhs.owner_before(lhs);
     }
 
+#ifdef USE_WYHASH
     template<class Key>
-    class wyhash_function
+    class custom_hash
     {
     public:
         size_t operator()(Key t) const
@@ -50,7 +56,7 @@ namespace ibh {
     };
 
     template<>
-    class wyhash_function<weak_ptr<void>>
+    class custom_hash<weak_ptr<void>>
     {
     public:
         size_t operator()(weak_ptr<void> const &key) const
@@ -61,7 +67,7 @@ namespace ibh {
     };
 
     template<>
-    class wyhash_function<string>
+    class custom_hash<string>
     {
     public:
         size_t operator()(string const &key) const
@@ -76,7 +82,7 @@ namespace ibh {
     };
 
     template<>
-    class wyhash_function<tuple<uint64_t, uint64_t>>
+    class custom_hash<tuple<uint64_t, uint64_t>>
     {
     public:
         size_t operator()(tuple<uint64_t, uint64_t> t) const
@@ -86,7 +92,7 @@ namespace ibh {
     };
 
     template<>
-    class wyhash_function<tuple<int32_t, int32_t>>
+    class custom_hash<tuple<int32_t, int32_t>>
     {
     public:
         size_t operator()(tuple<int32_t, int32_t> t) const
@@ -94,9 +100,10 @@ namespace ibh {
             return wyhash(&t, tuple_sum_size(t), 1283474321412);
         }
     };
+#else
 
     template<class Key>
-    class xxhash_function
+    class custom_hash
     {
     public:
         size_t operator()(Key t) const
@@ -106,7 +113,7 @@ namespace ibh {
     };
 
     template<>
-    class xxhash_function<weak_ptr<void>>
+    class custom_hash<weak_ptr<void>>
     {
     public:
         size_t operator()(weak_ptr<void> const &key) const
@@ -117,7 +124,7 @@ namespace ibh {
     };
 
     template<>
-    class xxhash_function<string>
+    class custom_hash<string>
     {
     public:
         size_t operator()(string const &key) const
@@ -132,7 +139,7 @@ namespace ibh {
     };
 
     template<>
-    class xxhash_function<tuple<uint64_t, uint64_t>>
+    class custom_hash<tuple<uint64_t, uint64_t>>
     {
     public:
         size_t operator()(tuple<uint64_t, uint64_t> t) const
@@ -142,12 +149,53 @@ namespace ibh {
     };
 
     template<>
-    class xxhash_function<tuple<int32_t, int32_t>>
+    class custom_hash<tuple<int32_t, int32_t>>
     {
     public:
         size_t operator()(tuple<int32_t, int32_t> t) const
         {
             return XXH3_64bits(&t, tuple_sum_size(t));
+        }
+    };
+#endif
+
+    template<>
+    class custom_hash<uint32_t>
+    {
+    public:
+        size_t operator()(uint32_t t) const
+        {
+            return t;
+        }
+    };
+
+    template<>
+    class custom_hash<uint64_t>
+    {
+    public:
+        size_t operator()(uint64_t t) const
+        {
+            return t;
+        }
+    };
+
+    template<>
+    class custom_hash<int32_t>
+    {
+    public:
+        size_t operator()(int32_t t) const
+        {
+            return t;
+        }
+    };
+
+    template<>
+    class custom_hash<int64_t>
+    {
+    public:
+        size_t operator()(int64_t t) const
+        {
+            return t;
         }
     };
 
@@ -212,7 +260,7 @@ namespace ibh {
     };
 
     template <typename Key, typename T>
-    using ibh_flat_map = robin_hood::unordered_flat_map<Key, T, xxhash_function<Key>, custom_equalto<Key>>;
+    using ibh_flat_map = robin_hood::unordered_flat_map<Key, T, custom_hash<Key>, custom_equalto<Key>>;
     template <typename Key>
-    using ibh_unordered_set = unordered_set<Key, xxhash_function<Key>, custom_equalto<Key>, allocator<Key>>;
+    using ibh_unordered_set = unordered_set<Key, custom_hash<Key>, custom_equalto<Key>, allocator<Key>>;
 }

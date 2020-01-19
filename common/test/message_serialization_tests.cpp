@@ -48,13 +48,15 @@ using namespace ibh;
             rapidjson::Document d; \
             auto ser = msg.serialize(); \
             d.Parse(ser.c_str(), ser.size()); \
-            auto msg2 = type::deserialize(d);
+            auto msg2 = type::deserialize(d); \
+            static_assert(true, "") // force usage of semicolon
 
 #define SERDE(type, ...) type msg(__VA_ARGS__); \
             rapidjson::Document d; \
             auto ser = msg.serialize(); \
             d.Parse(ser.c_str(), ser.size()); \
-            auto msg2 = type::deserialize(d);
+            auto msg2 = type::deserialize(d); \
+            static_assert(true, "") // force usage of semicolon
 
 TEST_CASE("message serialization tests") {
 
@@ -282,10 +284,13 @@ TEST_CASE("message serialization tests") {
     }
 
     SECTION("new battle response") {
-        SERDE(new_battle_response, "battle", 1, 2);
+        SERDE(new_battle_response, "battle", 1, 2, 3, 4, 5);
         REQUIRE(msg2->mob_name == "battle");
         REQUIRE(msg2->mob_level == 1);
         REQUIRE(msg2->mob_hp == 2);
+        REQUIRE(msg2->mob_max_hp == 3);
+        REQUIRE(msg2->player_hp == 4);
+        REQUIRE(msg2->player_max_hp == 5);
     }
 
     SECTION("battle finished response") {
@@ -307,7 +312,7 @@ TEST_CASE("message serialization tests") {
     // misc
 
     SECTION("update response") {
-        SERDE_SINGLE(update_response)
+        SERDE_SINGLE(update_response);
         REQUIRE(msg2);
     }
 

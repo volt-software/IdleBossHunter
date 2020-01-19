@@ -79,6 +79,8 @@ TEST_CASE("users repository tests") {
 
     SECTION( "get all users" ) {
         auto transaction = user_repo.create_transaction();
+        auto existing_usrs = user_repo.get_all(transaction);
+
         db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         db_user usr2{0, "user2", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
@@ -87,11 +89,13 @@ TEST_CASE("users repository tests") {
         REQUIRE(usr2.id != 0);
 
         auto usrs = user_repo.get_all(transaction);
-        REQUIRE(usrs.size() == 2);
+        REQUIRE(usrs.size() == existing_usrs.size() + 2);
     }
 
     SECTION( "get all users without banned" ) {
         auto transaction = user_repo.create_transaction();
+        auto existing_usrs = user_repo.get_all(transaction);
+
         db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         db_user usr2{0, "user2", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
@@ -103,7 +107,7 @@ TEST_CASE("users repository tests") {
         REQUIRE(busr.id != 0);
 
         auto usrs = user_repo.get_all(transaction);
-        REQUIRE(usrs.size() == 1);
+        REQUIRE(usrs.size() == existing_usrs.size() + 1);
     }
 }
 

@@ -16,35 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "main_menu_scene.h"
-#include "settings_menu_scene.h"
-#include "login_menu_scene.h"
 #include "about_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
-#include <SDL.h>
 
 using namespace std;
 using namespace ibh;
 
-void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::MenuItem("Login")) {
-            manager->add(make_unique<login_menu_scene>());
-        }
-
-        if (ImGui::MenuItem("Settings")) {
-            manager->add(make_unique<settings_menu_scene>());
-        }
-
-        if (ImGui::MenuItem("About")) {
-            manager->add(make_unique<about_scene>());
-        }
-
-        ImGui::EndMainMenuBar();
+void about_scene::update(iscene_manager *manager, TimeDelta dt) {
+    if(_closed) {
+        return;
     }
+
+    if(ImGui::Begin("About")) {
+        ImGui::Text("IdleBossHunter v0.0.1");
+        ImGui::Text("Copyright 2020© by sole proprietorship Volt Software, situated in the Netherlands");
+        ImGui::Text("");
+        if(ImGui::Button("Discord")) {
+            emscripten_run_script("window.open('https://discord.gg/r9BtesB', '_blank');");
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Github")) {
+            emscripten_run_script("window.open('https://github.com/Oipo/IdleBossHunter', '_blank');");
+        }
+        ImGui::SameLine(ImGui::GetWindowWidth()-67);
+        if (ImGui::Button("Close")) {
+            _closed = true;
+        }
+    }
+    ImGui::End();
 }
 
-void main_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void about_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
 
 }

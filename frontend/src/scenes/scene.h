@@ -29,7 +29,7 @@
 namespace ibh {
     class scene {
     public:
-        scene(uint64_t type) : _id(0), _type(type), _closed(false) {}
+        scene(uint64_t type) : _id(0), _type(type), _closed(false), _m() {}
         virtual ~scene() = default;
 
         virtual void update(iscene_manager *manager, TimeDelta dt) = 0;
@@ -47,6 +47,7 @@ namespace ibh {
         unsigned int _id;
         uint64_t _type;
         bool _closed;
+        mutex _m;
     };
 
     void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr);

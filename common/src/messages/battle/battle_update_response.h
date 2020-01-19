@@ -28,8 +28,6 @@
 using namespace std;
 
 namespace ibh {
-    struct character_component;
-
     struct battle_update_response : message {
         battle_update_response(uint64_t mob_turns, uint64_t player_turns, uint64_t mob_hits, uint64_t player_hits, uint64_t mob_damage, uint64_t player_damage) noexcept;
 

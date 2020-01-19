@@ -39,6 +39,9 @@
 //#include <ai/default_ai.h>
 #include <messages/generic_error_response.h>
 #include <random_helper.h>
+#include <random>
+#include <macros.h>
+#include <on_leaving_scope.h>
 
 using namespace std;
 using namespace ibh;
@@ -62,18 +65,14 @@ void bench_censor_sensor() {
         return;
     }
 
+    MEASURE_TIME_OF_FUNCTION();
+
     censor_sensor s{};
     s.add_dictionary("assets/profanity_locales/en.json");
-
-    auto start = chrono::system_clock::now();
 
     for(int i = 0; i < 1'000'000; i++) {
         s.is_profane("this is bollocks");
     }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 //void bench_fov(map_component const &m) {
@@ -102,7 +101,7 @@ void bench_hashing() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
 
     if (crypto_pwhash_str(hashed_password,
                           test_pass.c_str(),
@@ -112,10 +111,6 @@ void bench_hashing() {
         spdlog::error("out of memory?");
         return;
     }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 void bench_hash_verify() {
@@ -123,15 +118,11 @@ void bench_hash_verify() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
 
     if (crypto_pwhash_str_verify(hashed_password, test_pass.c_str(), test_pass.length()) != 0) {
         spdlog::error("Hash should verify");
     }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 //void bench_a_star(map_component const &m) {
@@ -176,7 +167,7 @@ void bench_serialization() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
     generic_error_response resp{"err", "pretty err", "desc", true};
 
     for(int i = 0; i < 1'000'000; i++) {
@@ -188,10 +179,6 @@ void bench_serialization() {
             spdlog::error("[{}] err in serialization", __FUNCTION__);
         }
     }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 void bench_serialization_cereal() {
@@ -199,7 +186,7 @@ void bench_serialization_cereal() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
     generic_error_response resp{"err", "pretty err", "desc", true};
 
     for(int i = 0; i < 1'000'000; i++) {
@@ -217,10 +204,6 @@ void bench_serialization_cereal() {
             }
         }
     }
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 void bench_rapidjson_without_strlen() {
@@ -228,7 +211,7 @@ void bench_rapidjson_without_strlen() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -239,10 +222,6 @@ void bench_rapidjson_without_strlen() {
     }
 
     writer.EndObject();
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 void bench_rapidjson_with_strlen() {
@@ -250,7 +229,7 @@ void bench_rapidjson_with_strlen() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -261,10 +240,6 @@ void bench_rapidjson_with_strlen() {
     }
 
     writer.EndObject();
-
-    auto end = chrono::system_clock::now();
-
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
 
 void bench_random_helper() {
@@ -272,18 +247,31 @@ void bench_random_helper() {
         return;
     }
 
-    auto start = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
 
     for(int64_t i = 0; i < 1'000'000; i++) {
-        ibh::random.generate_single(0L, i);
+        ibh::random.generate_single(0L, 1'000'000L);
+    }
+}
+
+void bench_pcg() {
+    if(quit) {
+        return;
     }
 
-    auto end = chrono::system_clock::now();
+    MEASURE_TIME_OF_FUNCTION();
 
-    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
+    pcg64 rng64{pcg_extras::seed_seq_from<random_device>()};
+    uniform_int_distribution<int64_t> dist;
+    for(int64_t i = 0; i < 1'000'000; i++) {
+        dist(rng64);
+    }
 }
 
 int main(int argc, char **argv) {
+    spdlog::set_level(spdlog::level::info);
+    spdlog::set_pattern("[%C-%m-%d %H:%M:%S.%e] [%L] %v");
+    locale::global(locale("en_US.UTF-8"));
     set_cwd(get_selfpath());
     ::signal(SIGINT, on_sigint);
 
@@ -308,31 +296,16 @@ int main(int argc, char **argv) {
     entt::registry registry;
     //load_assets(registry, quit);
 
-//    auto map_view = registry.view<map_component>();
-//
-//    optional<map_component> m;
-//    for(auto m_entity : map_view) {
-//        map_component &mc = map_view.get(m_entity);
-//
-//        if(mc.name == "DedlaenMaze") {
-//            m = mc;
-//        }
-//    }
-//
-//    if(!m) {
-//        spdlog::error("[{}] could not find map", __FUNCTION__);
-//        return 1;
-//    }
-
-//    bench_censor_sensor();
+    bench_censor_sensor();
 //    bench_fov(m.value());
-//    bench_hashing();
-//    bench_hash_verify();
+    bench_hashing();
+    bench_hash_verify();
 //    bench_a_star(m.value());
 //    bench_default_ai(m.value());
-//    bench_serialization();
-//    bench_serialization_cereal();
-//    bench_rapidjson_without_strlen();
-//    bench_rapidjson_with_strlen();
+    bench_serialization();
+    bench_serialization_cereal();
+    bench_rapidjson_without_strlen();
+    bench_rapidjson_with_strlen();
     bench_random_helper();
+    bench_pcg();
 }

@@ -28,7 +28,7 @@ using namespace std;
 
 namespace ibh {
     struct new_battle_response : message {
-        new_battle_response(string mob_name, uint64_t mob_level, uint64_t mob_hp) noexcept;
+        new_battle_response(string mob_name, uint64_t mob_level, uint64_t mob_hp, uint64_t mob_max_hp, uint64_t player_hp, uint64_t player_max_hp) noexcept;
 
         ~new_battle_response() noexcept override = default;
 
@@ -41,6 +41,9 @@ namespace ibh {
         string mob_name;
         uint64_t mob_level;
         uint64_t mob_hp;
+        uint64_t mob_max_hp;
+        uint64_t player_hp;
+        uint64_t player_max_hp;
 
         inline static constexpr uint64_t type = generate_type<new_battle_response>();
     };

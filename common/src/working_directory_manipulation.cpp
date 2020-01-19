@@ -37,7 +37,7 @@ string ibh::get_selfpath() {
 }
 
 void ibh::set_cwd(string const &path) {
-    spdlog::info("cwd changing to {}", path);
+    spdlog::info("[{}] changing cwd to {}", __FUNCTION__, path);
     filesystem::current_path(path);
 }
 

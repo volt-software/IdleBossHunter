@@ -38,8 +38,8 @@ namespace ibh {
             return;
         }
 
-        MEASURE_TIME_OF_FUNCTION()
-        DESERIALIZE_WITH_PLAYING_CHECK(set_motd_request)
+        MEASURE_TIME_OF_FUNCTION();
+        DESERIALIZE_WITH_PLAYING_CHECK(set_motd_request);
 
         spdlog::info("[{}] motd set to \"{}\" by user {}", __FUNCTION__, msg->motd, user_data->username);
         motd = msg->motd;

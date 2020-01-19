@@ -36,16 +36,18 @@ using namespace ibh;
     if(var_name == end(stats)) { \
         spdlog::error("[{}] missing " #var_name " for pc {} battle {}", __FUNCTION__, pc.id, pc.battle->monster_name); \
         throw std::runtime_error("missing " #var_name); \
-    }
+    } \
+    static_assert(true, "") // force usage of semicolon
 
 #define GET_STAT_DEFAULT(stats, var_name, stat_name, def) \
     auto var_name = stats.find(stat_name); \
     if(var_name == end(stats)) { \
-        /*spdlog::warn("[{}] missing " #var_name " for pc {} battle {}, inserted default {}", __FUNCTION__, pc.id, pc.battle->monster_name, def);*/ \
         stats.insert(ibh_flat_map<string, stat_component>::value_type{stat_name, stat_component{stat_name, def}}); \
         var_name = stats.find(stat_name); \
-    }
+    } \
+    static_assert(true, "") // force usage of semicolon
 
+[[nodiscard]]
 int64_t battle_turn(pc_component &pc, ibh_flat_map<string, stat_component> &attacker, ibh_flat_map<string, stat_component> &defender, bool &attacker_dead, bool &defender_dead, string const &attacker_name, string const &defender_name) {
     GET_STAT(attacker, attacker_str, stat_str);
     GET_STAT(attacker, attacker_agi, stat_agi);
@@ -104,7 +106,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
                 //spdlog::error("[{}] couldn't find stat {}", __FUNCTION__, stat_name);
                 continue;
             }
-            double value = level * 5 * stat_it->second.value / 100.;
+            double value = level * 6 * stat_it->second.value / 100.;
             if(special >= 0) {
                 auto special_stat_it = special_def.stats.find(stat_name);
                 if(special_stat_it != end(special_def.stats)) {
@@ -152,7 +154,10 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
 
         if(pc.connection_id > 0) {
             auto mob_hp = pc.battle->monster_stats.find(stat_hp);
-            auto new_battle_msg = make_unique<new_battle_response>(name, level, mob_hp->second.value);
+            auto mob_max_hp = pc.battle->monster_stats.find(stat_max_hp);
+            auto player_hp = pc.battle->total_player_stats.find(stat_hp);
+            auto player_max_hp = pc.battle->total_player_stats.find(stat_max_hp);
+            auto new_battle_msg = make_unique<new_battle_response>(name, level, mob_hp->second.value, mob_max_hp->second.value, player_hp->second.value, player_max_hp->second.value);
             outward_queue->enqueue({pc.connection_id, move(new_battle_msg)});
         }
     }
@@ -174,8 +179,8 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
     int64_t plyr_spd = plyr_spd_iter->second.value;
     uint64_t player_turns = 0;
     uint64_t mob_turns = 0;
-    uint64_t player_dmg = 0;
-    uint64_t mob_dmg = 0;
+    uint64_t player_dmg_to_mob = 0;
+    uint64_t mob_dmg_to_player = 0;
     uint64_t player_hits = 0;
     uint64_t mob_hits = 0;
     bool mob_dead = false;
@@ -189,7 +194,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
             auto dmg = battle_turn(pc, pc.battle->monster_stats, pc.battle->total_player_stats, mob_dead, plyr_dead, pc.battle->monster_name, pc.name);
             if(dmg >= 0) {
                 mob_hits++;
-                mob_dmg += dmg;
+                mob_dmg_to_player += dmg;
             }
 
             if(mob_dead || plyr_dead) {
@@ -202,7 +207,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
             auto dmg = battle_turn(pc, pc.battle->total_player_stats, pc.battle->monster_stats, plyr_dead, mob_dead, pc.name, pc.battle->monster_name);
             if(dmg >= 0) {
                 player_hits++;
-                player_dmg += dmg;
+                player_dmg_to_mob += dmg;
             }
         }
     } else {
@@ -213,7 +218,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
             auto dmg = battle_turn(pc, pc.battle->total_player_stats, pc.battle->monster_stats, plyr_dead, mob_dead, pc.name, pc.battle->monster_name);
             if(dmg >= 0) {
                 player_hits++;
-                player_dmg += dmg;
+                player_dmg_to_mob += dmg;
             }
 
             if(mob_dead || plyr_dead) {
@@ -226,7 +231,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
             auto dmg = battle_turn(pc, pc.battle->monster_stats, pc.battle->total_player_stats, mob_dead, plyr_dead, pc.battle->monster_name, pc.name);
             if(dmg >= 0) {
                 mob_hits++;
-                mob_dmg += dmg;
+                mob_dmg_to_player += dmg;
             }
         }
     }
@@ -317,7 +322,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, vector<monster_defini
     } else {
         spdlog::trace("[{}] pc fought against mob {}", __FUNCTION__, pc.name, pc.battle->monster_name);
         if(pc.connection_id > 0) {
-            auto update_msg = make_unique<battle_update_response>(mob_turns, player_turns, mob_hits, player_hits, mob_dmg, player_dmg);
+            auto update_msg = make_unique<battle_update_response>(mob_turns, player_turns, mob_hits, player_hits, mob_dmg_to_player, player_dmg_to_mob);
             outward_queue->enqueue({pc.connection_id, move(update_msg)});
         }
     }
@@ -332,7 +337,7 @@ void ibh::battle_system::do_tick(entt::registry &es) {
 
     _tick_count = 0;
 
-    MEASURE_TIME_OF_FUNCTION()
+    MEASURE_TIME_OF_FUNCTION();
     auto pc_view = es.view<pc_component>();
     for(auto pc_entity : pc_view) {
         pc_component &pc = pc_view.get<pc_component>(pc_entity);

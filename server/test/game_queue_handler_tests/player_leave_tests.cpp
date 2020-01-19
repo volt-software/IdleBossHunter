@@ -28,10 +28,17 @@ TEST_CASE("character leave tests") {
     SECTION( "character leaves world" ) {
         entt::registry registry;
 
+        auto entt = registry.create();
+        {
+            pc_component pc{};
+            pc.connection_id = 1;
+            registry.assign<pc_component>(entt, move(pc));
+        }
         outward_queues q;
         player_leave_message msg(1);
         handle_player_leave_message(&msg, registry, q);
 
-        // TODO
+        auto &pc = registry.get<pc_component>(entt);
+        REQUIRE(pc.connection_id == 0);
     }
 }

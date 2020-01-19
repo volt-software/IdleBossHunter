@@ -75,6 +75,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
                 _show_register = true;
             }
         }
+        ImGui::SameLine();
 
         if (ImGui::Button("Login") || login_fasttrack) {
             _show_register = false;

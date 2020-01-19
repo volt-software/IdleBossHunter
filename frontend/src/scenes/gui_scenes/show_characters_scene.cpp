@@ -76,6 +76,8 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
         }
 
+        ImGui::SameLine();
+
         if (ImGui::Button("Delete Character")) {
             _show_delete = true;
         }

@@ -3,6 +3,6 @@
 
 ## Discord
 
-https://discord.gg/M6F8R9S
+https://discord.gg/r9BtesB
 
 

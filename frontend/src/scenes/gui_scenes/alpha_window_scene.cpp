@@ -32,7 +32,6 @@ void alpha_window_scene::update(iscene_manager *manager, TimeDelta dt) {
         ImGui::Text("This build is alpha quality, things may be broken or otherwise.");
         if (ImGui::Button("Gotcha")) {
             _closed = true;
-            manager->remove(this);
         }
     }
     ImGui::End();

@@ -20,19 +20,25 @@
 #pragma once
 
 #include "../scene.h"
+#include <mutex>
 
 namespace ibh {
     class battle_scene : public scene  {
     public:
-        battle_scene() : scene(generate_type<battle_scene>()), _battle_log(), _mob_name(), _first_frame(true) {}
+        battle_scene() : scene(generate_type<battle_scene>()), _current_battle_log(), _battle_log(), _mob_name(), _first_frame(true) {}
         ~battle_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
         void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
 
     private:
+        vector<string> _current_battle_log;
         vector<string> _battle_log;
         string _mob_name;
         bool _first_frame;
+        uint64_t _mob_max_hp;
+        uint64_t _player_max_hp;
+        uint64_t _mob_current_hp;
+        uint64_t _player_current_hp;
     };
 }

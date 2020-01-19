@@ -16,24 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <entt/entity/registry.hpp>
-#include "components.h"
-#include "game_queue_messages/messages.h"
+#include "../scene.h"
 
 namespace ibh {
-    class battle_system {
+    class about_scene : public scene  {
     public:
-        battle_system(uint32_t every_n_ticks, outward_queues *outward_queue, vector<monster_definition_component> monsters, vector<monster_special_definition_component> monster_specials) :
-        _tick_count(0), _every_n_ticks(every_n_ticks), _outward_queue(outward_queue), _monsters(move(monsters)), _monster_specials(move(monster_specials)) {}
-        void do_tick(entt::registry &es);
+        about_scene() : scene(generate_type<about_scene>()) {}
+        ~about_scene() override = default;
 
-    private:
-        uint32_t _tick_count;
-        uint32_t _every_n_ticks;
-        outward_queues *_outward_queue;
-        vector<monster_definition_component> _monsters;
-        vector<monster_special_definition_component> _monster_specials;
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
     };
 }

@@ -54,7 +54,7 @@ void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
         }
         ImGui::PopItemWidth();
 
-        ImGui::BeginChild("Chat Messages", ImVec2(0.0F, 200.0F), true, ImGuiWindowFlags_None);
+        ImGui::BeginChild("Chat Messages", ImVec2(0.0F, 0.0F), true, ImGuiWindowFlags_None);
         ImGui::Columns(2);
 
         if(_first_frame) {

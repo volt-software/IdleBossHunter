@@ -41,8 +41,8 @@ namespace ibh {
     template <class Server, class WebSocket>
     void handle_login(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
                       per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
-        MEASURE_TIME_OF_FUNCTION()
-        DESERIALIZE_WITH_NOT_LOGIN_CHECK(login_request)
+        MEASURE_TIME_OF_FUNCTION();
+        DESERIALIZE_WITH_NOT_LOGIN_CHECK(login_request);
 
         users_repository<database_pool, database_transaction> user_repo(pool);
         banned_users_repository<database_pool, database_transaction> banned_user_repo(pool);
