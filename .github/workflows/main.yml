@@ -61,4 +61,4 @@ jobs:
         CXX: g++-9
         EM_CACHE: ${{runner.workspace}}/emcache
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: make -j all
+      run: make -j all ibh_common_test ibh_server_test ibh_benchmark
