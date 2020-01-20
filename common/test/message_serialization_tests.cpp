@@ -40,6 +40,16 @@
 #include <messages/battle/level_up_response.h>
 #include <messages/battle/new_battle_response.h>
 #include <messages/battle/battle_finished_response.h>
+#include <messages/clan/create_clan_request.h>
+#include <messages/clan/create_clan_response.h>
+#include <messages/clan/get_clan_listing_request.h>
+#include <messages/clan/get_clan_listing_response.h>
+#include <messages/clan/increase_bonus_request.h>
+#include <messages/clan/increase_bonus_response.h>
+#include <messages/clan/join_clan_request.h>
+#include <messages/clan/join_clan_response.h>
+#include <messages/clan/set_tax_request.h>
+#include <messages/clan/set_tax_response.h>
 
 using namespace std;
 using namespace ibh;
@@ -307,6 +317,95 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg2->player_died == true);
         REQUIRE(msg2->xp_gained == 3);
         REQUIRE(msg2->money_gained == 4);
+    }
+
+    // clan
+
+    SECTION("create clan request") {
+        SERDE(create_clan_request, "clan");
+        REQUIRE(msg2->name == "clan");
+    }
+
+    SECTION("create clan response") {
+        SERDE(create_clan_response, "error");
+        REQUIRE(msg2->error == "error");
+    }
+
+    SECTION("get clan listing request") {
+        SERDE_SINGLE(get_clan_listing_request);
+        REQUIRE(msg2);
+    }
+
+    SECTION("get clan listing response") {
+        vector<clan> clans;
+        vector<bonus> bonuses1;
+        vector<string> members1;
+        vector<bonus> bonuses2;
+        vector<string> members2;
+
+        bonuses1.emplace_back("b1", 2);
+        bonuses1.emplace_back("b2", 3);
+        members1.emplace_back("m1");
+        members1.emplace_back("m2");
+        bonuses2.emplace_back("b3", 4);
+        bonuses2.emplace_back("b4", 5);
+        members2.emplace_back("m3");
+        members2.emplace_back("m4");
+        clans.emplace_back(10, "c1", members1, bonuses1);
+        clans.emplace_back(20, "c2", members2, bonuses2);
+        SERDE(get_clan_listing_response, "error", clans);
+        REQUIRE(msg2->error == "error");
+        REQUIRE(msg2->clans.size() == 2);
+        REQUIRE(msg2->clans[0].id == 10);
+        REQUIRE(msg2->clans[0].name == "c1");
+        REQUIRE(msg2->clans[0].members.size() == 2);
+        REQUIRE(msg2->clans[0].members[0] == "m1");
+        REQUIRE(msg2->clans[0].members[1] == "m2");
+        REQUIRE(msg2->clans[0].bonuses.size() == 2);
+        REQUIRE(msg2->clans[0].bonuses[0].name == "b1");
+        REQUIRE(msg2->clans[0].bonuses[0].amount == 2);
+        REQUIRE(msg2->clans[0].bonuses[1].name == "b2");
+        REQUIRE(msg2->clans[0].bonuses[1].amount == 3);
+        REQUIRE(msg2->clans[1].id == 20);
+        REQUIRE(msg2->clans[1].name == "c2");
+        REQUIRE(msg2->clans[1].members.size() == 2);
+        REQUIRE(msg2->clans[1].members[0] == "m3");
+        REQUIRE(msg2->clans[1].members[1] == "m4");
+        REQUIRE(msg2->clans[1].bonuses.size() == 2);
+        REQUIRE(msg2->clans[1].bonuses[0].name == "b3");
+        REQUIRE(msg2->clans[1].bonuses[0].amount == 4);
+        REQUIRE(msg2->clans[1].bonuses[1].name == "b4");
+        REQUIRE(msg2->clans[1].bonuses[1].amount == 5);
+    }
+
+    SECTION("increase bonus request") {
+        SERDE(increase_bonus_request, 1);
+        REQUIRE(msg2->bonus_type == 1);
+    }
+
+    SECTION("increase bonus response") {
+        SERDE(increase_bonus_response, "error");
+        REQUIRE(msg2->error == "error");
+    }
+
+    SECTION("join clan request") {
+        SERDE(join_clan_request, 1);
+        REQUIRE(msg2->clan_id == 1);
+    }
+
+    SECTION("join clan response") {
+        SERDE(join_clan_response, "error");
+        REQUIRE(msg2->error == "error");
+    }
+
+    SECTION("set tax request") {
+        SERDE(set_tax_request, 1);
+        REQUIRE(msg2->rate == 1);
+    }
+
+    SECTION("set tax response") {
+        SERDE(set_tax_response, "error");
+        REQUIRE(msg2->error == "error");
     }
 
     // misc

@@ -16,16 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "character_select_request.h"
+#include "get_clan_listing_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-character_select_request::character_select_request() noexcept = default;
+get_clan_listing_request::get_clan_listing_request() noexcept = default;
 
-string character_select_request::serialize() const {
+string get_clan_listing_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -38,16 +38,16 @@ string character_select_request::serialize() const {
     return sb.GetString();
 }
 
-unique_ptr<character_select_request> character_select_request::deserialize(rapidjson::Document const &d) {
+unique_ptr<get_clan_listing_request> get_clan_listing_request::deserialize(rapidjson::Document const &d) {
     if (!d.HasMember("type")) {
-        spdlog::warn("[character_select_request] deserialize failed");
+        spdlog::warn("[get_clan_listing_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[character_select_request] deserialize failed wrong type");
+        spdlog::warn("[get_clan_listing_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<character_select_request>();
+    return make_unique<get_clan_listing_request>();
 }

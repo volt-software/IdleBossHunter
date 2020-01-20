@@ -16,16 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "character_select_request.h"
+#include "join_clan_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-character_select_request::character_select_request() noexcept = default;
+join_clan_request::join_clan_request(uint64_t clan_id) noexcept : clan_id(clan_id) {
 
-string character_select_request::serialize() const {
+}
+
+string join_clan_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -34,20 +36,23 @@ string character_select_request::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
+    writer.String(KEY_STRING("clan_id"));
+    writer.Uint64(clan_id);
+
     writer.EndObject();
     return sb.GetString();
 }
 
-unique_ptr<character_select_request> character_select_request::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type")) {
-        spdlog::warn("[character_select_request] deserialize failed");
+unique_ptr<join_clan_request> join_clan_request::deserialize(rapidjson::Document const &d) {
+    if (!d.HasMember("type") || !d.HasMember("clan_id")) {
+        spdlog::warn("[join_clan_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[character_select_request] deserialize failed wrong type");
+        spdlog::warn("[join_clan_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<character_select_request>();
+    return make_unique<join_clan_request>(d["clan_id"].GetUint64());
 }

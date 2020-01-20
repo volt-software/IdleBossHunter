@@ -16,16 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "character_select_request.h"
+#include "increase_bonus_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-character_select_request::character_select_request() noexcept = default;
+increase_bonus_request::increase_bonus_request(uint32_t bonus_type) noexcept : bonus_type(bonus_type) {
 
-string character_select_request::serialize() const {
+}
+
+string increase_bonus_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -34,20 +36,23 @@ string character_select_request::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
+    writer.String(KEY_STRING("bonus_type"));
+    writer.Uint(bonus_type);
+
     writer.EndObject();
     return sb.GetString();
 }
 
-unique_ptr<character_select_request> character_select_request::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type")) {
-        spdlog::warn("[character_select_request] deserialize failed");
+unique_ptr<increase_bonus_request> increase_bonus_request::deserialize(rapidjson::Document const &d) {
+    if (!d.HasMember("type") || !d.HasMember("bonus_type")) {
+        spdlog::warn("[increase_bonus_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[character_select_request] deserialize failed wrong type");
+        spdlog::warn("[increase_bonus_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<character_select_request>();
+    return make_unique<increase_bonus_request>(d["bonus_type"].GetUint());
 }
