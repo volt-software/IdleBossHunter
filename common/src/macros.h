@@ -18,11 +18,11 @@
 
 #pragma once
 
-#define MEASURE_TIME_OF_FUNCTION()  auto start = chrono::system_clock::now(); \
+#define MEASURE_TIME_OF_FUNCTION(level)  auto start = chrono::system_clock::now(); \
                                     auto func_name = __FUNCTION__; \
                                     auto time_scope_guard = on_leaving_scope([start, func_name] { \
                                         auto end = chrono::system_clock::now(); \
-                                        spdlog::info("[{}] finished in {:n} µs", func_name, chrono::duration_cast<chrono::microseconds>(end-start).count()); \
+                                        spdlog::level("[{}] finished in {:n} µs", func_name, chrono::duration_cast<chrono::microseconds>(end-start).count()); \
                                     }); \
                                     static_assert(true, "") // force usage of semicolon
 

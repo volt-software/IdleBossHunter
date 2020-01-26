@@ -32,16 +32,13 @@
 #include "../src/config_parsers.h"
 #include "benchmark_helpers/startup_helper.h"
 #include "../src/working_directory_manipulation.h"
-//#include "game_logic/fov.h"
-//#include "../src/asset_loading/load_map.h"
-//#include <game_logic/a_star.h>
 #include <asset_loading/load_assets.h>
-//#include <ai/default_ai.h>
 #include <messages/generic_error_response.h>
 #include <random_helper.h>
 #include <random>
 #include <macros.h>
 #include <on_leaving_scope.h>
+#include <ecs/battle_system.h>
 
 using namespace std;
 using namespace ibh;
@@ -65,7 +62,7 @@ void bench_censor_sensor() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
 
     censor_sensor s{};
     s.add_dictionary("assets/profanity_locales/en.json");
@@ -74,23 +71,6 @@ void bench_censor_sensor() {
         s.is_profane("this is bollocks");
     }
 }
-
-//void bench_fov(map_component const &m) {
-//    if(quit) {
-//        return;
-//    }
-//
-//    auto loc = make_tuple(4, 4);
-//    auto start = chrono::system_clock::now();
-//
-//    for(int i = 0; i < 1'000'000; i++) {
-//        compute_fov_restrictive_shadowcasting(m, loc, false);
-//    }
-//
-//    auto end = chrono::system_clock::now();
-//
-//    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
-//}
 
 char hashed_password[crypto_pwhash_STRBYTES];
 string test_pass = "very_secure_password";
@@ -101,7 +81,7 @@ void bench_hashing() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
 
     if (crypto_pwhash_str(hashed_password,
                           test_pass.c_str(),
@@ -118,56 +98,19 @@ void bench_hash_verify() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
 
     if (crypto_pwhash_str_verify(hashed_password, test_pass.c_str(), test_pass.length()) != 0) {
         spdlog::error("Hash should verify");
     }
 }
 
-//void bench_a_star(map_component const &m) {
-//    if(quit) {
-//        return;
-//    }
-//
-//    auto start = chrono::system_clock::now();
-//    auto start_loc = make_tuple(10, 10);
-//    auto goal_loc = make_tuple(25, 25);
-//
-//    for(int i = 0; i < 10'000; i++) {
-//        a_star_path(m, start_loc, goal_loc);
-//    }
-//
-//    auto end = chrono::system_clock::now();
-//
-//    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
-//}
-//
-//void bench_default_ai(map_component &m) {
-//    if(quit) {
-//        return;
-//    }
-//
-//    auto start = chrono::system_clock::now();
-//    lotr_player_location_map player_locs{};
-//
-//    for(int i = 0; i < 10'000; i++) {
-//        for(auto &npc : m.npcs) {
-//            run_ai_on(npc, m, player_locs);
-//        }
-//    }
-//
-//    auto end = chrono::system_clock::now();
-//
-//    spdlog::info("[{}] {:n} µs", __FUNCTION__, chrono::duration_cast<chrono::microseconds>(end-start).count());
-//}
-
 void bench_serialization() {
     if(quit) {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
     generic_error_response resp{"err", "pretty err", "desc", true};
 
     for(int i = 0; i < 1'000'000; i++) {
@@ -186,7 +129,7 @@ void bench_serialization_cereal() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
     generic_error_response resp{"err", "pretty err", "desc", true};
 
     for(int i = 0; i < 1'000'000; i++) {
@@ -211,7 +154,7 @@ void bench_rapidjson_without_strlen() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -229,7 +172,7 @@ void bench_rapidjson_with_strlen() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -247,7 +190,7 @@ void bench_random_helper() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
 
     for(int64_t i = 0; i < 1'000'000; i++) {
         ibh::random.generate_single(0L, 1'000'000L);
@@ -259,12 +202,57 @@ void bench_pcg() {
         return;
     }
 
-    MEASURE_TIME_OF_FUNCTION();
+    MEASURE_TIME_OF_FUNCTION(info);
 
     pcg64 rng64{pcg_extras::seed_seq_from<random_device>()};
     uniform_int_distribution<int64_t> dist;
     for(int64_t i = 0; i < 1'000'000; i++) {
         dist(rng64);
+    }
+}
+
+void bench_battle() {
+    if(quit) {
+        return;
+    }
+
+    outward_queues q;
+    entt::registry es;
+
+    for(int64_t i = 0; i < 1'000; i++) {
+        auto entt = es.create();
+        ibh_flat_map<uint32_t, stat_component> stats;
+        for(auto &stat : stat_name_ids) {
+            stats.insert(ibh_flat_map<uint32_t, stat_component>::value_type{stat, stat_component{"t", i+1}});
+        }
+        es.assign<monster_definition_component>(entt, fmt::format("{}", i), stats);
+    }
+
+    for(int64_t i = 0; i < 1'000; i++) {
+        auto entt = es.create();
+        ibh_flat_map<uint32_t, int64_t> stats;
+        for(auto &stat : stat_name_ids) {
+            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat, i+1});
+        }
+        es.assign<monster_special_definition_component>(entt, fmt::format("{}", i), stats, false);
+    }
+
+    for(int64_t i = 0; i < 1'000; i++) {
+        auto entt = es.create();
+        ibh_flat_map<uint32_t, int64_t> stats;
+        for(auto &stat : stat_name_ids) {
+            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat, i+1});
+        }
+        es.assign<pc_component>(entt, i, i,  "name", "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
+    }
+
+    battle_system s{1, &q};
+
+    {
+        MEASURE_TIME_OF_FUNCTION(info);
+        for (int64_t i = 0; i < 1'000 && !quit; i++) {
+            s.do_tick(es);
+        }
     }
 }
 
@@ -296,16 +284,14 @@ int main(int argc, char **argv) {
     entt::registry registry;
     //load_assets(registry, quit);
 
-    bench_censor_sensor();
-//    bench_fov(m.value());
-    bench_hashing();
-    bench_hash_verify();
-//    bench_a_star(m.value());
-//    bench_default_ai(m.value());
-    bench_serialization();
-    bench_serialization_cereal();
-    bench_rapidjson_without_strlen();
-    bench_rapidjson_with_strlen();
-    bench_random_helper();
-    bench_pcg();
+//    bench_censor_sensor();
+//    bench_hashing();
+//    bench_hash_verify();
+//    bench_serialization();
+//    bench_serialization_cereal();
+//    bench_rapidjson_without_strlen();
+//    bench_rapidjson_with_strlen();
+//    bench_random_helper();
+//    bench_pcg();
+    bench_battle();
 }

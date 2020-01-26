@@ -63,11 +63,16 @@ void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool>
     }
 
     for(auto &character : all_characters) {
-        ibh_flat_map<string, stat_component> stats;
+        ibh_flat_map<uint32_t , int64_t> stats;
         vector<item_component> items;
 
         for(auto &stat : character.stats) {
-            stats.insert(ibh_flat_map<string, stat_component>::value_type{stat.name, stat_component{stat.name, stat.value}});
+            auto mapper_it = stat_name_to_id_mapper.find(stat.name);
+            if(mapper_it == end(stat_name_to_id_mapper)) {
+                spdlog::error("[{}] missing mapper for stat name {}", __FUNCTION__, stat.name);
+                continue;
+            }
+            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{mapper_it->second, stat.value});
         }
 
         for(auto &item : character.items) {
@@ -83,8 +88,8 @@ void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool>
         auto new_entity = registry.create();
         registry.assign<pc_component>(new_entity, pc_component{character.id, 0, character.name, character.race, "",
                                                                character._class, "", character.level,
-                                                               character.skill_points, (stats),
-                                                               ibh_flat_map<string, item_component>{}, (items),
+                                                               character.skill_points, stats,
+                                                               ibh_flat_map<uint32_t, item_component>{}, (items),
                                                                ibh_flat_map<string, skill_component>{}});
     }
 

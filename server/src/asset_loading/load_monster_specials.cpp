@@ -42,14 +42,20 @@ optional<monster_special_definition_component> ibh::load_monster_specials(string
         return {};
     }
 
-    ibh_flat_map<string, stat_component> stats;
+    ibh_flat_map<uint32_t, int64_t> stats;
     stats.reserve(d["multipliers"].MemberCount());
+    string name = d["name"].GetString();
 
     for (auto const &stat : stat_names) {
         if(d["multipliers"].HasMember(stat.c_str())) {
-            stats.insert(ibh_flat_map<string, stat_component>::value_type{stat, stat_component{stat, d["multipliers"][stat.c_str()].GetInt64()}});
+            auto mapper_it = stat_name_to_id_mapper.find(stat);
+            if(mapper_it == end(stat_name_to_id_mapper)) {
+                spdlog::error("[{}] monster {} could not map stat {}", __FUNCTION__, name, stat);
+                continue;
+            }
+            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{mapper_it->second, d["multipliers"][stat.c_str()].GetInt64()});
         }
     }
 
-    return monster_special_definition_component(d["name"].GetString(), move(stats), d["teleport_when_beat"].GetBool());
+    return monster_special_definition_component(name, move(stats), d["teleport_when_beat"].GetBool());
 }

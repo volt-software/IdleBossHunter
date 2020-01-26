@@ -48,7 +48,7 @@ namespace ibh {
     template <class Server, class WebSocket>
     void handle_register(Server *s, rapidjson::Document const &d,
                          shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
-        MEASURE_TIME_OF_FUNCTION();
+        MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_LOGIN_CHECK(register_request);
 
         users_repository<database_pool, database_transaction> user_repo(pool);
