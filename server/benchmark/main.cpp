@@ -284,14 +284,14 @@ int main(int argc, char **argv) {
     entt::registry registry;
     //load_assets(registry, quit);
 
-//    bench_censor_sensor();
-//    bench_hashing();
-//    bench_hash_verify();
-//    bench_serialization();
-//    bench_serialization_cereal();
-//    bench_rapidjson_without_strlen();
-//    bench_rapidjson_with_strlen();
-//    bench_random_helper();
-//    bench_pcg();
+    bench_censor_sensor();
+    bench_hashing();
+    bench_hash_verify();
+    bench_serialization();
+    bench_serialization_cereal();
+    bench_rapidjson_without_strlen();
+    bench_rapidjson_with_strlen();
+    bench_random_helper();
+    bench_pcg();
     bench_battle();
 }

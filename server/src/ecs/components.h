@@ -127,14 +127,15 @@ namespace ibh {
 
     struct clan_building_definition_component {
         string name;
-        vector<stat_component> bonuses;
+        vector<stat_id_component> bonuses;
         uint64_t cost;
     };
 
     struct clan_component {
+        uint64_t id;
         string name;
         vector<clan_member_component> members;
-        vector<stat_component> stats;
+        vector<stat_id_component> stats;
     };
 
     struct battle_component {
@@ -157,6 +158,7 @@ namespace ibh {
 
         uint64_t level;
         uint64_t skill_points;
+        uint64_t clan_id;
 
         optional<battle_component> battle;
 
@@ -189,4 +191,7 @@ namespace ibh {
 
 
     // constants
+    constexpr uint32_t CLAN_ADMIN = 2;
+    constexpr uint32_t CLAN_SAGE = 1;
+    constexpr uint32_t CLAN_MEMBER = 1;
 }

@@ -35,8 +35,19 @@ namespace ibh {
         uint64_t connection_id;
 
         queue_message(uint32_t type, uint64_t connection_id) : type(type), connection_id(connection_id) {}
-        virtual ~queue_message() {}
+        virtual ~queue_message() = default;
     };
+
+    // clan
+
+    struct create_clan_message : queue_message {
+        string clan_name;
+        static uint32_t const _type;
+
+        create_clan_message(uint64_t connection_id, string clan_name);
+    };
+
+    // uac
 
     struct player_enter_message : queue_message {
         uint64_t character_id;

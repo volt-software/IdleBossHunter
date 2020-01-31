@@ -127,9 +127,8 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
 }
 
 template<typename pool_T, typename transaction_T>
-optional<db_character> characters_repository<pool_T, transaction_T>::get_character(uint64_t id, uint64_t user_id,
-                                                                                   unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT p.id, p.user_id, p.slot, p.level, p.gold, p.xp, p.skill_points, p.x, p.y, p.character_name, p.race, p.class, p.map FROM characters p WHERE id = {} and user_id = {}", id, user_id));
+optional<db_character> characters_repository<pool_T, transaction_T>::get_character(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT p.id, p.user_id, p.slot, p.level, p.gold, p.xp, p.skill_points, p.x, p.y, p.character_name, p.race, p.class, p.map FROM characters p WHERE id = {}", id));
 
     if(result.empty()) {
         spdlog::debug("[{}] found no db_character by id {}", __FUNCTION__, id);
@@ -186,11 +185,10 @@ vector<db_character> characters_repository<pool_T, transaction_T>::get_by_user_i
     characters.reserve(result.size());
 
     for(auto const & res : result) {
-        db_character character{res[0].as(uint64_t{}), res[1].as(uint64_t{}), res[2].as(uint32_t{}), res[3].as(uint64_t{}),
-                               res[4].as(uint64_t{}),res[5].as(uint64_t{}), res[6].as(uint64_t{}), res[7].as(uint32_t{}),
-                               res[8].as(uint32_t{}), res[9].as(string{}), res[10].as(string{}), res[11].as(string{}),
-                               res[12].as(string{}), {}, {}};
-        characters.push_back(move(character));
+        characters.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), res[2].as(uint32_t{}), res[3].as(uint64_t{}),
+                                res[4].as(uint64_t{}),res[5].as(uint64_t{}), res[6].as(uint64_t{}), res[7].as(uint32_t{}),
+                                res[8].as(uint32_t{}), res[9].as(string{}), res[10].as(string{}), res[11].as(string{}),
+                                res[12].as(string{}), vector<db_character_stat>{}, vector<db_item>{});
     }
 
     return characters;

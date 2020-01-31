@@ -24,7 +24,7 @@
 using namespace std;
 
 namespace ibh {
-    void handle_player_leave_message(queue_message* msg, entt::registry& registry, outward_queues&) {
+    void handle_player_leave_message(queue_message* msg, entt::registry& registry, outward_queues&, shared_ptr<database_pool> pool) {
         auto *leave_message = dynamic_cast<player_leave_message*>(msg);
 
         if(leave_message == nullptr) {
@@ -47,7 +47,7 @@ namespace ibh {
         }
 
         if(!player_found) {
-            throw std::runtime_error("Could not find player");
+            spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, leave_message->connection_id);
         }
     }
 }

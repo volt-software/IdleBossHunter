@@ -47,7 +47,7 @@
 
 #include "ecs/battle_system.h"
 
-#include "uws_thread.h"
+#include "websocket_thread.h"
 
 using namespace std;
 using namespace ibh;
@@ -110,60 +110,23 @@ int main() {
 
     select_response = char_sel.value();
 
-    vector<monster_definition_component> mob_defs;
-    vector<monster_special_definition_component> special_defs;
     auto mob_def_view = es.view<monster_definition_component>();
     auto special_def_view = es.view<monster_special_definition_component>();
-    for(auto entity : mob_def_view) {
-        auto const &c = mob_def_view.get<monster_definition_component>(entity);
 
-        for(auto &stat_name :stat_names) {
-            auto stat_it = c.stats.find(stat_name);
-
-            if(stat_it == end(c.stats)) {
-                continue;
-            }
-
-            if(stat_it->second.value >= 300) {
-                spdlog::error("[{}] mob {} has stat {} more than 300", __FUNCTION__, c.name, stat_name);
-            }
-        }
-
-        mob_defs.push_back(c);
-    }
-    for(auto entity : special_def_view) {
-        auto const &c = special_def_view.get<monster_special_definition_component>(entity);
-
-        for(auto &stat_name :stat_names) {
-            auto stat_it = c.stats.find(stat_name);
-
-            if(stat_it == end(c.stats)) {
-                continue;
-            }
-
-            if(stat_it->second.value >= 500) {
-                spdlog::error("[{}] mob special {} has stat {} more than 300", __FUNCTION__, c.name, stat_name);
-            }
-        }
-
-        special_defs.push_back(c);
-    }
-
-    if(mob_defs.empty() || special_defs.empty()) {
+    if(mob_def_view.empty() || special_def_view.empty()) {
         spdlog::error("[{}] monster init failure", __FUNCTION__);
         return 1;
     }
 
     outward_queues outward_queue;
-    battle_system bs{config.battle_system_each_n_ticks, &outward_queue, move(mob_defs), move(special_defs)};
+    battle_system bs{config.battle_system_each_n_ticks, &outward_queue};
 
     if(quit) {
         spdlog::warn("[{}] quitting program", __FUNCTION__);
         return 0;
     }
 
-    auto uws_thread = run_uws(config, pool, s_handle, quit);
-
+    auto websocket_thread = run_websocket(config, pool, s_handle, quit);
 
     vector<uint64_t> frame_times;
     auto next_tick = chrono::system_clock::now() + chrono::milliseconds(config.tick_length);
@@ -190,49 +153,6 @@ int main() {
         }
 
         bs.do_tick(es);
-
-/*        for(auto m_entity : map_viewc) {
-            map_component &m = map_view.get(m_entity);
-            lotr_player_location_map player_location_map;
-
-            for (auto &player : m.players) {
-                auto existing_players = player_location_map.find(player.loc);
-
-                if (existing_players == end(player_location_map)) {
-                    player_location_map[player.loc] = vector<pc_component *>{&player};
-                } else {
-                    existing_players->second.push_back(&player);
-                }
-
-                player.fov = compute_fov_restrictive_shadowcasting(m, player.loc, true);
-
-                auto min_x = max(0U, get<0>(player.loc) - fov_max_distance);
-                auto min_y = max(0U, get<1>(player.loc) - fov_max_distance);
-                auto max_x = min(m.width, get<0>(player.loc) + fov_max_distance);
-                auto max_y = min(m.height, get<1>(player.loc) + fov_max_distance);
-
-                auto visible_npcs = m.npcs | ranges::views::filter([&](npc_component const &npc){ return is_visible(player.loc, npc.loc, player.fov, min_x, max_x, min_y, max_y); });
-                auto visible_pcs = m.players | ranges::views::filter([&](pc_component const &pc){ return is_visible(player.loc, pc.loc, player.fov, min_x, max_x, min_y, max_y) && player.connection_id != pc.connection_id; });
-                vector<character_component> cs;
-
-                for(auto &npc : visible_npcs) {
-                    cs.push_back(npc);
-                }
-
-                for(auto &pc : visible_pcs) {
-                    cs.push_back(pc);
-                }
-
-                outward_queue.enqueue(outward_message{player.connection_id, make_unique<update_response>(cs)});
-            }
-
-            remove_dead_npcs(m.npcs);
-            fill_spawners(m, m.npcs, es);
-
-            for(auto &npc : m.npcs) {
-                run_ai_on(npc, m, player_location_map);
-            }
-        }*/
 
         auto tick_end = chrono::system_clock::now();
         frame_times.push_back(chrono::duration_cast<chrono::microseconds>(tick_end - tick_start).count());
@@ -270,8 +190,8 @@ int main() {
 
     spdlog::warn("[{}] quitting program", __FUNCTION__);
     s_handle.s->stop();
-    uws_thread.join();
-    spdlog::warn("[{}] uws thread stopped", __FUNCTION__);
+    websocket_thread.join();
+    spdlog::warn("[{}] websocket thread stopped", __FUNCTION__);
 
     return 0;
 }

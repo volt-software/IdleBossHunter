@@ -52,6 +52,30 @@ TEST_CASE("clans repository tests") {
         REQUIRE(clan2->id == clan.id);
         REQUIRE(clan2->name == clan.name);
     }
+
+    SECTION( "remove clan" ) {
+        auto transaction = clans_repo.create_transaction();
+        db_clan clan{0, "clan", {}, {}};
+        clans_repo.insert(clan, transaction);
+        REQUIRE(clan.id > 0);
+
+        clans_repo.remove(clan, transaction);
+
+        auto clan2 = clans_repo.get(clan.id, transaction);
+        REQUIRE(!clan2);
+    }
+
+    SECTION( "get all clans" ) {
+        auto transaction = clans_repo.create_transaction();
+        auto clans_existing = clans_repo.get_all(transaction);
+
+        db_clan clan{0, "clan", {}, {}};
+        clans_repo.insert(clan, transaction);
+        REQUIRE(clan.id > 0);
+
+        auto clans = clans_repo.get_all(transaction);
+        REQUIRE(clans.size() == clans_existing.size() + 1);
+    }
 }
 
 #endif

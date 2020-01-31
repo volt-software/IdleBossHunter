@@ -41,7 +41,7 @@ TEST_CASE("characters repository tests") {
         auto inserted = characters_repo.insert_or_update_character(character, transaction);
         REQUIRE(inserted == true);
 
-        auto character2 = characters_repo.get_character(character.id, usr.id, transaction);
+        auto character2 = characters_repo.get_character(character.id, transaction);
         REQUIRE(character2);
         REQUIRE(character2->user_id == character.user_id);
         REQUIRE(character2->slot == character.slot);
@@ -65,7 +65,7 @@ TEST_CASE("characters repository tests") {
         auto inserted = characters_repo.insert_or_update_character(character, transaction);
         REQUIRE(inserted == true);
 
-        auto character2 = characters_repo.get_character(character.id, usr.id + 1, transaction);
+        auto character2 = characters_repo.get_character(character.name, usr.id + 1, transaction);
         REQUIRE(!character2);
     }
 
@@ -86,7 +86,7 @@ TEST_CASE("characters repository tests") {
         inserted = characters_repo.insert_or_update_character(character, transaction);
         REQUIRE(inserted == false);
 
-        auto character2 = characters_repo.get_character(character.id, usr.id, transaction);
+        auto character2 = characters_repo.get_character(character.id, transaction);
         REQUIRE(character2);
         REQUIRE(character2->user_id == character.user_id);
         REQUIRE(character2->name == character.name);
@@ -144,7 +144,7 @@ TEST_CASE("characters repository tests") {
         ret = characters_repo.insert(character, transaction);
         REQUIRE(ret == false);
 
-        auto character2 = characters_repo.get_character(character.id, usr.id, transaction);
+        auto character2 = characters_repo.get_character(character.id, transaction);
         REQUIRE(character2);
         REQUIRE(character2->user_id == character.user_id);
         REQUIRE(character2->slot == character.slot);

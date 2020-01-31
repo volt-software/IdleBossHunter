@@ -36,7 +36,7 @@ TEST_CASE("character leave tests") {
         }
         outward_queues q;
         player_leave_message msg(1);
-        handle_player_leave_message(&msg, registry, q);
+        handle_player_leave_message(&msg, registry, q, nullptr);
 
         auto &pc = registry.get<pc_component>(entt);
         REQUIRE(pc.connection_id == 0);

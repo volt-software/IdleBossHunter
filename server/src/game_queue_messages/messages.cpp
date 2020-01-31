@@ -23,6 +23,7 @@ namespace ibh {
     uint32_t const player_enter_message::_type = 1;
     uint32_t const player_leave_message::_type = 2;
     uint32_t const player_move_message::_type  = 3;
+    uint32_t const create_clan_message::_type  = 4;
 
     player_enter_message::player_enter_message(uint64_t character_id, string character_name, string race, string baseclass, vector <stat_component> player_stats, uint64_t connection_id, uint64_t level, uint64_t gold, uint64_t xp, uint64_t skill_points)
             : queue_message(_type, connection_id), character_id(character_id), character_name(move(character_name)), race(move(race)), baseclass(move(baseclass)),
@@ -33,4 +34,6 @@ namespace ibh {
 
     player_move_message::player_move_message(uint64_t connection_id, uint32_t x, uint32_t y)
             : queue_message(_type, connection_id), x(x), y(y) {}
+
+    create_clan_message::create_clan_message(uint64_t connection_id, string clan_name) : queue_message(_type, connection_id), clan_name(move(clan_name)) {}
 }

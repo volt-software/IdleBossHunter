@@ -18,29 +18,16 @@
 
 #pragma once
 
-#include <shared_mutex>
-#include <config.h>
+#include <rapidjson/document.h>
 #include <database/database_pool.h>
-#include <ibh_containers.h>
+#include <per_socket_data.h>
 #include <concurrentqueue.h>
-
 #include <game_queue_messages/messages.h>
-#include "per_socket_data.h"
+
+using namespace std;
 
 namespace ibh {
-    struct server_handle {
-        server* s;
-    };
-
-    struct character_select_response;
-
-    extern ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> user_connections;
-    extern moodycamel::ConcurrentQueue<unique_ptr<queue_message>> game_loop_queue;
-    extern string motd;
-    extern character_select_response select_response;
-    extern shared_mutex user_connections_mutex;
-
-    using user_connections_type = ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>>::value_type;
-
-    thread run_uws(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit);
+    template <class Server, class WebSocket>
+    void handle_set_tax(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
+                        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
 }

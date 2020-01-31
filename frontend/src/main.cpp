@@ -433,9 +433,8 @@ int main(int argc, char* argv[]) {
             ++counted_frames;
 
             auto fps_ticks = fps_timer.get_ticks();
-            if (config.log_fps && fps_ticks > 1'000'000) {
-                spdlog::info("[main] FPS {}-{} - frame times max/avg/min: {} / {} / {} µs", counted_frames,
-                             counted_frames / (fps_ticks / 1'000'000.F),
+            if (config.log_fps && fps_ticks >= 2'000'000) {
+                spdlog::info("[main] FPS {} - frame times max/avg/min: {} / {} / {} µs", counted_frames / 2,
                              *max_element(begin(frame_times), end(frame_times)),
                              accumulate(begin(frame_times), end(frame_times), 0UL) / frame_times.size(),
                              *min_element(begin(frame_times), end(frame_times)));

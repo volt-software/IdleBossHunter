@@ -36,7 +36,7 @@ TEST_CASE("character enter tests") {
         }
         outward_queues q;
         player_enter_message msg(1, "name", "race", "class", {}, 2, 3, 4, 5, 6);
-        handle_player_enter_message(&msg, registry, q);
+        handle_player_enter_message(&msg, registry, q, nullptr);
 
         auto &pc = registry.get<pc_component>(entt);
         REQUIRE(pc.connection_id == 2);

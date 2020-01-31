@@ -101,11 +101,10 @@ vector<db_user> users_repository<pool_T, transaction_T>::get_all(const unique_pt
     users.reserve(result.size());
 
     for(auto const & res : result) {
-        db_user user{res["id"].as(uint64_t{}), res["username"].as(string{}),
-                     res["password"].as(string{}), res["email"].as(string{}),
-                     res["login_attempts"].as(uint16_t{}), res["verification_code"].as(string{}),
-                     res["max_characters"].as(uint16_t{}), res["is_game_master"].as(uint16_t{})};
-        users.push_back(move(user));
+        users.emplace_back(res["id"].as(uint64_t{}), res["username"].as(string{}),
+                           res["password"].as(string{}), res["email"].as(string{}),
+                           res["login_attempts"].as(uint16_t{}), res["verification_code"].as(string{}),
+                           res["max_characters"].as(uint16_t{}), res["is_game_master"].as(uint16_t{}));
     }
 
     return users;

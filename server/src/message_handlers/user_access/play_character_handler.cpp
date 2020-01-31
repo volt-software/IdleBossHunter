@@ -26,7 +26,7 @@
 #include <repositories/character_stats_repository.h>
 #include "message_handlers/handler_macros.h"
 #include <ecs/components.h>
-#include <uws_thread.h>
+#include <websocket_thread.h>
 #include <utf.h>
 #include <messages/user_access/character_select_response.h>
 #include <messages/user_access/play_character_response.h>

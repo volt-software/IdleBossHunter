@@ -58,6 +58,13 @@ void clans_repository<pool_T, transaction_T>::update(db_clan const &clan, unique
 }
 
 template<typename pool_T, typename transaction_T>
+void clans_repository<pool_T, transaction_T>::remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("DELETE FROM clans WHERE id = {}", clan.id));
+
+    spdlog::debug("[{}] removed {} entries", __FUNCTION__, result.size());
+}
+
+template<typename pool_T, typename transaction_T>
 optional<db_clan> clans_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT id, name FROM clans WHERE id = {}", id));
 
@@ -68,4 +75,20 @@ optional<db_clan> clans_repository<pool_T, transaction_T>::get(int id, unique_pt
     }
 
     return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
+}
+
+template<typename pool_T, typename transaction_T>
+vector<db_clan> clans_repository<pool_T, transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
+    auto result = transaction->execute("SELECT id, name FROM clans");
+
+    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+
+    vector<db_clan> clans;
+    clans.reserve(result.size());
+
+    for(auto const & res : result) {
+        clans.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
+    }
+
+    return clans;
 }

@@ -36,7 +36,9 @@ namespace ibh {
         unique_ptr<transaction_T> create_transaction();
         bool insert(db_clan& clan, unique_ptr<transaction_T> const &transaction) const;
         void update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
+        void remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
         optional<db_clan> get(int id, unique_ptr<transaction_T> const &transaction) const;
+        vector<db_clan> get_all(unique_ptr<transaction_T> const &transaction) const;
     private:
         shared_ptr<pool_T> _database_pool;
     };

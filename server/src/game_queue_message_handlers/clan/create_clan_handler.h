@@ -18,16 +18,12 @@
 
 #pragma once
 
-#include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
 #include <game_queue_messages/messages.h>
+#include <entt/entt.hpp>
+#include <database/database_pool.h>
 
 using namespace std;
 
 namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_set_motd(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-                          per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    void handle_create_clan(queue_message*, entt::registry&, outward_queues&, shared_ptr<database_pool> pool);
 }

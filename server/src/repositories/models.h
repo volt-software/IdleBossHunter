@@ -119,6 +119,15 @@ namespace ibh {
         db_boss(uint64_t id, string name, vector<db_boss_stat> stats) : id(id), name(move(name)), stats(move(stats)) {}
     };
 
+    struct db_clan_member {
+        uint64_t clan_id;
+        uint64_t character_id;
+        uint16_t member_level;
+
+        db_clan_member() : clan_id(), character_id(), member_level() {}
+        db_clan_member(uint64_t clan_id, uint64_t character_id, uint16_t member_level) : clan_id(clan_id), character_id(character_id), member_level(member_level) {}
+    };
+
     struct db_clan_stat {
         uint64_t id;
         uint64_t clan_id;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(ibh_backend)
+project(ibh_server)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE CXX STANDARD REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -32,7 +32,7 @@ SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-li
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE COMMON_SOURCES ${TOP_DIR}/common/src/*.cpp)
 file(GLOB SPDLOG_SOURCE ${EXTERNAL_DIR}/spdlog/src/*.cpp)
-add_executable(ibh_backend ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES})
+add_executable(ibh_server ${SPDLOG_SOURCE} ${PROJECT_SOURCES} ${COMMON_SOURCES})
 
 file(GLOB_RECURSE PROJECT_SOURCES_WITHOUT_MAIN ${PROJECT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM PROJECT_SOURCES_WITHOUT_MAIN "${PROJECT_SOURCE_DIR}/src/main.cpp")
@@ -81,11 +81,11 @@ include_directories("${EXTERNAL_DIR}/concurrentqueue")
 include_directories("${EXTERNAL_DIR}/cereal/include")
 
 
-target_link_libraries(ibh_backend PUBLIC ${PQXX_LIBRARY} -lpq)
-target_link_libraries(ibh_backend PUBLIC -lpthread -lstdc++fs)
-target_link_libraries(ibh_backend PUBLIC ${ZLIB_LIBRARIES} )
-target_link_libraries(ibh_backend PUBLIC ${OPENSSL_LIBRARIES})
-target_link_libraries(ibh_backend PUBLIC ${SODIUM_LIBRARY})
+target_link_libraries(ibh_server PUBLIC ${PQXX_LIBRARY} -lpq)
+target_link_libraries(ibh_server PUBLIC -lpthread -lstdc++fs)
+target_link_libraries(ibh_server PUBLIC ${ZLIB_LIBRARIES} )
+target_link_libraries(ibh_server PUBLIC ${OPENSSL_LIBRARIES})
+target_link_libraries(ibh_server PUBLIC ${SODIUM_LIBRARY})
 
 target_link_libraries(ibh_server_test PUBLIC ${PQXX_LIBRARY} -lpq)
 target_link_libraries(ibh_server_test PUBLIC -lpthread -lstdc++fs)
@@ -100,7 +100,7 @@ target_link_libraries(ibh_benchmark PUBLIC ${OPENSSL_LIBRARIES})
 target_link_libraries(ibh_benchmark PUBLIC ${SODIUM_LIBRARY})
 
 add_custom_command(
-        TARGET ibh_backend POST_BUILD
+        TARGET ibh_server POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets/
         ${CMAKE_BINARY_DIR}/assets)

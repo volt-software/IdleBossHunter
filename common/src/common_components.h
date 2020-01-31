@@ -32,6 +32,13 @@ namespace ibh {
         stat_component(string name, int64_t value) : name(move(name)), value(value) {}
     };
 
+    struct stat_id_component {
+        uint32_t id;
+        int64_t value;
+
+        stat_id_component(uint32_t id, int64_t value) : id(id), value(value) {}
+    };
+
 
 
     extern string const stat_str;

@@ -28,6 +28,6 @@ using namespace std;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_set_motd(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
-                          per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    void handle_increase_bonus(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
+                               moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
 }

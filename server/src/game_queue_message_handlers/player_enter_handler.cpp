@@ -20,14 +20,12 @@
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
-#include <range/v3/algorithm/any_of.hpp>
-#include <messages/generic_error_response.h>
 #include <messages/battle/new_battle_response.h>
 
 using namespace std;
 
 namespace ibh {
-    void handle_player_enter_message(queue_message* msg, entt::registry& registry, outward_queues& outward_queue) {
+    void handle_player_enter_message(queue_message* msg, entt::registry& registry, outward_queues& outward_queue, shared_ptr<database_pool> pool) {
         auto *enter_msg = dynamic_cast<player_enter_message*>(msg);
 
         if(enter_msg == nullptr) {
@@ -61,7 +59,7 @@ namespace ibh {
         }
 
         if(!player_found) {
-            throw std::runtime_error("Could not find player");
+            spdlog::trace("[{}] could not find pc {} conn id {}", __FUNCTION__, enter_msg->character_id, enter_msg->connection_id);
         }
     }
 }

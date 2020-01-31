@@ -22,7 +22,7 @@
 #include <spdlog/spdlog.h>
 
 #include <messages/moderator/set_motd_request.h>
-#include <uws_thread.h>
+#include <websocket_thread.h>
 #include <messages/moderator/update_motd_response.h>
 #include "message_handlers/handler_macros.h"
 #include "macros.h"
@@ -31,7 +31,7 @@ using namespace std;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void set_motd_handler(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
+    void handle_set_motd(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
                           moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         if(!user_data->is_game_master) {
             spdlog::warn("[{}] user {} tried to set motd but is not a game master!", __FUNCTION__, user_data->username);
@@ -61,7 +61,7 @@ namespace ibh {
         }
     }
 
-    template void set_motd_handler<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_set_motd<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
                                                                         per_socket_data<websocketpp::connection_hdl> *user_data,
                                                                         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

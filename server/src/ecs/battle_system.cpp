@@ -17,7 +17,7 @@
 */
 
 #include <spdlog/spdlog.h>
-#include <uws_thread.h>
+#include <websocket_thread.h>
 #include <messages/user_access/character_select_response.h>
 #include <messages/battle/new_battle_response.h>
 #include <messages/battle/level_up_response.h>

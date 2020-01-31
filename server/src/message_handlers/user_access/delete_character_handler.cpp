@@ -24,7 +24,7 @@
 #include <messages/user_access/delete_character_request.h>
 #include <messages/user_access/delete_character_response.h>
 #include <repositories/characters_repository.h>
-#include <uws_thread.h>
+#include <websocket_thread.h>
 #include "message_handlers/handler_macros.h"
 #include "macros.h"
 

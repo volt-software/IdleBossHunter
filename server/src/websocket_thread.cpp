@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "uws_thread.h"
+#include "websocket_thread.h"
 #include <spdlog/spdlog.h>
 #include <ibh_containers.h>
 #include <rapidjson/document.h>
@@ -28,6 +28,11 @@
 #include <message_handlers/user_access/character_select_handler.h>
 #include <message_handlers/chat/public_chat_handler.h>
 #include <message_handlers/moderator/set_motd_handler.h>
+#include <message_handlers/clan/set_tax_handler.h>
+#include <message_handlers/clan/join_clan_handler.h>
+#include <message_handlers/clan/increase_bonus_handler.h>
+#include <message_handlers/clan/get_clan_listing_handler.h>
+#include <message_handlers/clan/create_clan_handler.h>
 #include <messages/user_access/login_request.h>
 #include <messages/user_access/register_request.h>
 #include <messages/user_access/play_character_request.h>
@@ -37,6 +42,11 @@
 #include <messages/user_access/character_select_response.h>
 #include <messages/chat/message_request.h>
 #include <messages/moderator/set_motd_request.h>
+#include <messages/clan/set_tax_request.h>
+#include <messages/clan/join_clan_request.h>
+#include <messages/clan/increase_bonus_request.h>
+#include <messages/clan/get_clan_listing_request.h>
+#include <messages/clan/create_clan_request.h>
 #include <message_handlers/handler_macros.h>
 #include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
@@ -246,10 +256,15 @@ void add_routes(message_router_type &message_router) {
     message_router.emplace(delete_character_request::type, handle_delete_character<server, websocketpp::connection_hdl>);
     message_router.emplace(character_select_request::type, handle_character_select<server, websocketpp::connection_hdl>);
     message_router.emplace(message_request::type, handle_public_chat<server, websocketpp::connection_hdl>);
-    message_router.emplace(set_motd_request::type, set_motd_handler<server, websocketpp::connection_hdl>);
+    message_router.emplace(set_motd_request::type, handle_set_motd<server, websocketpp::connection_hdl>);
+    message_router.emplace(set_tax_request::type, handle_set_tax<server, websocketpp::connection_hdl>);
+    message_router.emplace(join_clan_request::type, handle_join_clan<server, websocketpp::connection_hdl>);
+    message_router.emplace(increase_bonus_request::type, handle_increase_bonus<server, websocketpp::connection_hdl>);
+    message_router.emplace(get_clan_listing_request::type, handle_get_clan_listing<server, websocketpp::connection_hdl>);
+    message_router.emplace(create_clan_request::type, handle_create_clan<server, websocketpp::connection_hdl>);
 }
 
-thread ibh::run_uws(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {
+thread ibh::run_websocket(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {
     auto t = thread([&config, pool, &s_handle, &quit] {
         server roa_server;
         s_handle.s = &roa_server;

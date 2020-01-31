@@ -33,7 +33,7 @@
 #include "message_handlers/handler_macros.h"
 #include <utf.h>
 #include <messages/user_access/user_entered_game_response.h>
-#include <uws_thread.h>
+#include <websocket_thread.h>
 #include <ecs/components.h>
 #include "macros.h"
 

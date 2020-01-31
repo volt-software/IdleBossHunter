@@ -20,9 +20,10 @@
 
 #include <game_queue_messages/messages.h>
 #include <entt/entt.hpp>
+#include <database/database_pool.h>
 
 using namespace std;
 
 namespace ibh {
-    void handle_player_enter_message(queue_message*, entt::registry&, outward_queues&);
+    void handle_player_enter_message(queue_message*, entt::registry&, outward_queues&, shared_ptr<database_pool> pool);
 }
