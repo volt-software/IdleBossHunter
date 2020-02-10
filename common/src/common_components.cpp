@@ -88,62 +88,10 @@ namespace ibh {
                                                 gear_slot_ring2, gear_slot_head, gear_slot_neck, gear_slot_waist, gear_slot_wrist, gear_slot_hands,
                                                 gear_slot_feet, gear_slot_ear};
 
-    uint32_t const stat_str_id = 1;
-    uint32_t const stat_dex_id = 2;
-    uint32_t const stat_agi_id = 3;
-    uint32_t const stat_int_id = 4;
-    uint32_t const stat_spd_id = 5;
-    uint32_t const stat_vit_id = 6;
-    uint32_t const stat_luk_id = 7;
-    uint32_t const stat_cha_id = 8;
-    uint32_t const stat_con_id = 9;
-    uint32_t const stat_move_id = 10;
-    uint32_t const stat_hpregen_id = 11;
-    uint32_t const stat_mpregen_id = 12;
-    uint32_t const stat_hp_id = 13;
-    uint32_t const stat_max_hp_id = 14;
-    uint32_t const stat_mp_id = 15;
-    uint32_t const stat_max_mp_id = 16;
-    uint32_t const stat_xp_id = 17;
-    uint32_t const stat_gold_id = 18;
-    uint32_t const stat_hweapon_damage_rolls_id = 19;
-    uint32_t const stat_weapon_armor_class_id = 20;
-    uint32_t const stat_armor_class_id = 21;
-    uint32_t const stat_accuracy_id = 22;
-    uint32_t const stat_offense_id = 23;
-    uint32_t const stat_defense_id = 24;
-    uint32_t const stat_stealth_id = 25;
-    uint32_t const stat_perception_id = 26;
-    uint32_t const stat_physical_damage_boost_id = 26;
-    uint32_t const stat_magical_damage_boost_id = 27;
-    uint32_t const stat_healing_boost_id = 28;
-    uint32_t const stat_physical_damage_reflect_id = 29;
-    uint32_t const stat_magical_damage_reflect_id = 30;
-    uint32_t const stat_mitigation_id = 31;
-    uint32_t const stat_magical_resist_id = 32;
-    uint32_t const stat_physical_resist_id = 33;
-    uint32_t const stat_necrotic_resist_id = 34;
-    uint32_t const stat_energy_resist_id = 35;
-    uint32_t const stat_water_resist_id = 36;
-    uint32_t const stat_fire_resist_id = 37;
-    uint32_t const stat_ice_resist_id = 38;
-    uint32_t const stat_poison_resist_id = 39;
-    uint32_t const stat_disease_resist_id = 40;
-    uint32_t const stat_action_speed_id = 41;
+
     /*, "damageFactor"s TODO damage factor is a double :< */
 
-    uint32_t const gear_slot_armor_id = 1003;
-    uint32_t const gear_slot_robe1_id = 1004;
-    uint32_t const gear_slot_robe2_id = 1005;
-    uint32_t const gear_slot_ring1_id = 1006;
-    uint32_t const gear_slot_ring2_id = 1007;
-    uint32_t const gear_slot_head_id = 1008;
-    uint32_t const gear_slot_neck_id = 1009;
-    uint32_t const gear_slot_waist_id = 1010;
-    uint32_t const gear_slot_wrist_id = 1011;
-    uint32_t const gear_slot_hands_id = 1012;
-    uint32_t const gear_slot_feet_id = 1013;
-    uint32_t const gear_slot_ear_id = 1014;
+
 
     array<uint32_t const, 42> const stat_name_ids = {stat_str_id, stat_dex_id, stat_agi_id, stat_int_id, stat_spd_id, stat_vit_id, stat_luk_id, stat_cha_id, stat_con_id, stat_move_id,
                                                 stat_hpregen_id, stat_mpregen_id, stat_hp_id, stat_mp_id, stat_max_hp_id, stat_max_mp_id, stat_xp_id, stat_gold_id, stat_hweapon_damage_rolls_id, stat_weapon_armor_class_id, stat_armor_class_id,

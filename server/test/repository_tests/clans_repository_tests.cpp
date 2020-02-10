@@ -26,10 +26,10 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("clans repository tests") {
-    clans_repository<database_pool, database_transaction> clans_repo(db_pool);
+    clans_repository<database_transaction> clans_repo{};
 
     SECTION("clan inserted correctly" ) {
-        auto transaction = clans_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
@@ -40,7 +40,7 @@ TEST_CASE("clans repository tests") {
     }
 
     SECTION( "update clan" ) {
-        auto transaction = clans_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
@@ -54,7 +54,7 @@ TEST_CASE("clans repository tests") {
     }
 
     SECTION( "remove clan" ) {
-        auto transaction = clans_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
@@ -66,7 +66,7 @@ TEST_CASE("clans repository tests") {
     }
 
     SECTION( "get all clans" ) {
-        auto transaction = clans_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         auto clans_existing = clans_repo.get_all(transaction);
 
         db_clan clan{0, "clan", {}, {}};

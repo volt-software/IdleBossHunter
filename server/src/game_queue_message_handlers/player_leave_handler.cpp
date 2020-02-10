@@ -24,15 +24,14 @@
 using namespace std;
 
 namespace ibh {
-    void handle_player_leave_message(queue_message* msg, entt::registry& registry, outward_queues&, shared_ptr<database_pool> pool) {
+    bool handle_player_leave_message(queue_message* msg, entt::registry& registry, outward_queues&, unique_ptr<database_transaction> const &transaction) {
         auto *leave_message = dynamic_cast<player_leave_message*>(msg);
 
         if(leave_message == nullptr) {
-            spdlog::error("[{}] player_leave_message nullptr", __FUNCTION__);
-            return;
+            spdlog::error("[{}] nullptr", __FUNCTION__);
+            return false;
         }
 
-        bool player_found = false;
         auto pc_view = registry.view<pc_component>();
         for(auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
@@ -43,11 +42,11 @@ namespace ibh {
 
             spdlog::trace("[{}] found pc {} for connection id {}", __FUNCTION__, pc.name, pc.connection_id);
             pc.connection_id = 0;
-            player_found = true;
+
+            return true;
         }
 
-        if(!player_found) {
-            spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, leave_message->connection_id);
-        }
+        spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, leave_message->connection_id);
+        return false;
     }
 }

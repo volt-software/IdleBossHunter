@@ -47,7 +47,7 @@ namespace ibh {
 
         void create_connections(const string& connection_string, uint32_t min_connections = 5);
 
-        unique_ptr<database_transaction> create_transaction();
+        [[nodiscard]] unique_ptr<database_transaction> create_transaction();
 
         /**
          * Marks connection as available again

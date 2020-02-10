@@ -33,12 +33,11 @@ namespace ibh {
         bonus(string name, uint64_t amount) noexcept : name(move(name)), amount(amount) {}
     };
     struct clan {
-        uint64_t id;
         string name;
         vector<string> members;
         vector<bonus> bonuses;
 
-        clan(uint64_t id, string name, vector<string> members, vector<bonus> bonuses) noexcept : id(id), name(move(name)), members(move(members)), bonuses(move(bonuses)) {}
+        clan(string name, vector<string> members, vector<bonus> bonuses) noexcept : name(move(name)), members(move(members)), bonuses(move(bonuses)) {}
     };
 
     struct get_clan_listing_response : message {

@@ -22,7 +22,6 @@ namespace ibh {
 
     template<typename T, typename DatabaseType, DatabaseTransaction DBT>
     concept bool Repository = requires(T a, DatabaseType& ref_type, unique_ptr<DBT> transaction, int id) {
-        { a.create_transaction() } -> unique_ptr<DatabaseTransaction>;
         { a.insert_if_not_exists(ref_type, transaction) } -> bool;
         { a.update(ref_type, transaction) } -> void;
         { a.get(id, transaction) } -> optional<DatabaseType>;

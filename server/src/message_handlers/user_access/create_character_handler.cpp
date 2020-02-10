@@ -38,20 +38,20 @@ using namespace std;
 namespace ibh {
     template <class Server, class WebSocket>
     void handle_create_character(Server *s, rapidjson::Document const &d,
-                                 shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                                 unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_PLAYING_CHECK(create_character_request);
 
-        characters_repository<database_pool, database_transaction> player_repo(pool);
-        character_stats_repository<database_pool, database_transaction> stats_repo(pool);
+        characters_repository<database_subtransaction> player_repo{};
+        character_stats_repository<database_subtransaction> stats_repo{};
 
         if(msg->slot > 4) {
             SEND_ERROR("Slot has to be at least 0 and at most 3.", "", "", true);
             return;
         }
 
-        auto transaction = player_repo.create_transaction();
-        auto existing_character = player_repo.get_character_by_slot(msg->slot, user_data->user_id, transaction);
+        auto subtransaction = transaction->create_subtransaction();
+        auto existing_character = player_repo.get_character_by_slot(msg->slot, user_data->user_id, subtransaction);
 
         if(existing_character) {
             SEND_ERROR("Character already exists in slot", "", "", true);
@@ -113,7 +113,7 @@ namespace ibh {
             return;
         }
 
-        if(!player_repo.insert(new_player, transaction)) {
+        if(!player_repo.insert(new_player, subtransaction)) {
             SEND_ERROR("Player with name already exists", "", "", true);
             spdlog::error("[{}] Player with slot {} already exists, but this code path should never be hit.", __FUNCTION__, new_player.slot);
             return;
@@ -142,11 +142,11 @@ namespace ibh {
 
         for(auto const &stat : player_stats) {
             db_character_stat char_stat{0, new_player.id, stat.name, stat.value};
-            stats_repo.insert(char_stat, transaction);
+            stats_repo.insert(char_stat, subtransaction);
             player_stats.emplace_back(stat.name, stat.value);
         }
 
-        transaction->commit();
+        subtransaction->commit();
 
 
         create_character_response response{character_object{new_player.name, new_player.race, new_player._class,
@@ -155,6 +155,6 @@ namespace ibh {
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
     }
 
-    template void handle_create_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_create_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                                per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

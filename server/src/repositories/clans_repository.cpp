@@ -22,20 +22,11 @@
 using namespace ibh;
 using namespace chrono;
 
-template class ibh::clans_repository<database_pool, database_transaction>;
+template class ibh::clans_repository<database_transaction>;
+template class ibh::clans_repository<database_subtransaction>;
 
-template<typename pool_T, typename transaction_T>
-clans_repository<pool_T, transaction_T>::clans_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {
-
-}
-
-template<typename pool_T, typename transaction_T>
-unique_ptr<transaction_T> clans_repository<pool_T, transaction_T>::create_transaction() {
-    return _database_pool->create_transaction();
-}
-
-template<typename pool_T, typename transaction_T>
-bool clans_repository<pool_T, transaction_T>::insert(db_clan &clan, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+bool clans_repository<transaction_T>::insert(db_clan &clan, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("INSERT INTO clans (name) VALUES ('{}') ON CONFLICT DO NOTHING RETURNING id", transaction->escape(clan.name)));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -50,22 +41,22 @@ bool clans_repository<pool_T, transaction_T>::insert(db_clan &clan, unique_ptr<t
     return true;
 }
 
-template<typename pool_T, typename transaction_T>
-void clans_repository<pool_T, transaction_T>::update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void clans_repository<transaction_T>::update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("UPDATE clans SET name = '{}' WHERE id = {}", transaction->escape(clan.name), clan.id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
 }
 
-template<typename pool_T, typename transaction_T>
-void clans_repository<pool_T, transaction_T>::remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void clans_repository<transaction_T>::remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("DELETE FROM clans WHERE id = {}", clan.id));
 
     spdlog::debug("[{}] removed {} entries", __FUNCTION__, result.size());
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_clan> clans_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_clan> clans_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT id, name FROM clans WHERE id = {}", id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -77,8 +68,8 @@ optional<db_clan> clans_repository<pool_T, transaction_T>::get(int id, unique_pt
     return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
 }
 
-template<typename pool_T, typename transaction_T>
-vector<db_clan> clans_repository<pool_T, transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
+template<DatabaseTransaction transaction_T>
+vector<db_clan> clans_repository<transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
     auto result = transaction->execute("SELECT id, name FROM clans");
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());

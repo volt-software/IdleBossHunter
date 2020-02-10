@@ -21,23 +21,16 @@
 #include <string>
 #include <memory>
 #include <optional>
-#include <database/database_pool.h>
 #include <database/database_transaction.h>
 #include "models.h"
 
 namespace ibh {
-    template<typename pool_T, typename transaction_T>
+    template<DatabaseTransaction transaction_T>
     class clan_members_repository  {
     public:
-        explicit clan_members_repository(shared_ptr<pool_T> database_pool);
-
-        unique_ptr<transaction_T> create_transaction();
-
-        void insert(db_clan_member &stat, unique_ptr<transaction_T> const &transaction) const;
-        void update(db_clan_member const &stat, unique_ptr<transaction_T> const &transaction) const;
-        optional<db_clan_member> get(uint64_t id, uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
-        vector<db_clan_member> get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const;
-    private:
-        shared_ptr<pool_T> _database_pool;
+        void insert(db_clan_member &member, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_clan_member> get(uint64_t id, uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] vector<db_clan_member> get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const;
     };
 }

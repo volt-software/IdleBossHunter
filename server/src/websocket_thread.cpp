@@ -54,7 +54,7 @@
 using namespace std;
 using namespace ibh;
 
-using message_router_type = ibh_flat_map<uint64_t, function<void(server*, rapidjson::Document const &, shared_ptr<database_pool>, per_socket_data<websocketpp::connection_hdl>*,
+using message_router_type = ibh_flat_map<uint64_t, function<void(server*, rapidjson::Document const &, unique_ptr<database_transaction> const &, per_socket_data<websocketpp::connection_hdl>*,
                                                                moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &)>>;
 
 using websocketpp::lib::placeholders::_1;
@@ -177,8 +177,10 @@ void on_message(shared_ptr<database_pool> pool, message_router_type &message_rou
 
     auto handler = message_router.find(type);
     if (handler != message_router.end()) {
+        auto transaction = pool->create_transaction();
         try {
-            handler->second(s, d, pool, user_data, game_loop_queue, user_connections);
+            handler->second(s, d, transaction, user_data, game_loop_queue, user_connections);
+            transaction->commit();
         } catch (exception const &e) {
             spdlog::error("[{}] some exception {} message_type {} user_id {} connection_id {} hdl_id {}", __FUNCTION__, e.what(), type, user_data->user_id, user_data->connection_id, id_map_it->second);
             SEND_ERROR("Server error, please report this as a bug.", "", "", true);

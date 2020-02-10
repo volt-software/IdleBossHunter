@@ -93,9 +93,9 @@ int main() {
     auto pool = make_shared<database_pool>();
     pool->create_connections(config.connection_string, 1);
 
-    users_repository<database_pool, database_transaction> user_repo(pool);
-    banned_users_repository<database_pool, database_transaction> banned_user_repo(pool);
-    characters_repository<database_pool, database_transaction> player_repo(pool);
+    users_repository<database_transaction> user_repo{};
+    banned_users_repository<database_transaction> banned_user_repo{};
+    characters_repository<database_transaction> player_repo{};
     server_handle s_handle{};
 
     entt::registry es;
@@ -133,7 +133,7 @@ int main() {
     auto next_log_tick_times = chrono::system_clock::now() + chrono::seconds(1);
     uint32_t tick_counter = 0;
 
-    ibh_flat_map<uint32_t, function<void(queue_message*, entt::registry&, outward_queues&)>> game_queue_message_router;
+    ibh_flat_map<uint32_t, function<bool(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &)>> game_queue_message_router;
     game_queue_message_router.emplace(player_enter_message::_type, handle_player_enter_message);
     game_queue_message_router.emplace(player_leave_message::_type, handle_player_leave_message);
 
@@ -148,7 +148,10 @@ int main() {
             unique_ptr<queue_message> msg(nullptr);
             while (game_loop_queue.try_dequeue(msg)) {
                 spdlog::trace("[{}] got game loop msg with type {}", __FUNCTION__, msg->type);
-                game_queue_message_router[msg->type](msg.get(), es, outward_queue);
+                auto transaction = pool->create_transaction();
+                if(game_queue_message_router[msg->type](msg.get(), es, outward_queue, transaction)) {
+                    transaction->commit();
+                }
             }
         }
 

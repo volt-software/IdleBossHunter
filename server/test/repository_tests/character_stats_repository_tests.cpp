@@ -28,12 +28,12 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("character stats repository tests") {
-    character_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
-    users_repository<database_pool, database_transaction> users_repo(db_pool);
-    characters_repository<database_pool, database_transaction> characters_repo(db_pool);
+    character_stats_repository<database_transaction> stat_repo{};
+    users_repository<database_transaction> users_repo{};
+    characters_repository<database_transaction> characters_repo{};
 
     SECTION("character stats inserted correctly" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user usr{0, "test", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id > 0);
@@ -52,7 +52,7 @@ TEST_CASE("character stats repository tests") {
     }
 
     SECTION( "update stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user usr{0, "test", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id > 0);
@@ -74,7 +74,7 @@ TEST_CASE("character stats repository tests") {
     }
 
     SECTION( "get all for character stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user usr{0, "test", "pass", "email", 0, "code", 0, 0};
         users_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id > 0);

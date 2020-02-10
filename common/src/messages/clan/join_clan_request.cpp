@@ -23,7 +23,7 @@
 using namespace ibh;
 using namespace rapidjson;
 
-join_clan_request::join_clan_request(uint64_t clan_id) noexcept : clan_id(clan_id) {
+join_clan_request::join_clan_request(string clan_name) noexcept : clan_name(move(clan_name)) {
 
 }
 
@@ -36,15 +36,15 @@ string join_clan_request::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String(KEY_STRING("clan_id"));
-    writer.Uint64(clan_id);
+    writer.String(KEY_STRING("clan_name"));
+    writer.String(clan_name.c_str(), clan_name.length());
 
     writer.EndObject();
     return sb.GetString();
 }
 
 unique_ptr<join_clan_request> join_clan_request::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("clan_id")) {
+    if (!d.HasMember("type") || !d.HasMember("clan_name")) {
         spdlog::warn("[join_clan_request] deserialize failed");
         return nullptr;
     }
@@ -54,5 +54,5 @@ unique_ptr<join_clan_request> join_clan_request::deserialize(rapidjson::Document
         return nullptr;
     }
 
-    return make_unique<join_clan_request>(d["clan_id"].GetUint64());
+    return make_unique<join_clan_request>(d["clan_name"].GetString());
 }

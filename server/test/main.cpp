@@ -26,6 +26,8 @@
 #include "../src/config.h"
 #include "../src/config_parsers.h"
 #include "test_helpers/startup_helper.h"
+#include "on_leaving_scope.h"
+#include "macros.h"
 
 using namespace std;
 using namespace ibh;
@@ -54,6 +56,7 @@ int main(int argc, char **argv) {
     db_pool->create_connections(config.connection_string, 2);
 #endif
 
+    MEASURE_TIME_OF_FUNCTION(trace);
     int result = Catch::Session().run( argc, argv );
     // global clean-up...
 

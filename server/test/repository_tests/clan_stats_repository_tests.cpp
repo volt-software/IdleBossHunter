@@ -27,11 +27,11 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("clan stats repository tests") {
-    clan_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
-    clans_repository<database_pool, database_transaction> clans_repo(db_pool);
+    clan_stats_repository<database_transaction> stat_repo{};
+    clans_repository<database_transaction> clans_repo{};
 
     SECTION("clan stats inserted correctly" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
@@ -47,7 +47,7 @@ TEST_CASE("clan stats repository tests") {
     }
 
     SECTION( "update stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
@@ -66,7 +66,7 @@ TEST_CASE("clan stats repository tests") {
     }
 
     SECTION( "get all for character stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);

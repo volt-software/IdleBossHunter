@@ -18,12 +18,12 @@
 
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
-#include "../test_helpers/startup_helper.h"
+#include "../../test_helpers/startup_helper.h"
 #include <message_handlers/clan/get_clan_listing_handler.h>
 #include <messages/clan/get_clan_listing_request.h>
 #include <messages/clan/get_clan_listing_response.h>
 #include <repositories/clans_repository.h>
-#include "../custom_server.h"
+#include "../../custom_server.h"
 
 using namespace std;
 using namespace ibh;
@@ -35,22 +35,19 @@ TEST_CASE("get clan listing handler tests") {
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
         custom_server s;
-        clans_repository<database_pool, database_transaction> clans_repo(db_pool);
+        clans_repository<database_transaction> clans_repo{};
         user_data.ws = 1;
         user_data.username = "test_user";
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
+        auto transaction = db_pool->create_transaction();
         db_clan new_clan{0, "test", {}, {}};
-        {
-            auto transaction = clans_repo.create_transaction();
-            clans_repo.insert(new_clan, transaction);
-            REQUIRE(new_clan.id > 0);
-            transaction->commit();
-        }
+        clans_repo.insert(new_clan, transaction);
+        REQUIRE(new_clan.id > 0);
 
-        handle_get_clan_listing(&s, d, db_pool, &user_data, q, user_connections);
+        handle_get_clan_listing(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = get_clan_listing_response::deserialize(d);
@@ -60,10 +57,6 @@ TEST_CASE("get clan listing handler tests") {
         auto inserted_clan = find_if(begin(new_msg->clans), end(new_msg->clans), [clan_name = new_clan.name](clan const &c){ return c.name == clan_name; });
         REQUIRE(inserted_clan != end(new_msg->clans));
         REQUIRE(inserted_clan->name == new_clan.name);
-        {
-            auto transaction = clans_repo.create_transaction();
-            clans_repo.remove(new_clan, transaction);
-            transaction->commit();
-        }
+        clans_repo.remove(new_clan, transaction);
     }
 }

@@ -28,9 +28,9 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("characters repository tests") {
-    users_repository<database_pool, database_transaction> users_repo(db_pool);
-    characters_repository<database_pool, database_transaction> characters_repo(db_pool);
-    auto transaction = characters_repo.create_transaction();
+    users_repository<database_transaction> users_repo{};
+    characters_repository<database_transaction> characters_repo{};
+    auto transaction = db_pool->create_transaction();
 
 
     SECTION( "db_character inserted correctly" ) {

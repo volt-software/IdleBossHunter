@@ -21,5 +21,5 @@
 #include <ecs/components.h>
 
 namespace ibh {
-    optional<monster_definition_component> load_monsters(string const &file);
+    [[nodiscard]] optional<monster_definition_component> load_monsters(string const &file);
 }

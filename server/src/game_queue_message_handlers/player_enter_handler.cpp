@@ -25,15 +25,14 @@
 using namespace std;
 
 namespace ibh {
-    void handle_player_enter_message(queue_message* msg, entt::registry& registry, outward_queues& outward_queue, shared_ptr<database_pool> pool) {
+    bool handle_player_enter_message(queue_message* msg, entt::registry& registry, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
         auto *enter_msg = dynamic_cast<player_enter_message*>(msg);
 
         if(enter_msg == nullptr) {
-            spdlog::error("[{}] player_enter_message nullptr", __FUNCTION__);
-            return;
+            spdlog::error("[{}] nullptr", __FUNCTION__);
+            return false;
         }
 
-        bool player_found = false;
         auto pc_view = registry.view<pc_component>();
         for(auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
@@ -44,7 +43,6 @@ namespace ibh {
 
             pc.connection_id = enter_msg->connection_id;
             spdlog::trace("[{}] found pc {} for connection id {}", __FUNCTION__, pc.name, pc.connection_id);
-            player_found = true;
 
             if(pc.battle) {
                 auto mob_hp = pc.battle->monster_stats.find(stat_hp_id);
@@ -55,11 +53,10 @@ namespace ibh {
                 outward_queue.enqueue({pc.connection_id, move(new_battle_msg)});
             }
 
-            break;
+            return true;
         }
 
-        if(!player_found) {
-            spdlog::trace("[{}] could not find pc {} conn id {}", __FUNCTION__, enter_msg->character_id, enter_msg->connection_id);
-        }
+        spdlog::trace("[{}] could not find pc {} conn id {}", __FUNCTION__, enter_msg->character_id, enter_msg->connection_id);
+        return false;
     }
 }

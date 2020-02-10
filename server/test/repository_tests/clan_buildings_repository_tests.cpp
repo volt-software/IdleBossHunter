@@ -27,11 +27,11 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("clan buildings repository tests") {
-    clans_repository<database_pool, database_transaction> clans_repo(db_pool);
-    clan_buildings_repository<database_pool, database_transaction> clan_buildings_repo(db_pool);
+    clans_repository<database_transaction> clans_repo{};
+    clan_buildings_repository<database_transaction> clan_buildings_repo{};
 
     SECTION("clan building inserted correctly" ) {
-        auto transaction = clans_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
@@ -47,7 +47,7 @@ TEST_CASE("clan buildings repository tests") {
     }
 
     SECTION( "update clan building" ) {
-        auto transaction = clans_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan", {}, {}};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);

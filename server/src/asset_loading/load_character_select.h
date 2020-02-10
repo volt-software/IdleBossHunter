@@ -21,5 +21,5 @@
 #include <messages/user_access/character_select_response.h>
 
 namespace ibh {
-    optional<character_select_response> load_character_select(string const &file);
+    [[nodiscard]] optional<character_select_response> load_character_select(string const &file);
 }

@@ -21,20 +21,11 @@
 
 using namespace ibh;
 
-template class ibh::clan_stats_repository<database_pool, database_transaction>;
+template class ibh::clan_stats_repository<database_transaction>;
+template class ibh::clan_stats_repository<database_subtransaction>;
 
-template<typename pool_T, typename transaction_T>
-clan_stats_repository<pool_T, transaction_T>::clan_stats_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {
-
-}
-
-template<typename pool_T, typename transaction_T>
-unique_ptr<transaction_T> clan_stats_repository<pool_T, transaction_T>::create_transaction() {
-    return _database_pool->create_transaction();
-}
-
-template<typename pool_T, typename transaction_T>
-void clan_stats_repository<pool_T, transaction_T>::insert(db_clan_stat &stat, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void clan_stats_repository<transaction_T>::insert(db_clan_stat &stat, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("INSERT INTO clan_stats (clan_id, stat_name, value) VALUES ({}, '{}', {}) RETURNING id", stat.clan_id, transaction->escape(stat.name), stat.value));
 
     if(result.empty()) {
@@ -47,15 +38,15 @@ void clan_stats_repository<pool_T, transaction_T>::insert(db_clan_stat &stat, un
     spdlog::debug("[{}] inserted stat {}", __FUNCTION__, stat.id);
 }
 
-template<typename pool_T, typename transaction_T>
-void clan_stats_repository<pool_T, transaction_T>::update(db_clan_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void clan_stats_repository<transaction_T>::update(db_clan_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE clan_stats SET value = {} WHERE id = {}", stat.value, stat.id));
 
     spdlog::debug("[{}] updated stat {}", __FUNCTION__, stat.id);
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_clan_stat> clan_stats_repository<pool_T, transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_clan_stat> clan_stats_repository<transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_name, s.value FROM clan_stats s WHERE s.id = {}" , id));
 
     if(result.empty()) {
@@ -71,8 +62,8 @@ optional<db_clan_stat> clan_stats_repository<pool_T, transaction_T>::get(uint64_
     return ret;
 }
 
-template<typename pool_T, typename transaction_T>
-vector<db_clan_stat> clan_stats_repository<pool_T, transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+vector<db_clan_stat> clan_stats_repository<transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_name, s.value FROM clan_stats s WHERE s.clan_id = {}", clan_id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());

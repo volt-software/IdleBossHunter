@@ -98,6 +98,11 @@ CREATE TABLE clan_members (
     member_level SMALLINT NOT NULL
 );
 
+CREATE TABLE clan_member_applications (
+    clan_id BIGINT NOT NULL,
+    character_id BIGINT NOT NULL
+);
+
 CREATE TABLE clan_stats (
     id BIGSERIAL PRIMARY KEY,
     clan_id BIGINT NOT NULL,
@@ -131,8 +136,11 @@ ALTER TABLE item_stats ADD CONSTRAINT "item_stats_items_id_fkey" FOREIGN KEY (it
 ALTER TABLE boss_stats ADD CONSTRAINT "boss_stats_bosses_id_fkey" FOREIGN KEY (boss_id) REFERENCES bosses(id);
 ALTER TABLE clan_members ADD CONSTRAINT "clan_members_clan_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
 ALTER TABLE clan_members ADD CONSTRAINT "clan_members_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
+ALTER TABLE clan_member_applications ADD CONSTRAINT "clan_member_applications_clan_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
+ALTER TABLE clan_member_applications ADD CONSTRAINT "clan_member_applications_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
 ALTER TABLE clan_stats ADD CONSTRAINT "clan_stats_clans_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
 ALTER TABLE clan_buildings ADD CONSTRAINT "clan_buildings_clans_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
+ALTER TABLE clans ADD CONSTRAINT "clan_name_unique" UNIQUE (name);
 ALTER TABLE settings ADD CONSTRAINT "settings_name_unique" UNIQUE (setting_name);
 ALTER TABLE schema_information ADD CONSTRAINT "schema_information_name_unique" UNIQUE (file_name);
 

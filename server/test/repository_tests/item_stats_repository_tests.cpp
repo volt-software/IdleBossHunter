@@ -29,13 +29,13 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("item stats repository tests") {
-    item_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
-    items_repository<database_pool, database_transaction> items_repo(db_pool);
-    characters_repository<database_pool, database_transaction> char_repo(db_pool);
-    users_repository<database_pool, database_transaction> user_repo(db_pool);
+    item_stats_repository<database_transaction> stat_repo{};
+    items_repository<database_transaction> items_repo{};
+    characters_repository<database_transaction> char_repo{};
+    users_repository<database_transaction> user_repo{};
 
     SECTION("item stats inserted correctly" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
@@ -58,7 +58,7 @@ TEST_CASE("item stats repository tests") {
     }
 
     SECTION( "update stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
@@ -84,7 +84,7 @@ TEST_CASE("item stats repository tests") {
     }
 
     SECTION( "get all for character stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);

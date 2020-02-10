@@ -32,7 +32,7 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_create_clan(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
+    void handle_create_clan(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                             moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_LOGIN_CHECK(create_clan_request);
@@ -40,6 +40,6 @@ namespace ibh {
         q.enqueue(make_unique<create_clan_message>(user_data->connection_id, msg->name));
     }
 
-    template void handle_create_clan<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_create_clan<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                           per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

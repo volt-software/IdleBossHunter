@@ -44,9 +44,6 @@ string get_clan_listing_response::serialize() const {
     for(auto &clan : clans) {
         writer.StartObject();
 
-        writer.String(KEY_STRING("id"));
-        writer.Uint64(clan.id);
-
         writer.String(KEY_STRING("name"));
         writer.String(clan.name.c_str(), clan.name.size());
 
@@ -101,7 +98,6 @@ unique_ptr<get_clan_listing_response> get_clan_listing_response::deserialize(rap
 
         for (SizeType i = 0; i < clan_array.Size(); i++) {
             if (!clan_array[i].IsObject() ||
-                !clan_array[i].HasMember("id") ||
                 !clan_array[i].HasMember("name") ||
                 !clan_array[i].HasMember("members") ||
                 !clan_array[i].HasMember("bonuses")) {
@@ -145,7 +141,7 @@ unique_ptr<get_clan_listing_response> get_clan_listing_response::deserialize(rap
                 }
             }
 
-            clans.emplace_back(clan_array[i]["id"].GetUint64(), clan_array[i]["name"].GetString(), move(members), move(bonuses));
+            clans.emplace_back(clan_array[i]["name"].GetString(), move(members), move(bonuses));
         }
     }
 

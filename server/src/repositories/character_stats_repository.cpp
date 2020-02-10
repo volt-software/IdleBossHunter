@@ -21,20 +21,11 @@
 
 using namespace ibh;
 
-template class ibh::character_stats_repository<database_pool, database_transaction>;
+template class ibh::character_stats_repository<database_transaction>;
+template class ibh::character_stats_repository<database_subtransaction>;
 
-template<typename pool_T, typename transaction_T>
-character_stats_repository<pool_T, transaction_T>::character_stats_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {
-
-}
-
-template<typename pool_T, typename transaction_T>
-unique_ptr<transaction_T> character_stats_repository<pool_T, transaction_T>::create_transaction() {
-    return _database_pool->create_transaction();
-}
-
-template<typename pool_T, typename transaction_T>
-void character_stats_repository<pool_T, transaction_T>::insert(db_character_stat &stat, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void character_stats_repository<transaction_T>::insert(db_character_stat &stat, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("INSERT INTO character_stats (character_id, stat_name, value) VALUES ({}, '{}', {}) RETURNING id", stat.character_id, transaction->escape(stat.name), stat.value));
 
     if(result.empty()) {
@@ -47,15 +38,15 @@ void character_stats_repository<pool_T, transaction_T>::insert(db_character_stat
     spdlog::debug("[{}] inserted stat {}", __FUNCTION__, stat.id);
 }
 
-template<typename pool_T, typename transaction_T>
-void character_stats_repository<pool_T, transaction_T>::update(db_character_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void character_stats_repository<transaction_T>::update(db_character_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE character_stats SET value = {} WHERE id = {}", stat.value, stat.id));
 
     spdlog::debug("[{}] updated stat {}", __FUNCTION__, stat.id);
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_character_stat> character_stats_repository<pool_T, transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_character_stat> character_stats_repository<transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT s.id, s.character_id, s.stat_name, s.value FROM character_stats s WHERE s.id = {}" , id));
 
     if(result.empty()) {
@@ -71,8 +62,8 @@ optional<db_character_stat> character_stats_repository<pool_T, transaction_T>::g
     return ret;
 }
 
-template<typename pool_T, typename transaction_T>
-vector<db_character_stat> character_stats_repository<pool_T, transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+vector<db_character_stat> character_stats_repository<transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT s.id, s.character_id, s.stat_name, s.value FROM character_stats s WHERE s.character_id = {}", character_id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());

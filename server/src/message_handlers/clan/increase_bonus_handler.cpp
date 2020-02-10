@@ -21,10 +21,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include <messages/chat/message_request.h>
-#include <messages/chat/message_response.h>
+#include <messages/clan/increase_bonus_request.h>
 #include "message_handlers/handler_macros.h"
-#include <game_logic/censor_sensor.h>
 #include <websocket_thread.h>
 #include "macros.h"
 
@@ -33,29 +31,14 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_increase_bonus(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
+    void handle_increase_bonus(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_LOGIN_CHECK(message_request);
+        DESERIALIZE_WITH_LOGIN_CHECK(increase_bonus_request);
 
-        auto now = system_clock::now();
-        auto chat_msg = message_response(user_data->username, sensor.clean_profanity_ish(msg->content), "game", duration_cast<milliseconds>(now.time_since_epoch()).count()).serialize();
-
-        {
-            shared_lock lock(user_connections_mutex);
-            for (auto &[conn_id, other_user_data] : user_connections) {
-                try {
-                    if (other_user_data.ws.expired()) {
-                        continue;
-                    }
-                    s->send(other_user_data.ws, chat_msg, websocketpp::frame::opcode::value::TEXT);
-                } catch (...) {
-                    continue;
-                }
-            }
-        }
+        q.enqueue(make_unique<increase_bonus_message>(user_data->connection_id, msg->bonus_type));
     }
 
-    template void handle_increase_bonus<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_increase_bonus<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                              per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

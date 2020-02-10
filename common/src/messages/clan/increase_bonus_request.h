@@ -21,20 +21,12 @@
 #include <string>
 #include <optional>
 #include <rapidjson/document.h>
+#include <common_components.h>
 #include "messages/message.h"
 
 using namespace std;
 
 namespace ibh {
-    enum bonus_type {
-        XP = 1,
-        GOLD = 2,
-        STR = 3,
-        AGI = 4,
-        VIT = 5,
-        PSI = 6,
-        SPD = 7,
-    };
 
     struct increase_bonus_request : message {
         explicit increase_bonus_request(uint32_t bonus_type) noexcept;

@@ -47,14 +47,14 @@ using namespace std;
 namespace ibh {
     template <class Server, class WebSocket>
     void handle_register(Server *s, rapidjson::Document const &d,
-                         shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                         unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_LOGIN_CHECK(register_request);
 
-        users_repository<database_pool, database_transaction> user_repo(pool);
-        banned_users_repository<database_pool, database_transaction> banned_user_repo(pool);
-        characters_repository<database_pool, database_transaction> character_repo(pool);
-        character_stats_repository<database_pool, database_transaction> stats_repo(pool);
+        users_repository<database_subtransaction> user_repo{};
+        banned_users_repository<database_subtransaction> banned_user_repo{};
+        characters_repository<database_subtransaction> character_repo{};
+        character_stats_repository<database_subtransaction> stats_repo{};
 
         if(sensor.is_profane_ish(msg->username)) {
             SEND_ERROR("Usernames cannot contain profanities", "", "", true);
@@ -81,16 +81,16 @@ namespace ibh {
             return;
         }
 
-        auto transaction = user_repo.create_transaction();
+        auto subtransaction = transaction->create_subtransaction();
         // TODO modify uwebsockets to include ip address
-        auto banned_usr = banned_user_repo.is_username_or_ip_banned(msg->username, {}, transaction);
+        auto banned_usr = banned_user_repo.is_username_or_ip_banned(msg->username, {}, subtransaction);
 
         if (banned_usr) {
             s->close(user_data->ws, 0, "You are banned");
             return;
         }
 
-        auto usr = user_repo.get(msg->username, transaction);
+        auto usr = user_repo.get(msg->username, subtransaction);
 
         if (usr) {
             SEND_ERROR("User already exists", "", "", true);
@@ -116,7 +116,7 @@ namespace ibh {
             }
 
             db_user new_usr{0, msg->username, string(hashed_password), msg->email, 0, "", 0, 0};
-            auto inserted = user_repo.insert_if_not_exists(new_usr, transaction);
+            auto inserted = user_repo.insert_if_not_exists(new_usr, subtransaction);
 
             if (!inserted) {
                 SEND_ERROR("Server error", "", "", true);
@@ -127,10 +127,10 @@ namespace ibh {
             user_data->username = new_usr.username;
 
             vector<character_object> message_characters;
-            auto characters = character_repo.get_by_user_id(usr->id, transaction);
+            auto characters = character_repo.get_by_user_id(usr->id, subtransaction);
 
             for (auto &character : characters) {
-                auto db_stats = stats_repo.get_by_character_id(character.id, transaction);
+                auto db_stats = stats_repo.get_by_character_id(character.id, subtransaction);
                 vector<stat_component> stats;
                 stats.reserve(db_stats.size());
                 for(auto const &stat : db_stats) {
@@ -174,7 +174,7 @@ namespace ibh {
                 }
             }
 
-            transaction->commit();
+            subtransaction->commit();
 
             login_response response(move(message_characters), move(online_users), new_usr.username, new_usr.email, motd);
             auto response_msg = response.serialize();
@@ -182,11 +182,11 @@ namespace ibh {
         }
     }
 
-    template void handle_register<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_register<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                        per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
-    template void handle_register<custom_server, uint64_t>(custom_server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_register<custom_server, uint64_t>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                            per_socket_data<uint64_t> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<uint64_t>> &user_connections);
 #endif
 }

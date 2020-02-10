@@ -28,12 +28,12 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("items repository tests") {
-    items_repository<database_pool, database_transaction> items_repo(db_pool);
-    characters_repository<database_pool, database_transaction> char_repo(db_pool);
-    users_repository<database_pool, database_transaction> user_repo(db_pool);
+    items_repository<database_transaction> items_repo{};
+    characters_repository<database_transaction> char_repo{};
+    users_repository<database_transaction> user_repo{};
 
     SECTION("item inserted correctly" ) {
-        auto transaction = items_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
@@ -54,7 +54,7 @@ TEST_CASE("items repository tests") {
     }
 
     SECTION( "update item equip_slot" ) {
-        auto transaction = items_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
@@ -78,7 +78,7 @@ TEST_CASE("items repository tests") {
     }
 
     SECTION( "update item npc/character ids" ) {
-        auto transaction = items_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
@@ -108,7 +108,7 @@ TEST_CASE("items repository tests") {
     }
 
     SECTION( "delete item" ) {
-        auto transaction = items_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);
@@ -127,7 +127,7 @@ TEST_CASE("items repository tests") {
     }
 
     SECTION( "get items by character id" ) {
-        auto transaction = items_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user u{};
         user_repo.insert_if_not_exists(u, transaction);
         REQUIRE(u.id > 0);

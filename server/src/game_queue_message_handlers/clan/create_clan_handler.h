@@ -20,10 +20,10 @@
 
 #include <game_queue_messages/messages.h>
 #include <entt/entt.hpp>
-#include <database/database_pool.h>
+#include <database/database_transaction.h>
 
 using namespace std;
 
 namespace ibh {
-    void handle_create_clan(queue_message*, entt::registry&, outward_queues&, shared_ptr<database_pool> pool);
+    bool handle_create_clan(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &transaction);
 }

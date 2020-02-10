@@ -29,13 +29,13 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("clan members repository tests") {
-    clan_members_repository<database_pool, database_transaction> member_repo(db_pool);
-    clans_repository<database_pool, database_transaction> clan_repo(db_pool);
-    characters_repository<database_pool, database_transaction> char_repo(db_pool);
-    users_repository<database_pool, database_transaction> user_repo(db_pool);
+    clan_members_repository<database_transaction> member_repo{};
+    clans_repository<database_transaction> clan_repo{};
+    characters_repository<database_transaction> char_repo{};
+    users_repository<database_transaction> user_repo{};
 
     SECTION("clan members inserted correctly" ) {
-        auto transaction = member_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
         REQUIRE(user.id > 0);
@@ -55,7 +55,7 @@ TEST_CASE("clan members repository tests") {
     }
 
     SECTION( "get all character members" ) {
-        auto transaction = member_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
         REQUIRE(user.id > 0);

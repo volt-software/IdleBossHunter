@@ -23,6 +23,26 @@
 using namespace std;
 using namespace ibh;
 
+
+
+database_subtransaction::database_subtransaction(pqxx::work &transaction, string const &name) noexcept : _subtransaction(transaction, name) {
+
+}
+
+pqxx::result database_subtransaction::execute(string const &query) {
+    spdlog::trace("[database_transaction] executing query {}", query);
+    return _subtransaction.exec(query);
+}
+
+string database_subtransaction::escape(string const &element) {
+    return _subtransaction.esc(element);
+}
+
+void database_subtransaction::commit() {
+    _subtransaction.commit();
+}
+
+
 database_transaction::database_transaction(database_pool *pool, uint32_t connection_id, shared_ptr<pqxx::connection> connection) noexcept
         : _pool(pool), _connection_id(connection_id), _transaction(*connection) {
 
@@ -30,6 +50,10 @@ database_transaction::database_transaction(database_pool *pool, uint32_t connect
 
 database_transaction::~database_transaction() {
     _pool->release_connection(_connection_id);
+}
+
+unique_ptr<database_subtransaction> database_transaction::create_subtransaction(string const &name) {
+    return make_unique<database_subtransaction>(_transaction, name);
 }
 
 pqxx::result database_transaction::execute(string const &query) {

@@ -35,15 +35,15 @@ using namespace std;
 using namespace ibh;
 
 void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool> db_pool, atomic<bool> const &quit) {
-    item_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
-    items_repository<database_pool, database_transaction> items_repo(db_pool);
-    item_stats_repository<database_pool, database_transaction> item_stats_repo(db_pool);
-    users_repository<database_pool, database_transaction> user_repo(db_pool);
-    characters_repository<database_pool, database_transaction> char_repo(db_pool);
-    character_stats_repository<database_pool, database_transaction> char_stats_repo(db_pool);
+    item_stats_repository<database_transaction> stat_repo{};
+    items_repository<database_transaction> items_repo{};
+    item_stats_repository<database_transaction> item_stats_repo{};
+    users_repository<database_transaction> user_repo{};
+    characters_repository<database_transaction> char_repo{};
+    character_stats_repository<database_transaction> char_stats_repo{};
     auto loading_start = chrono::system_clock::now();
 
-    auto transaction = user_repo.create_transaction();
+    auto transaction = db_pool->create_transaction();
     auto users = user_repo.get_all(transaction);
     vector<db_character> all_characters;
 

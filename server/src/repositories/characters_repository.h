@@ -21,29 +21,22 @@
 #include <string>
 #include <memory>
 #include <optional>
-#include <database/database_pool.h>
 #include <database/database_transaction.h>
 #include "models.h"
 
 using namespace std;
 
 namespace ibh {
-    template<typename pool_T, typename transaction_T>
+    template<DatabaseTransaction transaction_T>
     class characters_repository {
     public:
-        explicit characters_repository(shared_ptr<pool_T> database_pool);
-
-        unique_ptr<transaction_T> create_transaction();
-
         bool insert(db_character &plyr, unique_ptr<transaction_T> const &transaction) const;
         bool insert_or_update_character(db_character &plyr, unique_ptr<transaction_T> const &transaction) const;
         void update_character(db_character const &plyr, unique_ptr<transaction_T> const &transaction) const;
         void delete_character_by_slot(uint32_t slot, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
-        optional<db_character> get_character(string const &name, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
-        optional<db_character> get_character(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
-        optional<db_character> get_character_by_slot(uint32_t slot, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
-        vector<db_character> get_by_user_id(uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
-    private:
-        shared_ptr<pool_T> _database_pool;
+        [[nodiscard]] optional<db_character> get_character(string const &name, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_character> get_character(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_character> get_character_by_slot(uint32_t slot, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] vector<db_character> get_by_user_id(uint64_t user_id, unique_ptr<transaction_T> const &transaction) const;
     };
 }

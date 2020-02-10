@@ -26,10 +26,10 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("bosses repository tests") {
-    bosses_repository<database_pool, database_transaction> bosses_repo(db_pool);
+    bosses_repository<database_transaction> bosses_repo{};
 
     SECTION("boss inserted correctly" ) {
-        auto transaction = bosses_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);
@@ -40,7 +40,7 @@ TEST_CASE("bosses repository tests") {
     }
 
     SECTION( "update boss" ) {
-        auto transaction = bosses_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);

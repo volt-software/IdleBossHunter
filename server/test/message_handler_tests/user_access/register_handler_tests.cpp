@@ -18,11 +18,11 @@
 
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
-#include "../test_helpers/startup_helper.h"
+#include "../../test_helpers/startup_helper.h"
 #include <message_handlers/user_access/register_handler.h>
 #include <messages/user_access/register_request.h>
 #include <messages/generic_error_response.h>
-#include "../custom_server.h"
+#include "../../custom_server.h"
 
 using namespace std;
 using namespace ibh;
@@ -33,13 +33,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -52,13 +53,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -71,13 +73,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -90,13 +93,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -109,13 +113,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -128,13 +133,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -147,13 +153,14 @@ TEST_CASE("register handler tests") {
         per_socket_data<uint64_t> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
         ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        auto transaction = db_pool->create_transaction();
         custom_server s;
         user_data.ws = 1;
 
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, db_pool, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);

@@ -21,20 +21,11 @@
 
 using namespace ibh;
 
-template class ibh::items_repository<database_pool, database_transaction>;
+template class ibh::items_repository<database_transaction>;
+template class ibh::items_repository<database_subtransaction>;
 
-template<typename pool_T, typename transaction_T>
-items_repository<pool_T, transaction_T>::items_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {
-
-}
-
-template<typename pool_T, typename transaction_T>
-unique_ptr<transaction_T> items_repository<pool_T, transaction_T>::create_transaction() {
-    return _database_pool->create_transaction();
-}
-
-template<typename pool_T, typename transaction_T>
-bool items_repository<pool_T, transaction_T>::insert(db_item &item, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+bool items_repository<transaction_T>::insert(db_item &item, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format(
             "INSERT INTO items (character_id, item_name, item_slot, equip_slot) VALUES ({}, '{}', '{}', '{}') "
             "RETURNING xmax, id",
@@ -56,22 +47,22 @@ bool items_repository<pool_T, transaction_T>::insert(db_item &item, unique_ptr<t
     return false;
 }
 
-template<typename pool_T, typename transaction_T>
-void items_repository<pool_T, transaction_T>::update_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void items_repository<transaction_T>::update_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE items SET character_id = {}, equip_slot = '{}' WHERE id = {}", item.character_id, transaction->escape(item.equip_slot), item.id));
 
     spdlog::debug("[{}] updated db_item {}", __FUNCTION__, item.id);
 }
 
-template<typename pool_T, typename transaction_T>
-void items_repository<pool_T, transaction_T>::delete_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void items_repository<transaction_T>::delete_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("DELETE FROM items WHERE id = {}", item.id));
 
     spdlog::debug("[{}] deleted db_item {}", __FUNCTION__, item.id);
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_item> items_repository<pool_T, transaction_T>::get_item(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_item> items_repository<transaction_T>::get_item(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT p.id, p.character_id, p.item_name, p.item_slot, p.equip_slot FROM items p WHERE id = {}", id));
 
     if(result.empty()) {
@@ -88,8 +79,8 @@ optional<db_item> items_repository<pool_T, transaction_T>::get_item(uint64_t id,
     return ret;
 }
 
-template<typename pool_T, typename transaction_T>
-vector<db_item> items_repository<pool_T, transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+vector<db_item> items_repository<transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
     pqxx::result result = transaction->execute(fmt::format("SELECT p.id, p.character_id, p.item_name, p.item_slot, p.equip_slot FROM items p WHERE character_id = {}", character_id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());

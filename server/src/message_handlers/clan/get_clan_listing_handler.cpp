@@ -40,17 +40,16 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_get_clan_listing(Server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data,
+    void handle_get_clan_listing(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                  moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_LOGIN_CHECK(get_clan_listing_request);
 
-        clans_repository<database_pool, database_transaction> clan_repo(pool);
-        clan_members_repository<database_pool, database_transaction> clan_member_repo(pool);
-        clan_stats_repository<database_pool, database_transaction> clan_stat_repo(pool);
-        characters_repository<database_pool, database_transaction> char_repo(pool);
+        clans_repository<database_transaction> clan_repo{};
+        clan_members_repository<database_transaction> clan_member_repo{};
+        clan_stats_repository<database_transaction> clan_stat_repo{};
+        characters_repository<database_transaction> char_repo{};
 
-        auto transaction = clan_repo.create_transaction();
         auto clans = clan_repo.get_all(transaction);
         vector<clan> msg_clans;
         for(auto &c : clans) {
@@ -69,18 +68,18 @@ namespace ibh {
                 msg_bonuses.emplace_back(bonus.name, bonus.value);
             }
 
-            msg_clans.emplace_back(c.id, c.name, msg_members, msg_bonuses);
+            msg_clans.emplace_back(c.name, msg_members, msg_bonuses);
         }
 
         get_clan_listing_response resp{"", msg_clans};
         s->send(user_data->ws, resp.serialize(), websocketpp::frame::opcode::value::TEXT);
     }
 
-    template void handle_get_clan_listing<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_get_clan_listing<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                                per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
-    template void handle_get_clan_listing<custom_server, uint64_t>(custom_server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_get_clan_listing<custom_server, uint64_t>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                            per_socket_data<uint64_t> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<uint64_t>> &user_connections);
 #endif
 }

@@ -27,7 +27,7 @@ using namespace std;
 
 namespace ibh {
     struct join_clan_request : message {
-        explicit join_clan_request(uint64_t clan_id) noexcept;
+        explicit join_clan_request(string clan_name) noexcept;
 
         ~join_clan_request() noexcept override = default;
 
@@ -37,7 +37,7 @@ namespace ibh {
         [[nodiscard]]
         static unique_ptr<join_clan_request> deserialize(rapidjson::Document const &d);
 
-        uint64_t clan_id;
+        string clan_name;
 
         inline static constexpr uint64_t type = generate_type<join_clan_request>();
     };

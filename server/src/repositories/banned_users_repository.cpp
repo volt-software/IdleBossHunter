@@ -22,20 +22,11 @@
 using namespace ibh;
 using namespace chrono;
 
-template class ibh::banned_users_repository<database_pool, database_transaction>;
+template class ibh::banned_users_repository<database_transaction>;
+template class ibh::banned_users_repository<database_subtransaction>;
 
-template<typename pool_T, typename transaction_T>
-banned_users_repository<pool_T, transaction_T>::banned_users_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {
-
-}
-
-template<typename pool_T, typename transaction_T>
-unique_ptr<transaction_T> banned_users_repository<pool_T, transaction_T>::create_transaction() {
-    return _database_pool->create_transaction();
-}
-
-template<typename pool_T, typename transaction_T>
-bool banned_users_repository<pool_T, transaction_T>::insert_if_not_exists(db_banned_user &usr, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+bool banned_users_repository<transaction_T>::insert_if_not_exists(db_banned_user &usr, unique_ptr<transaction_T> const &transaction) const {
     string ip = !usr.ip.empty() ? "'" + transaction->escape(usr.ip) + "'" : "NULL";
     string user_id = usr._user ? to_string(usr._user->id) : "NULL";
     string until = usr.until ? to_string(usr.until->time_since_epoch().count()) : "NULL";
@@ -54,8 +45,8 @@ bool banned_users_repository<pool_T, transaction_T>::insert_if_not_exists(db_ban
     return true;
 }
 
-template<typename pool_T, typename transaction_T>
-void banned_users_repository<pool_T, transaction_T>::update(db_banned_user const &usr, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void banned_users_repository<transaction_T>::update(db_banned_user const &usr, unique_ptr<transaction_T> const &transaction) const {
     string ip = !usr.ip.empty() ? "'" + transaction->escape(usr.ip) + "'" : "NULL";
     string user_id = usr._user ? to_string(usr._user->id) : "NULL";
     string until = usr.until ? to_string(usr.until->time_since_epoch().count()) : "NULL";
@@ -65,8 +56,8 @@ void banned_users_repository<pool_T, transaction_T>::update(db_banned_user const
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_banned_user> banned_users_repository<pool_T, transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_banned_user> banned_users_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT id, ip, user_id, until FROM banned_users WHERE id = {}", id));
 
     spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -94,8 +85,8 @@ optional<db_banned_user> banned_users_repository<pool_T, transaction_T>::get(int
     return make_optional<db_banned_user>(result[0]["id"].as(uint64_t{}), ip, _user, until);
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_banned_user> banned_users_repository<pool_T, transaction_T>::is_username_or_ip_banned(optional<string> username, optional<string> ip, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_banned_user> banned_users_repository<transaction_T>::is_username_or_ip_banned(optional<string> username, optional<string> ip, unique_ptr<transaction_T> const &transaction) const {
     if(!username && !ip) {
         spdlog::error("[{}] called without arguments", __FUNCTION__);
         return {};

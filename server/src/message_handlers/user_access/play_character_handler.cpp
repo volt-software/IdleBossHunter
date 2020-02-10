@@ -37,13 +37,13 @@ using namespace std;
 namespace ibh {
     template <class Server, class WebSocket>
     void handle_play_character(Server *s, rapidjson::Document const &d,
-                               shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                               unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_PLAYING_CHECK(play_character_request);
 
-        characters_repository<database_pool, database_transaction> character_repo(pool);
-        character_stats_repository<database_pool, database_transaction> stats_repo(pool);
-        auto transaction = character_repo.create_transaction();
+        characters_repository<database_transaction> character_repo{};
+        character_stats_repository<database_transaction> stats_repo{};
+
         auto character = character_repo.get_character_by_slot(msg->slot, user_data->user_id, transaction);
 
         if(!character) {
@@ -111,6 +111,6 @@ namespace ibh {
                 user_data->connection_id, character->level, character->gold, character->xp, character->skill_points));
     }
 
-    template void handle_play_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_play_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                              per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

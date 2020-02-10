@@ -27,11 +27,11 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("boss stats repository tests") {
-    boss_stats_repository<database_pool, database_transaction> stat_repo(db_pool);
-    bosses_repository<database_pool, database_transaction> bosses_repo(db_pool);
+    boss_stats_repository<database_transaction> stat_repo{};
+    bosses_repository<database_transaction> bosses_repo{};
 
     SECTION("boss stats inserted correctly" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);
@@ -47,7 +47,7 @@ TEST_CASE("boss stats repository tests") {
     }
 
     SECTION( "update stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);
@@ -66,7 +66,7 @@ TEST_CASE("boss stats repository tests") {
     }
 
     SECTION( "get all for character stats" ) {
-        auto transaction = stat_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);

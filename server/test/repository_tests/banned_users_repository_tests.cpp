@@ -27,11 +27,11 @@ using namespace std;
 using namespace ibh;
 
 TEST_CASE("banned users repository tests") {
-    users_repository<database_pool, database_transaction> user_repo(db_pool);
-    banned_users_repository<database_pool, database_transaction> banned_user_repo(db_pool);
+    users_repository<database_transaction> user_repo{};
+    banned_users_repository<database_transaction> banned_user_repo{};
 
     SECTION( "banned user inserted correctly" ) {
-        auto transaction = user_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
@@ -51,7 +51,7 @@ TEST_CASE("banned users repository tests") {
     }
 
     SECTION( "update banned user" ) {
-        auto transaction = user_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);
@@ -81,7 +81,7 @@ TEST_CASE("banned users repository tests") {
     }
 
     SECTION( "banned user is banned" ) {
-        auto transaction = user_repo.create_transaction();
+        auto transaction = db_pool->create_transaction();
         db_user usr{0, "user", "pass", "email", 0, "code", 0, 0};
         user_repo.insert_if_not_exists(usr, transaction);
         REQUIRE(usr.id != 0);

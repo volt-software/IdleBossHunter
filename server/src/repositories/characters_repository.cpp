@@ -21,20 +21,11 @@
 
 using namespace ibh;
 
-template class ibh::characters_repository<database_pool, database_transaction>;
+template class ibh::characters_repository<database_transaction>;
+template class ibh::characters_repository<database_subtransaction>;
 
-template<typename pool_T, typename transaction_T>
-characters_repository<pool_T, transaction_T>::characters_repository(shared_ptr<pool_T> database_pool) : _database_pool(move(database_pool)) {
-
-}
-
-template<typename pool_T, typename transaction_T>
-unique_ptr<transaction_T> characters_repository<pool_T, transaction_T>::create_transaction() {
-    return _database_pool->create_transaction();
-}
-
-template<typename pool_T, typename transaction_T>
-bool characters_repository<pool_T, transaction_T>::insert(db_character &character, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+bool characters_repository<transaction_T>::insert(db_character &character, unique_ptr<transaction_T> const &transaction) const {
 
     auto result = transaction->execute(fmt::format(
             "INSERT INTO characters (user_id, slot, level, gold, xp, skill_points, x, y, character_name, race, class, map) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, '{}', '{}', '{}', '{}') "
@@ -58,8 +49,8 @@ bool characters_repository<pool_T, transaction_T>::insert(db_character &characte
     return false;
 }
 
-template<typename pool_T, typename transaction_T>
-bool characters_repository<pool_T, transaction_T>::insert_or_update_character(db_character &character, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+bool characters_repository<transaction_T>::insert_or_update_character(db_character &character, unique_ptr<transaction_T> const &transaction) const {
 
     auto result = transaction->execute(fmt::format(
             "INSERT INTO characters (user_id, slot, level, gold, xp, skill_points, x, y, character_name, race, class, map) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, '{}', '{}', '{}', '{}') "
@@ -85,8 +76,8 @@ bool characters_repository<pool_T, transaction_T>::insert_or_update_character(db
     return false;
 }
 
-template<typename pool_T, typename transaction_T>
-void characters_repository<pool_T, transaction_T>::update_character(db_character const &character, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void characters_repository<transaction_T>::update_character(db_character const &character, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE characters SET user_id = {}, level = {}, gold = {}, xp = {}, skill_points = {}, x = {}, y = {}, race = '{}', class = '{}', map = '{}' WHERE id = {}",
             character.user_id, character.level, character.gold, character.xp, character.skill_points, character.x, character.y,
             transaction->escape(character.race), transaction->escape(character._class), transaction->escape(character.map), character.id));
@@ -94,16 +85,16 @@ void characters_repository<pool_T, transaction_T>::update_character(db_character
     spdlog::debug("[{}] updated db_character {}", __FUNCTION__, character.id);
 }
 
-template<typename pool_T, typename transaction_T>
-void characters_repository<pool_T, transaction_T>::delete_character_by_slot(uint32_t slot, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+void characters_repository<transaction_T>::delete_character_by_slot(uint32_t slot, uint64_t user_id, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("DELETE FROM character_stats s USING characters c WHERE s.character_id = c.id AND c.slot = {} AND c.user_id = {}", slot, user_id));
     transaction->execute(fmt::format("DELETE FROM characters WHERE slot = {} AND user_id = {}", slot, user_id));
 
     spdlog::debug("[{}] deleted db_character {} for user {}", __FUNCTION__, slot, user_id);
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_character> characters_repository<pool_T, transaction_T>::get_character(string const &name, uint64_t user_id,
+template<DatabaseTransaction transaction_T>
+optional<db_character> characters_repository<transaction_T>::get_character(string const &name, uint64_t user_id,
                                                                                    unique_ptr<transaction_T> const &transaction) const {
     pqxx::result result = transaction->execute(fmt::format("SELECT p.id, p.user_id, p.slot, p.level, p.gold, p.xp, p.skill_points, p.x, p.y, p.character_name, p.race, p.class, p.map FROM characters p WHERE character_name = '{}' and p.user_id = {}", transaction->escape(name), user_id));
 
@@ -126,8 +117,8 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
     return ret;
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_character> characters_repository<pool_T, transaction_T>::get_character(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
+template<DatabaseTransaction transaction_T>
+optional<db_character> characters_repository<transaction_T>::get_character(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT p.id, p.user_id, p.slot, p.level, p.gold, p.xp, p.skill_points, p.x, p.y, p.character_name, p.race, p.class, p.map FROM characters p WHERE id = {}", id));
 
     if(result.empty()) {
@@ -149,8 +140,8 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
     return ret;
 }
 
-template<typename pool_T, typename transaction_T>
-optional<db_character> characters_repository<pool_T, transaction_T>::get_character_by_slot(uint32_t slot, uint64_t user_id,
+template<DatabaseTransaction transaction_T>
+optional<db_character> characters_repository<transaction_T>::get_character_by_slot(uint32_t slot, uint64_t user_id,
                                                                                    unique_ptr<transaction_T> const &transaction) const {
     pqxx::result result = transaction->execute(fmt::format("SELECT p.id, p.user_id, p.slot, p.level, p.gold, p.xp, p.skill_points, p.x, p.y, p.character_name, p.race, p.class, p.map FROM characters p WHERE slot = {} and user_id = {}", slot, user_id));
 
@@ -174,8 +165,8 @@ optional<db_character> characters_repository<pool_T, transaction_T>::get_charact
     return ret;
 }
 
-template<typename pool_T, typename transaction_T>
-vector<db_character> characters_repository<pool_T, transaction_T>::get_by_user_id(uint64_t user_id,
+template<DatabaseTransaction transaction_T>
+vector<db_character> characters_repository<transaction_T>::get_by_user_id(uint64_t user_id,
                                                                                   unique_ptr<transaction_T> const &transaction) const {
     pqxx::result result = transaction->execute(fmt::format("SELECT p.id, p.user_id, p.slot, p.level, p.gold, p.xp, p.skill_points, p.x, p.y, p.character_name, p.race, p.class, p.map FROM characters p WHERE user_id = {}", user_id));
 

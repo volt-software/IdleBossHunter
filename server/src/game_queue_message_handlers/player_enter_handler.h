@@ -25,5 +25,5 @@
 using namespace std;
 
 namespace ibh {
-    void handle_player_enter_message(queue_message*, entt::registry&, outward_queues&, shared_ptr<database_pool> pool);
+    bool handle_player_enter_message(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &transaction);
 }

@@ -21,26 +21,19 @@
 #include <string>
 #include <memory>
 #include <optional>
-#include <database/database_pool.h>
 #include <database/database_transaction.h>
 #include "models.h"
 
 using namespace std;
 
 namespace ibh {
-    template<typename pool_T, typename transaction_T>
+    template<DatabaseTransaction transaction_T>
     class items_repository {
     public:
-        explicit items_repository(shared_ptr<pool_T> database_pool);
-
-        unique_ptr<transaction_T> create_transaction();
-
         bool insert(db_item &item, unique_ptr<transaction_T> const &transaction) const;
         void update_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const;
         void delete_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const;
-        optional<db_item> get_item(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
-        vector<db_item> get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
-    private:
-        shared_ptr<pool_T> _database_pool;
+        [[nodiscard]] optional<db_item> get_item(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] vector<db_item> get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
     };
 }

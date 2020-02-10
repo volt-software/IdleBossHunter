@@ -33,7 +33,7 @@ using namespace std;
 namespace ibh {
     template <class Server, class WebSocket>
     void handle_delete_character(Server *s, rapidjson::Document const &d,
-                                 shared_ptr<database_pool> pool, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                                 unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_PLAYING_CHECK(delete_character_request);
 
@@ -48,16 +48,16 @@ namespace ibh {
             }
         }
 
-        characters_repository<database_pool, database_transaction> player_repo(pool);
-        auto transaction = player_repo.create_transaction();
-        player_repo.delete_character_by_slot(msg->slot, user_data->user_id, transaction);
-        transaction->commit();
+        characters_repository<database_subtransaction> player_repo{};
+        auto subtransaction = transaction->create_subtransaction();
+        player_repo.delete_character_by_slot(msg->slot, user_data->user_id, subtransaction);
+        subtransaction->commit();
 
         delete_character_response response{msg->slot};
         auto response_msg = response.serialize();
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
     }
 
-    template void handle_delete_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, shared_ptr<database_pool> pool,
+    template void handle_delete_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                                per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 }

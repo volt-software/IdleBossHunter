@@ -33,7 +33,7 @@ namespace ibh {
 #ifdef __SIZEOF_INT128__
         __uint128_t r = A;
         r *= B;
-        return (r >> 64) ^ r;
+        return (r >> 64U) ^ r;
 #elif    defined(_MSC_VER) && defined(_M_X64)
         A=_umul128(A, B, &B);	return	A^B;
 #else
@@ -47,21 +47,21 @@ namespace ibh {
     template<typename T>
     static constexpr uint64_t constexpr_wyr8(const T *p) {
         uint64_t v = 0;
-        v = ((uint64_t) p[0] << 56) | ((uint64_t) p[1] << 48) | ((uint64_t) p[2] << 40) | ((uint64_t) p[3] << 32) |
-            (p[4] << 24) | (p[5] << 16) | (p[6] << 8) | p[7];
+        v = ((uint64_t) p[0] << 56U) | ((uint64_t) p[1] << 48U) | ((uint64_t) p[2] << 40U) | ((uint64_t) p[3] << 32U) |
+            (p[4] << 24U) | (p[5] << 16U) | (p[6] << 8U) | p[7];
         return v;
     }
 
     template<typename T>
     static constexpr uint64_t constexpr_wyr4(const T *p) {
         uint32_t v = 0;
-        v = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+        v = (p[0] << 24U) | (p[1] << 16U) | (p[2] << 8U) | p[3];
         return v;
     }
 
     template<typename T>
     static constexpr uint64_t constexpr_wyr3(const T *p, unsigned k) {
-        return (((uint64_t) p[0]) << 16) | (((uint64_t) p[k >> 1]) << 8) | p[k - 1];
+        return (((uint64_t) p[0]) << 16U) | (((uint64_t) p[k >> 1U]) << 8U) | p[k - 1];
     }
 
     template<typename T>

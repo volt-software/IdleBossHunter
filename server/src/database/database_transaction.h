@@ -25,14 +25,27 @@
 using namespace std;
 
 namespace ibh {
-    /*template<typename T>
-    concept bool DatabaseTransaction = requires(T a, string& a2) {
+    template<typename T>
+    concept DatabaseTransaction = requires(T a, string const& a2) {
         { a.execute(a2) } -> pqxx::result;
         { a.escape(a2) } -> string;
         { a.commit() } -> void;
-    };*/
+    };
 
     class database_pool;
+    class database_transaction;
+
+    class database_subtransaction {
+    public:
+        explicit database_subtransaction(pqxx::work &transaction, string const &name) noexcept;
+
+        pqxx::result execute(string const & query);
+        [[nodiscard]] string escape(string const & element);
+        void commit();
+    private:
+
+        pqxx::subtransaction _subtransaction;
+    };
 
     class database_transaction {
     public:
@@ -43,8 +56,9 @@ namespace ibh {
         database_transaction(database_transaction &&o) = delete;
         database_transaction& operator=(database_transaction const &o) = delete;
 
+        [[nodiscard]] unique_ptr<database_subtransaction> create_subtransaction(string const &name = string{});
         pqxx::result execute(string const & query);
-        string escape(string const & element);
+        [[nodiscard]] string escape(string const & element);
         void commit();
 
     private:

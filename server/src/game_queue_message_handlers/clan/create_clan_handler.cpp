@@ -24,19 +24,19 @@
 #include <messages/clan/create_clan_response.h>
 #include <repositories/clans_repository.h>
 #include <repositories/clan_stats_repository.h>
+#include <repositories/clan_members_repository.h>
 
 using namespace std;
 
 namespace ibh {
-    void handle_create_clan(queue_message* msg, entt::registry& es, outward_queues& outward_queue, shared_ptr<database_pool> pool) {
+    bool handle_create_clan(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
         auto *create_msg = dynamic_cast<create_clan_message*>(msg);
 
         if(create_msg == nullptr) {
-            spdlog::error("[{}] create_clan_message nullptr", __FUNCTION__);
-            return;
+            spdlog::error("[{}] nullptr", __FUNCTION__);
+            return false;
         }
 
-        bool player_found = false;
         auto pc_view = es.view<pc_component>();
         for(auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
@@ -45,33 +45,31 @@ namespace ibh {
                 continue;
             }
 
-            spdlog::trace("[{}] created clan {} for pc {} for connection id {}", __FUNCTION__, create_msg->clan_name, pc.name, pc.connection_id);
-            player_found = true;
-
             auto gold_it = pc.stats.find(stat_gold_id);
 
             if(gold_it == end(pc.stats)) {
                 spdlog::trace("[{}] pc {} not enough gold", __FUNCTION__, pc.id);
                 auto new_err_msg = make_unique<generic_error_response>("unknown error", "", "", false);
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
-                return;
+                return false;
             }
 
             if(gold_it->second < 10'000) {
                 auto new_err_msg = make_unique<create_clan_response>("Not enough gold, need 10,000 to create clan.");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
-                return;
+                return false;
             }
 
-            clans_repository<database_pool, database_transaction> clan_repo(pool);
-            clan_stats_repository<database_pool, database_transaction> clan_stats_repo(pool);
-            auto transaction = clan_repo.create_transaction();
+            clans_repository<database_subtransaction> clan_repo{};
+            clan_stats_repository<database_subtransaction> clan_stats_repo{};
+            clan_members_repository<database_subtransaction> clan_members_repo{};
+            auto subtransaction = transaction->create_subtransaction();
 
             db_clan new_clan{0, create_msg->clan_name, {}, {}};
-            if(!clan_repo.insert(new_clan, transaction)) {
+            if(!clan_repo.insert(new_clan, subtransaction)) {
                 auto new_err_msg = make_unique<create_clan_response>("Clan name already exists");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
-                return;
+                return false;
             }
 
             vector<stat_id_component> clan_stats;
@@ -85,22 +83,28 @@ namespace ibh {
 
                 db_clan_stat stat{0, new_clan.id, name, mapper_it->second == stat_xp_id || mapper_it->second == stat_gold_id ? 5 : 0};
                 clan_stats.emplace_back(stat_id_component{mapper_it->second, stat.value});
-                clan_stats_repo.insert(stat, transaction);
+                clan_stats_repo.insert(stat, subtransaction);
             }
-            transaction->commit();
+
+            db_clan_member clan_admin{new_clan.id, pc.id, CLAN_ADMIN};
+            clan_members_repo.insert(clan_admin, subtransaction);
+            subtransaction->commit();
 
             auto clan_entt = es.create();
             es.assign<clan_component>(clan_entt, new_clan.id, create_msg->clan_name, vector<clan_member_component>{{pc.id, CLAN_ADMIN}}, clan_stats);
             pc.clan_id = new_clan.id;
 
+            gold_it->second -= 10'000;
             auto new_err_msg = make_unique<create_clan_response>("");
             outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
 
-            break;
+            spdlog::trace("[{}] created clan {} for pc {} for connection id {}", __FUNCTION__, create_msg->clan_name, pc.name, pc.connection_id);
+
+            return true;
         }
 
-        if(!player_found) {
-            spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, create_msg->connection_id);
-        }
+        spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, create_msg->connection_id);
+
+        return false;
     }
 }
