@@ -307,20 +307,20 @@ int main(int argc, char* argv[]) {
     int counted_frames = 0;
     //ThreadPool thread_pool(config.threads);
 
-//    Mix_Music *mus1 = Mix_LoadMUS("assets/music/8bit Stage1 Intro.ogg");
-//    if(mus1 == nullptr) {
-//        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-//        close();
-//        return -1;
-//    }
-//
-//    Mix_Music *mus2 = Mix_LoadMUS("assets/music/8bit Stage1 Loop.ogg");
-//    if(mus2 == nullptr) {
-//        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-//        close();
-//        return -1;
-//    }
-//    Mix_PlayMusic(mus1, 0);
+    Mix_Music *mus1 = Mix_LoadMUS("assets/music/8bit Stage1 Intro.ogg");
+    if(mus1 == nullptr) {
+        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+        close();
+        return -1;
+    }
+
+    Mix_Music *mus2 = Mix_LoadMUS("assets/music/8bit Stage1 Loop.ogg");
+    if(mus2 == nullptr) {
+        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+        close();
+        return -1;
+    }
+    Mix_PlayMusic(mus1, 0);
 
     //auto map = ibh::map::load_from_file("./assets/maps/");
 
@@ -343,17 +343,17 @@ int main(int argc, char* argv[]) {
 
                 switch (e.type) {
                     case SDL_KEYDOWN: {
-//                        if (e.key.keysym.sym == SDLK_p) {
-//                            if (Mix_PlayingMusic()) {
-//                                if (Mix_PausedMusic()) {
-//                                    Mix_ResumeMusic();
-//                                } else {
-//                                    Mix_PauseMusic();
-//                                }
-//                            } else {
-//                                Mix_PlayMusic(mus1, 0);
-//                            }
-//                        }
+                        if (e.key.keysym.sym == SDLK_p) {
+                            if (Mix_PlayingMusic()) {
+                                if (Mix_PausedMusic()) {
+                                    Mix_ResumeMusic();
+                                } else {
+                                    Mix_PauseMusic();
+                                }
+                            } else {
+                                Mix_PlayMusic(mus1, 0);
+                            }
+                        }
                         break;
                     }
                     case SDL_WINDOWEVENT: {
@@ -386,25 +386,25 @@ int main(int argc, char* argv[]) {
                                     break;
                                 }
                                 case 3: {
-//                                    Mix_HaltMusic();
-//                                    Mix_FreeMusic(mus1);
-//                                    Mix_FreeMusic(mus2);
+                                    Mix_HaltMusic();
+                                    Mix_FreeMusic(mus1);
+                                    Mix_FreeMusic(mus2);
 
                                     int *val = static_cast<int *>(e.user.data1);
 
-//                                    mus1 = Mix_LoadMUS(
-//                                            fmt::format("assets/music/8bit Stage{} Intro.ogg", *val).c_str());
-//                                    if (mus1 == nullptr) {
-//                                        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-//                                        close();
-//                                    }
-//
-//                                    mus2 = Mix_LoadMUS(fmt::format("assets/music/8bit Stage{} Loop.ogg", *val).c_str());
-//                                    if (mus2 == nullptr) {
-//                                        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-//                                        close();
-//                                    }
-//                                    Mix_PlayMusic(mus1, 0);
+                                    mus1 = Mix_LoadMUS(
+                                            fmt::format("assets/music/8bit Stage{} Intro.ogg", *val).c_str());
+                                    if (mus1 == nullptr) {
+                                        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+                                        close();
+                                    }
+
+                                    mus2 = Mix_LoadMUS(fmt::format("assets/music/8bit Stage{} Loop.ogg", *val).c_str());
+                                    if (mus2 == nullptr) {
+                                        spdlog::error("Couldn't load mus1, {}", Mix_GetError());
+                                        close();
+                                    }
+                                    Mix_PlayMusic(mus1, 0);
                                     config.music_to_play = *val;
                                     delete val;
                                 }
@@ -417,9 +417,9 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-//            if (Mix_PlayingMusic() == 0) {
-//                Mix_PlayMusic(mus2, -1);
-//            }
+            if (Mix_PlayingMusic() == 0) {
+                Mix_PlayMusic(mus2, -1);
+            }
 
             bench_timer.start();
             rs.update(es, 1);
@@ -456,8 +456,8 @@ int main(int argc, char* argv[]) {
 
     spdlog::info("quitting");
 
-//    Mix_FreeMusic(mus1);
-//    Mix_FreeMusic(mus2);
+    Mix_FreeMusic(mus1);
+    Mix_FreeMusic(mus2);
 
     close();
 
