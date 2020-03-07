@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <vector>
 #include <rapidjson/document.h>
 #include "messages/message.h"
@@ -46,6 +45,6 @@ namespace ibh {
         string email;
         string motd;
 
-        inline static constexpr uint64_t type = generate_type<login_response>();
+        static constexpr uint64_t type = generate_type<login_response>();
     };
 }

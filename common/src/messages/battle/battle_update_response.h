@@ -46,6 +46,6 @@ namespace ibh {
         uint64_t mob_damage;
         uint64_t player_damage;
 
-        inline static constexpr uint64_t type = generate_type<battle_update_response>();
+        static constexpr uint64_t type = generate_type<battle_update_response>();
     };
 }

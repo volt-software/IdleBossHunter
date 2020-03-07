@@ -74,3 +74,19 @@ vector<db_clan_member> clan_members_repository<transaction_T>::get_by_clan_id(ui
 
     return members;
 }
+
+template<DatabaseTransaction transaction_T>
+optional<db_clan_member> clan_members_repository<transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT TOP 1 m.clan_id, m.character_id, m.member_level FROM clan_members m WHERE m.character_id = {}", character_id));
+
+    if(result.empty()) {
+        spdlog::error("[{}] found no member character_id {}", __FUNCTION__, character_id);
+        return {};
+    }
+
+    auto ret = make_optional<db_clan_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), result[0][2].as(uint16_t{}));
+
+    spdlog::trace("[{}] found member character_id {}", __FUNCTION__, character_id);
+
+    return ret;
+}

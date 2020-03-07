@@ -191,7 +191,7 @@ namespace ibh {
 
 
     // constants
-    constexpr uint32_t CLAN_ADMIN = 2;
-    constexpr uint32_t CLAN_SAGE = 1;
+    constexpr uint32_t CLAN_ADMIN = 3;
+    constexpr uint32_t CLAN_SAGE = 2;
     constexpr uint32_t CLAN_MEMBER = 1;
 }

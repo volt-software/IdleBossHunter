@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 #include "messages/objects/account_object.h"
@@ -40,6 +39,6 @@ namespace ibh {
 
         account_object user;
 
-        inline static constexpr uint64_t type = generate_type<user_entered_game_response>();
+        static constexpr uint64_t type = generate_type<user_entered_game_response>();
     };
 }

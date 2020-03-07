@@ -30,14 +30,23 @@ namespace ibh {
     player_move_message::player_move_message(uint64_t connection_id, uint32_t x, uint32_t y) noexcept
             : queue_message(_type, connection_id), x(x), y(y) {}
 
+    accept_application_message::accept_application_message(uint64_t connection_id, uint64_t applicant_id) noexcept
+            : queue_message(_type, connection_id), applicant_id(applicant_id) {}
+
     create_clan_message::create_clan_message(uint64_t connection_id, string clan_name) noexcept
-    : queue_message(_type, connection_id), clan_name(move(clan_name)) {}
+            : queue_message(_type, connection_id), clan_name(move(clan_name)) {}
 
     increase_bonus_message::increase_bonus_message(uint64_t connection_id, uint32_t bonus_type) noexcept
             : queue_message(_type, connection_id), bonus_type(bonus_type) {}
 
     join_clan_message::join_clan_message(uint64_t connection_id, string clan_name) noexcept
             : queue_message(_type, connection_id), clan_name(move(clan_name)) {}
+
+    leave_clan_message::leave_clan_message(uint64_t connection_id) noexcept
+            : queue_message(_type, connection_id) {}
+
+    reject_application_message::reject_application_message(uint64_t connection_id, uint64_t applicant_id) noexcept
+            : queue_message(_type, connection_id), applicant_id(applicant_id) {}
 
     set_tax_message::set_tax_message(uint64_t connection_id, uint32_t tax_percentage) noexcept
             : queue_message(_type, connection_id), tax_percentage(tax_percentage) {}

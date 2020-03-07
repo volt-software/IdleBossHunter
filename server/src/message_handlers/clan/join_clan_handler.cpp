@@ -26,6 +26,10 @@
 #include <websocket_thread.h>
 #include "macros.h"
 
+#ifdef TEST_CODE
+#include "../../../test/custom_server.h"
+#endif
+
 using namespace std;
 using namespace chrono;
 
@@ -41,4 +45,9 @@ namespace ibh {
 
     template void handle_join_clan<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                         per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
+
+#ifdef TEST_CODE
+    template void handle_join_clan<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+                                                           per_socket_data<custom_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
+#endif
 }

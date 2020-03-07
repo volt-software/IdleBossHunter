@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 
@@ -54,6 +53,6 @@ namespace ibh {
         string error;
         vector<clan> clans;
 
-        inline static constexpr uint64_t type = generate_type<get_clan_listing_response>();
+        static constexpr uint64_t type = generate_type<get_clan_listing_response>();
     };
 }

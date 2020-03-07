@@ -18,26 +18,16 @@
 
 #pragma once
 
-#include <string>
 #include <rapidjson/document.h>
-#include "messages/message.h"
+#include <database/database_pool.h>
+#include <per_socket_data.h>
+#include <concurrentqueue.h>
+#include <game_queue_messages/messages.h>
 
 using namespace std;
 
 namespace ibh {
-    struct accept_application_request : message {
-        explicit accept_application_request(uint64_t applicant_id) noexcept;
-
-        ~accept_application_request() noexcept override = default;
-
-        [[nodiscard]]
-        string serialize() const override;
-
-        [[nodiscard]]
-        static unique_ptr<accept_application_request> deserialize(rapidjson::Document const &d);
-
-        uint64_t applicant_id;
-
-        static constexpr uint64_t type = generate_type<accept_application_request>();
-    };
+    template <class Server, class WebSocket>
+    void handle_leave_clan(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
+                                   moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
 }

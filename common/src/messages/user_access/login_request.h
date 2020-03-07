@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 
@@ -40,6 +39,6 @@ namespace ibh {
         string username;
         string password;
 
-        inline static constexpr uint64_t type = generate_type<login_request>();
+        static constexpr uint64_t type = generate_type<login_request>();
     };
 }

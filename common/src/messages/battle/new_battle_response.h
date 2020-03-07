@@ -45,6 +45,6 @@ namespace ibh {
         uint64_t player_hp;
         uint64_t player_max_hp;
 
-        inline static constexpr uint64_t type = generate_type<new_battle_response>();
+        static constexpr uint64_t type = generate_type<new_battle_response>();
     };
 }

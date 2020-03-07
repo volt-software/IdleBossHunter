@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "message.h"
 
@@ -39,6 +38,6 @@ namespace ibh {
 
         string message;
 
-        inline static constexpr uint64_t type = generate_type<generic_ok_response>();
+        static constexpr uint64_t type = generate_type<generic_ok_response>();
     };
 }

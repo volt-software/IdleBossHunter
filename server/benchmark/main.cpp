@@ -293,5 +293,5 @@ int main(int argc, char **argv) {
     bench_rapidjson_with_strlen();
     bench_random_helper();
     bench_pcg();
-    bench_battle();
+    //bench_battle();
 }

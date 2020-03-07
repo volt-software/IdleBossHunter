@@ -44,6 +44,6 @@ namespace ibh {
         uint64_t xp_gained;
         uint64_t money_gained;
 
-        inline static constexpr uint64_t type = generate_type<battle_finished_response>();
+        static constexpr uint64_t type = generate_type<battle_finished_response>();
     };
 }

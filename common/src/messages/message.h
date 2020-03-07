@@ -34,7 +34,7 @@ namespace ibh {
     };
 
     struct outward_message {
-        outward_message(uint64_t conn_id, unique_ptr<message> msg) : conn_id(conn_id), msg(move(msg)) {}
+        outward_message(uint64_t conn_id, unique_ptr<message> msg) noexcept : conn_id(conn_id), msg(move(msg)) {}
 
         uint64_t conn_id;
         unique_ptr<message> msg;

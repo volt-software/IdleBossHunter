@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 
@@ -42,6 +41,6 @@ namespace ibh {
         string source;
         uint64_t unix_timestamp;
 
-        inline static constexpr uint64_t type = generate_type<message_response>();
+        static constexpr uint64_t type = generate_type<message_response>();
     };
 }

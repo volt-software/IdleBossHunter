@@ -46,6 +46,6 @@ namespace ibh {
         uint64_t new_xp_goal;
         uint64_t current_xp;
 
-        inline static constexpr uint64_t type = generate_type<level_up_response>();
+        static constexpr uint64_t type = generate_type<level_up_response>();
     };
 }

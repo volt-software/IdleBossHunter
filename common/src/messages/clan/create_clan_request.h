@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 
@@ -39,6 +38,6 @@ namespace ibh {
 
         string name;
 
-        inline static constexpr uint64_t type = generate_type<create_clan_request>();
+        static constexpr uint64_t type = generate_type<create_clan_request>();
     };
 }

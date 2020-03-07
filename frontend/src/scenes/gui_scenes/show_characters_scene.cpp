@@ -145,7 +145,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
         }
 
         static char bufcharname[64];
-        ImGui::InputTextWithHint("Character name", "<character name>", bufcharname, 64, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+        ImGui::InputTextWithHint("Character name", "<character name>", bufcharname, 64, ImGuiInputTextFlags_AutoSelectAll);
 
         if (ImGui::BeginCombo("Race", _selected_race.c_str()))
         {

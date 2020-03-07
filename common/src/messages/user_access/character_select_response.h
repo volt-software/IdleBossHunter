@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 #include "messages/objects/item_object.h"
@@ -62,6 +61,6 @@ namespace ibh {
         vector<character_race> races;
         vector<character_class> classes;
 
-        inline static constexpr uint64_t type = generate_type<character_select_response>();
+        static constexpr uint64_t type = generate_type<character_select_response>();
     };
 }

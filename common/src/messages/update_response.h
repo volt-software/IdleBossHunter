@@ -38,6 +38,6 @@ namespace ibh {
         [[nodiscard]]
         static unique_ptr<update_response> deserialize(rapidjson::Document const &d);
 
-        inline static constexpr uint64_t type = generate_type<update_response>();
+        static constexpr uint64_t type = generate_type<update_response>();
     };
 }

@@ -329,6 +329,7 @@ int main(int argc, char* argv[]) {
 
     rendering_system rs(&config, window, context);
     ss.init_main_menu();
+    bool previousCapture = false;
 
     loop = [&] {
         try {
@@ -337,13 +338,19 @@ int main(int argc, char* argv[]) {
             while (SDL_PollEvent(&e) != 0) {
                 ImGui_ImplSDL2_ProcessEvent(&e);
 
-                /*if (io.WantCaptureKeyboard) {
-                    continue;
-                }*/
+                ImGuiIO& io = ImGui::GetIO();
+                if(previousCapture != io.WantCaptureKeyboard) {
+                    if (io.WantCaptureKeyboard) {
+                        SDL_StartTextInput();
+                    } else {
+                        SDL_StopTextInput();
+                    }
+                    previousCapture = io.WantCaptureKeyboard;
+                }
 
                 switch (e.type) {
                     case SDL_KEYDOWN: {
-                        if (e.key.keysym.sym == SDLK_p) {
+                        if (io.KeyCtrl && e.key.keysym.sym == SDLK_p) {
                             if (Mix_PlayingMusic()) {
                                 if (Mix_PausedMusic()) {
                                     Mix_ResumeMusic();
@@ -356,6 +363,8 @@ int main(int argc, char* argv[]) {
                         }
                         break;
                     }
+                    case SDL_TEXTINPUT:
+
                     case SDL_WINDOWEVENT: {
                         if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
                             config.screen_width = e.window.data1;

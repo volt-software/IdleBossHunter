@@ -33,6 +33,10 @@
 #include <message_handlers/clan/increase_bonus_handler.h>
 #include <message_handlers/clan/get_clan_listing_handler.h>
 #include <message_handlers/clan/create_clan_handler.h>
+#include <message_handlers/clan/accept_application_handler.h>
+#include <message_handlers/clan/reject_application_handler.h>
+#include <message_handlers/clan/leave_clan_handler.h>
+#include <message_handlers/clan/get_clan_applicants_handler.h>
 #include <messages/user_access/login_request.h>
 #include <messages/user_access/register_request.h>
 #include <messages/user_access/play_character_request.h>
@@ -47,6 +51,10 @@
 #include <messages/clan/increase_bonus_request.h>
 #include <messages/clan/get_clan_listing_request.h>
 #include <messages/clan/create_clan_request.h>
+#include <messages/clan/accept_application_request.h>
+#include <messages/clan/reject_application_request.h>
+#include <messages/clan/leave_clan_request.h>
+#include <messages/clan/get_clan_applicants_request.h>
 #include <message_handlers/handler_macros.h>
 #include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
@@ -251,23 +259,34 @@ void on_fail(server* s, websocketpp::connection_hdl hdl) {
 }
 
 void add_routes(message_router_type &message_router) {
+    // UAC
     message_router.emplace(login_request::type, handle_login<server, websocketpp::connection_hdl>);
     message_router.emplace(register_request::type, handle_register<server, websocketpp::connection_hdl>);
     message_router.emplace(play_character_request::type, handle_play_character<server, websocketpp::connection_hdl>);
     message_router.emplace(create_character_request::type, handle_create_character<server, websocketpp::connection_hdl>);
     message_router.emplace(delete_character_request::type, handle_delete_character<server, websocketpp::connection_hdl>);
     message_router.emplace(character_select_request::type, handle_character_select<server, websocketpp::connection_hdl>);
+
+    // messaging
     message_router.emplace(message_request::type, handle_public_chat<server, websocketpp::connection_hdl>);
+
+    // admin/moderator
     message_router.emplace(set_motd_request::type, handle_set_motd<server, websocketpp::connection_hdl>);
+
+    // clans
     message_router.emplace(set_tax_request::type, handle_set_tax<server, websocketpp::connection_hdl>);
     message_router.emplace(join_clan_request::type, handle_join_clan<server, websocketpp::connection_hdl>);
     message_router.emplace(increase_bonus_request::type, handle_increase_bonus<server, websocketpp::connection_hdl>);
     message_router.emplace(get_clan_listing_request::type, handle_get_clan_listing<server, websocketpp::connection_hdl>);
     message_router.emplace(create_clan_request::type, handle_create_clan<server, websocketpp::connection_hdl>);
+    message_router.emplace(accept_application_request::type, handle_accept_application<server, websocketpp::connection_hdl>);
+    message_router.emplace(reject_application_request::type, handle_reject_application<server, websocketpp::connection_hdl>);
+    message_router.emplace(leave_clan_request::type, handle_leave_clan<server, websocketpp::connection_hdl>);
+    message_router.emplace(get_clan_applicants_request::type, handle_get_clan_applicants<server, websocketpp::connection_hdl>);
 }
 
 thread ibh::run_websocket(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {
-    auto t = thread([&config, pool, &s_handle, &quit] {
+    auto t = thread([&config, pool = move(pool), &s_handle, &quit] {
         server roa_server;
         s_handle.s = &roa_server;
 

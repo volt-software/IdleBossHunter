@@ -31,9 +31,9 @@ using namespace ibh;
 TEST_CASE("get clan listing handler tests") {
     SECTION("Should return clan") {
         string message = get_clan_listing_request().serialize();
-        per_socket_data<uint64_t> user_data;
+        per_socket_data<custom_hdl> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
-        ibh_flat_map<uint64_t, per_socket_data<uint64_t>> user_connections;
+        ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         custom_server s;
         clans_repository<database_transaction> clans_repo{};
         user_data.ws = 1;

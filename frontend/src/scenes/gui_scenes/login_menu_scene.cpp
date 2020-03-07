@@ -50,12 +50,12 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             _focus_on_open_flag = true;
         }
 
-        ImGui::InputTextWithHint("username", "<username>", bufuser, 64, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
-        bool login_fasttrack = ImGui::InputTextWithHint("password", "<password>", bufpass, 64, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_EnterReturnsTrue);
+        ImGui::InputTextWithHint("username", "<username>", bufuser, 64, ImGuiInputTextFlags_AutoSelectAll);
+        bool login_fasttrack = ImGui::InputTextWithHint("password", "<password>", bufpass, 64, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue);
 
         bool register_fasttrack = false;
         if(_show_register) {
-            register_fasttrack = ImGui::InputTextWithHint("email", "<email>", bufmail, 128, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_EnterReturnsTrue);
+            register_fasttrack = ImGui::InputTextWithHint("email", "<email>", bufmail, 128, ImGuiInputTextFlags_EnterReturnsTrue);
         }
 
         if (_waiting_for_reply)

@@ -54,6 +54,27 @@ TEST_CASE("clan members repository tests") {
         REQUIRE(member2->member_level == member.member_level);
     }
 
+    SECTION("get clan member by character id" ) {
+        auto transaction = db_pool->create_transaction();
+        db_user user{};
+        user_repo.insert_if_not_exists(user, transaction);
+        REQUIRE(user.id > 0);
+        db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
+        char_repo.insert(player, transaction);
+        REQUIRE(player.id > 0);
+        db_clan clan{0, "clan", {}, {}};
+        clan_repo.insert(clan, transaction);
+        REQUIRE(clan.id > 0);
+        db_clan_member member{clan.id, player.id, 1};
+        member_repo.insert(member, transaction);
+
+        auto member2 = member_repo.get_by_character_id(player.id, transaction);
+        REQUIRE(member2);
+        REQUIRE(member2->clan_id == member.clan_id);
+        REQUIRE(member2->character_id == member.character_id);
+        REQUIRE(member2->member_level == member.member_level);
+    }
+
     SECTION( "get all character members" ) {
         auto transaction = db_pool->create_transaction();
         db_user user{};

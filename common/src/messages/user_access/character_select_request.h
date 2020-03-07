@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include "messages/message.h"
 
@@ -37,6 +36,6 @@ namespace ibh {
         [[nodiscard]]
         static unique_ptr<character_select_request> deserialize(rapidjson::Document const &d);
 
-        inline static constexpr uint64_t type = generate_type<character_select_request>();
+        static constexpr uint64_t type = generate_type<character_select_request>();
     };
 }

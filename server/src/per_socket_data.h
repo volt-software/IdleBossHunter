@@ -30,6 +30,7 @@ namespace ibh {
     struct per_socket_data {
         uint64_t connection_id;
         uint64_t user_id;
+        uint64_t playing_character_id;
         uint32_t subscription_tier;
         bool is_tester;
         bool is_game_master;
@@ -37,6 +38,6 @@ namespace ibh {
         string username;
         WebSocket ws;
 
-        per_socket_data() : connection_id(0), user_id(0), subscription_tier(0), is_tester(), is_game_master(), playing_character_slot(), username(), ws() {}
+        per_socket_data() : connection_id(0), user_id(0), playing_character_id(0), subscription_tier(0), is_tester(), is_game_master(), playing_character_slot(), username(), ws() {}
     };
 }

@@ -21,15 +21,28 @@
 #include <string>
 
 namespace ibh {
-    class custom_server {
-    public:
-        bool send([[maybe_unused]] uint64_t handle, string message, [[maybe_unused]] websocketpp::frame::opcode::value op_code) {
+    struct custom_hdl {
+        uint64_t _id{};
+        bool _expired{};
+
+        custom_hdl& operator=(uint64_t id) noexcept {
+            _id = id;
+            return *this;
+        }
+
+        [[nodiscard]] bool expired() const noexcept {
+            return _expired;
+        }
+    };
+
+    struct custom_server {
+        bool send([[maybe_unused]] custom_hdl handle, string message, [[maybe_unused]] websocketpp::frame::opcode::value op_code) {
             sent_message = message;
 
             return true;
         }
 
-        void close([[maybe_unused]] uint64_t handle, [[maybe_unused]] uint64_t code, string message) {
+        void close([[maybe_unused]] custom_hdl handle, [[maybe_unused]] uint64_t code, string message) {
             close_message = message;
         }
 

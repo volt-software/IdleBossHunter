@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <rapidjson/document.h>
 #include <common_components.h>
 #include "messages/message.h"
@@ -41,6 +40,6 @@ namespace ibh {
 
         uint32_t bonus_type;
 
-        inline static constexpr uint64_t type = generate_type<increase_bonus_request>();
+        static constexpr uint64_t type = generate_type<increase_bonus_request>();
     };
 }
