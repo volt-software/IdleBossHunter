@@ -36,7 +36,7 @@
 #include <message_handlers/clan/accept_application_handler.h>
 #include <message_handlers/clan/reject_application_handler.h>
 #include <message_handlers/clan/leave_clan_handler.h>
-#include <message_handlers/clan/get_clan_applicants_handler.h>
+#include <message_handlers/clan/get_clan_applications_handler.h>
 #include <messages/user_access/login_request.h>
 #include <messages/user_access/register_request.h>
 #include <messages/user_access/play_character_request.h>
@@ -54,7 +54,7 @@
 #include <messages/clan/accept_application_request.h>
 #include <messages/clan/reject_application_request.h>
 #include <messages/clan/leave_clan_request.h>
-#include <messages/clan/get_clan_applicants_request.h>
+#include <messages/clan/get_clan_applications_request.h>
 #include <message_handlers/handler_macros.h>
 #include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
@@ -282,7 +282,7 @@ void add_routes(message_router_type &message_router) {
     message_router.emplace(accept_application_request::type, handle_accept_application<server, websocketpp::connection_hdl>);
     message_router.emplace(reject_application_request::type, handle_reject_application<server, websocketpp::connection_hdl>);
     message_router.emplace(leave_clan_request::type, handle_leave_clan<server, websocketpp::connection_hdl>);
-    message_router.emplace(get_clan_applicants_request::type, handle_get_clan_applicants<server, websocketpp::connection_hdl>);
+    message_router.emplace(get_clan_applications_request::type, handle_get_clan_applications<server, websocketpp::connection_hdl>);
 }
 
 thread ibh::run_websocket(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {

@@ -19,22 +19,23 @@
 #pragma once
 
 #include <string>
-#include <memory>
-#include <optional>
-#include <database/database_transaction.h>
-#include "models.h"
+#include <rapidjson/document.h>
+#include "messages/message.h"
 
 using namespace std;
 
 namespace ibh {
-    template<DatabaseTransaction transaction_T>
-    class clans_repository {
-    public:
-        bool insert(db_clan& clan, unique_ptr<transaction_T> const &transaction) const;
-        void update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
-        void remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan> get(int id, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan> get(string const &name, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] vector<db_clan> get_all(unique_ptr<transaction_T> const &transaction) const;
+    struct get_clan_applications_request : message {
+        get_clan_applications_request() noexcept;
+
+        ~get_clan_applications_request() noexcept override = default;
+
+        [[nodiscard]]
+        string serialize() const override;
+
+        [[nodiscard]]
+        static unique_ptr<get_clan_applications_request> deserialize(rapidjson::Document const &d);
+
+        static constexpr uint64_t type = generate_type<get_clan_applications_request>();
     };
 }

@@ -69,6 +69,19 @@ optional<db_clan> clans_repository<transaction_T>::get(int id, unique_ptr<transa
 }
 
 template<DatabaseTransaction transaction_T>
+optional<db_clan> clans_repository<transaction_T>::get(string const &name, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT id, name FROM clans WHERE name = '{}'", transaction->escape(name)));
+
+    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+
+    if(result.empty()) {
+        return {};
+    }
+
+    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
+}
+
+template<DatabaseTransaction transaction_T>
 vector<db_clan> clans_repository<transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
     auto result = transaction->execute("SELECT id, name FROM clans");
 

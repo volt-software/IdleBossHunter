@@ -25,15 +25,15 @@ template class ibh::clan_member_applications_repository<database_transaction>;
 template class ibh::clan_member_applications_repository<database_subtransaction>;
 
 template<DatabaseTransaction transaction_T>
-void clan_member_applications_repository<transaction_T>::insert(db_clan_member &member, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("INSERT INTO clan_member_applications (clan_id, character_id) VALUES ({}, {})", member.clan_id, member.character_id));
-
-    if(result.empty()) {
-        spdlog::error("[{}] contains {} entries", __FUNCTION__, result.size());
-        return;
+bool clan_member_applications_repository<transaction_T>::insert(db_clan_member &member, unique_ptr<transaction_T> const &transaction) const {
+    try {
+        transaction->execute(fmt::format("INSERT INTO clan_member_applications (clan_id, character_id) VALUES ({}, {})", member.clan_id, member.character_id));
+    } catch (pqxx::unique_violation const &e) {
+        return false;
     }
 
     spdlog::debug("[{}] inserted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
+    return true;
 }
 
 template<DatabaseTransaction transaction_T>

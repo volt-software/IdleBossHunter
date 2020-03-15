@@ -34,32 +34,30 @@ using namespace std;
 
 namespace ibh {
     template <typename ... Ts>
-    constexpr size_t tuple_sum_size(tuple<Ts...> const &)
+    constexpr size_t tuple_sum_size(tuple<Ts...> const &) noexcept
     {
         return (sizeof(Ts) + ...);
     }
 
     template <class T>
-    constexpr bool compare_weak_ptr(weak_ptr<T> const &lhs, weak_ptr<T> const &rhs) {
+    constexpr bool compare_weak_ptr(weak_ptr<T> const &lhs, weak_ptr<T> const &rhs) noexcept {
         return !lhs.owner_before(rhs) && !rhs.owner_before(lhs);
     }
 
 #ifdef USE_WYHASH
     template<class Key>
-    class custom_hash
+    struct custom_hash
     {
-    public:
-        size_t operator()(Key t) const
+        size_t operator()(Key t) const noexcept
         {
             return wyhash(&t, sizeof(t), 1283474321412);
         }
     };
 
     template<>
-    class custom_hash<weak_ptr<void>>
+    struct custom_hash<weak_ptr<void>>
     {
-    public:
-        size_t operator()(weak_ptr<void> const &key) const
+        size_t operator()(weak_ptr<void> const &key) const noexcept
         {
             auto p = key.lock();
             return wyhash(p.get(), sizeof(p.get()), 1283474321412);
@@ -67,35 +65,32 @@ namespace ibh {
     };
 
     template<>
-    class custom_hash<string>
+    struct custom_hash<string>
     {
-    public:
-        size_t operator()(string const &key) const
+        size_t operator()(string const &key) const noexcept
         {
             return wyhash(key.c_str(), key.size(), 1283474321412);
         }
 
-        size_t operator()(string_view const &key) const
+        size_t operator()(string_view const &key) const noexcept
         {
             return wyhash(&key[0], key.size(), 1283474321412);
         }
     };
 
     template<>
-    class custom_hash<tuple<uint64_t, uint64_t>>
+    struct custom_hash<tuple<uint64_t, uint64_t>>
     {
-    public:
-        size_t operator()(tuple<uint64_t, uint64_t> t) const
+        size_t operator()(tuple<uint64_t, uint64_t> t) const noexcept
         {
             return wyhash(&t, tuple_sum_size(t), 1283474321412);
         }
     };
 
     template<>
-    class custom_hash<tuple<int32_t, int32_t>>
+    struct custom_hash<tuple<int32_t, int32_t>>
     {
-    public:
-        size_t operator()(tuple<int32_t, int32_t> t) const
+        size_t operator()(tuple<int32_t, int32_t> t) const noexcept
         {
             return wyhash(&t, tuple_sum_size(t), 1283474321412);
         }
@@ -103,20 +98,18 @@ namespace ibh {
 #else
 
     template<class Key>
-    class custom_hash
+    struct custom_hash
     {
-    public:
-        size_t operator()(Key t) const
+        size_t operator()(Key t) const noexcept
         {
             return XXH3_64bits(&t, sizeof(t));
         }
     };
 
     template<>
-    class custom_hash<weak_ptr<void>>
+    struct custom_hash<weak_ptr<void>>
     {
-    public:
-        size_t operator()(weak_ptr<void> const &key) const
+        size_t operator()(weak_ptr<void> const &key) const noexcept
         {
             auto p = key.lock();
             return XXH3_64bits(p.get(), sizeof(p.get()));
@@ -124,35 +117,32 @@ namespace ibh {
     };
 
     template<>
-    class custom_hash<string>
+    struct custom_hash<string>
     {
-    public:
-        size_t operator()(string const &key) const
+        size_t operator()(string const &key) const noexcept
         {
             return XXH3_64bits(key.c_str(), key.size());
         }
 
-        size_t operator()(string_view const &key) const
+        size_t operator()(string_view const &key) const noexcept
         {
             return XXH3_64bits(&key[0], key.size());
         }
     };
 
     template<>
-    class custom_hash<tuple<uint64_t, uint64_t>>
+    struct custom_hash<tuple<uint64_t, uint64_t>>
     {
-    public:
-        size_t operator()(tuple<uint64_t, uint64_t> t) const
+        size_t operator()(tuple<uint64_t, uint64_t> t) const noexcept
         {
             return XXH3_64bits(&t, tuple_sum_size(t));
         }
     };
 
     template<>
-    class custom_hash<tuple<int32_t, int32_t>>
+    struct custom_hash<tuple<int32_t, int32_t>>
     {
-    public:
-        size_t operator()(tuple<int32_t, int32_t> t) const
+        size_t operator()(tuple<int32_t, int32_t> t) const noexcept
         {
             return XXH3_64bits(&t, tuple_sum_size(t));
         }
@@ -160,100 +150,91 @@ namespace ibh {
 #endif
 
     template<>
-    class custom_hash<uint32_t>
+    struct custom_hash<uint32_t>
     {
-    public:
-        size_t operator()(uint32_t t) const
+        size_t operator()(uint32_t t) const noexcept
         {
             return t;
         }
     };
 
     template<>
-    class custom_hash<uint64_t>
+    struct custom_hash<uint64_t>
     {
-    public:
-        size_t operator()(uint64_t t) const
+        size_t operator()(uint64_t t) const noexcept
         {
             return t;
         }
     };
 
     template<>
-    class custom_hash<int32_t>
+    struct custom_hash<int32_t>
     {
-    public:
-        size_t operator()(int32_t t) const
+        size_t operator()(int32_t t) const noexcept
         {
             return t;
         }
     };
 
     template<>
-    class custom_hash<int64_t>
+    struct custom_hash<int64_t>
     {
-    public:
-        size_t operator()(int64_t t) const
+        size_t operator()(int64_t t) const noexcept
         {
             return t;
         }
     };
 
     template<class Key>
-    class custom_equalto
+    struct custom_equalto
     {
-    public:
-        bool operator()(Key const &lhs, Key const &rhs) const
+        bool operator()(Key const &lhs, Key const &rhs) const noexcept
         {
             return lhs == rhs;
         }
     };
 
     template<>
-    class custom_equalto<weak_ptr<void>>
+    struct custom_equalto<weak_ptr<void>>
     {
-    public:
-        bool operator()(weak_ptr<void> const &lhs, weak_ptr<void> const &rhs) const
+        bool operator()(weak_ptr<void> const &lhs, weak_ptr<void> const &rhs) const noexcept
         {
             return compare_weak_ptr(lhs, rhs);
         }
     };
 
     template<>
-    class custom_equalto<string>
+    struct custom_equalto<string>
     {
-    public:
-        bool operator()(string const &lhs, string const &rhs) const
+        bool operator()(string const &lhs, string const &rhs) const noexcept
         {
             return lhs == rhs;
         }
 
-        bool operator()(string const &lhs, string_view const &rhs) const
+        bool operator()(string const &lhs, string_view const &rhs) const noexcept
         {
             return lhs == rhs;
         }
 
-        bool operator()(string_view const &lhs, string const &rhs) const
+        bool operator()(string_view const &lhs, string const &rhs) const noexcept
         {
             return lhs == rhs;
         }
     };
 
     template<>
-    class custom_equalto<tuple<uint64_t, uint64_t>>
+    struct custom_equalto<tuple<uint64_t, uint64_t>>
     {
-    public:
-        bool operator()(tuple<uint64_t, uint64_t> const &lhs, tuple<uint64_t, uint64_t> const &rhs) const
+        bool operator()(tuple<uint64_t, uint64_t> const &lhs, tuple<uint64_t, uint64_t> const &rhs) const noexcept
         {
             return lhs == rhs;
         }
     };
 
     template<>
-    class custom_equalto<tuple<int32_t, int32_t>>
+    struct custom_equalto<tuple<int32_t, int32_t>>
     {
-    public:
-        bool operator()(tuple<int32_t, int32_t> const &lhs, tuple<int32_t, int32_t> const &rhs) const
+        bool operator()(tuple<int32_t, int32_t> const &lhs, tuple<int32_t, int32_t> const &rhs) const noexcept
         {
             return lhs == rhs;
         }

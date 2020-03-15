@@ -363,8 +363,6 @@ int main(int argc, char* argv[]) {
                         }
                         break;
                     }
-                    case SDL_TEXTINPUT:
-
                     case SDL_WINDOWEVENT: {
                         if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
                             config.screen_width = e.window.data1;

@@ -46,11 +46,28 @@ TEST_CASE("clan member applications repository tests") {
         clan_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_member member{clan.id, player.id, 1};
-        member_repo.insert(member, transaction);
+        REQUIRE(member_repo.insert(member, transaction) == true);
 
         auto member2 = member_repo.get(clan.id, player.id, transaction);
         REQUIRE(member2->clan_id == member.clan_id);
         REQUIRE(member2->character_id == member.character_id);
+        REQUIRE(member2->member_level == 0);
+    }
+
+    SECTION("clan member applications no double insertion" ) {
+        auto transaction = db_pool->create_transaction();
+        db_user user{};
+        user_repo.insert_if_not_exists(user, transaction);
+        REQUIRE(user.id > 0);
+        db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
+        char_repo.insert(player, transaction);
+        REQUIRE(player.id > 0);
+        db_clan clan{0, "clan", {}, {}};
+        clan_repo.insert(clan, transaction);
+        REQUIRE(clan.id > 0);
+        db_clan_member member{clan.id, player.id, 1};
+        REQUIRE(member_repo.insert(member, transaction) == true);
+        REQUIRE(member_repo.insert(member, transaction) == false);
     }
 
     SECTION("clan member applications deleted correctly" ) {
@@ -70,6 +87,7 @@ TEST_CASE("clan member applications repository tests") {
         auto member2 = member_repo.get(clan.id, player.id, transaction);
         REQUIRE(member2->clan_id == member.clan_id);
         REQUIRE(member2->character_id == member.character_id);
+        REQUIRE(member2->member_level == 0);
 
         member_repo.remove(member, transaction);
         member2 = member_repo.get(clan.id, player.id, transaction);
@@ -99,8 +117,10 @@ TEST_CASE("clan member applications repository tests") {
         REQUIRE(members.size() == 2);
         REQUIRE(members[0].clan_id == member.clan_id);
         REQUIRE(members[0].character_id == member.character_id);
+        REQUIRE(members[0].member_level == 0);
         REQUIRE(members[1].clan_id == member2.clan_id);
         REQUIRE(members[1].character_id == member2.character_id);
+        REQUIRE(members[1].member_level == 0);
     }
 
     SECTION( "get all character member applications by char id" ) {
@@ -126,6 +146,7 @@ TEST_CASE("clan member applications repository tests") {
         REQUIRE(members.size() == 1);
         REQUIRE(members[0].clan_id == member.clan_id);
         REQUIRE(members[0].character_id == member.character_id);
+        REQUIRE(members[0].member_level == 0);
     }
 }
 

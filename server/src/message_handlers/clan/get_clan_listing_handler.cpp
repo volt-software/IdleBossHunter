@@ -52,6 +52,7 @@ namespace ibh {
 
         auto clans = clan_repo.get_all(transaction);
         vector<clan> msg_clans;
+        msg_clans.reserve(clans.size());
         for(auto &c : clans) {
             vector<string> msg_members;
             vector<bonus> msg_bonuses;

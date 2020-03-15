@@ -18,24 +18,12 @@
 
 #pragma once
 
-#include <string>
-#include <rapidjson/document.h>
-#include "messages/message.h"
+#include <game_queue_messages/messages.h>
+#include <entt/entt.hpp>
+#include <database/database_transaction.h>
 
 using namespace std;
 
 namespace ibh {
-    struct get_clan_applicants_request : message {
-        get_clan_applicants_request() noexcept;
-
-        ~get_clan_applicants_request() noexcept override = default;
-
-        [[nodiscard]]
-        string serialize() const override;
-
-        [[nodiscard]]
-        static unique_ptr<get_clan_applicants_request> deserialize(rapidjson::Document const &d);
-
-        static constexpr uint64_t type = generate_type<get_clan_applicants_request>();
-    };
+    bool handle_reject_application(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &transaction);
 }

@@ -28,7 +28,7 @@ namespace ibh {
     template<DatabaseTransaction transaction_T>
     class clan_member_applications_repository  {
     public:
-        void insert(db_clan_member &member, unique_ptr<transaction_T> const &transaction) const;
+        bool insert(db_clan_member &member, unique_ptr<transaction_T> const &transaction) const;
         void remove(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const;
         [[nodiscard]] optional<db_clan_member> get(uint64_t id, uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
         [[nodiscard]] vector<db_clan_member> get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const;

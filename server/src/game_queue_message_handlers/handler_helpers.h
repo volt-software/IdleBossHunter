@@ -18,23 +18,13 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
-#include <optional>
+#include <entt/entity/registry.hpp>
 #include <database/database_transaction.h>
-#include "models.h"
+#include <game_queue_messages/messages.h>
 
 using namespace std;
 
 namespace ibh {
-    template<DatabaseTransaction transaction_T>
-    class clans_repository {
-    public:
-        bool insert(db_clan& clan, unique_ptr<transaction_T> const &transaction) const;
-        void update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
-        void remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan> get(int id, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan> get(string const &name, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] vector<db_clan> get_all(unique_ptr<transaction_T> const &transaction) const;
-    };
+    void send_message_to_all_clan_members(uint64_t clan_id, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction);
+    void send_message_to_all_clan_admins(uint64_t clan_id, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction);
 }

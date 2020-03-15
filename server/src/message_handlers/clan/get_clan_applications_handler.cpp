@@ -17,12 +17,12 @@
 */
 
 
-#include "get_clan_applicants_handler.h"
+#include "get_clan_applications_handler.h"
 
 #include <spdlog/spdlog.h>
 
-#include <messages/clan/get_clan_applicants_request.h>
-#include <messages/clan/get_clan_applicants_response.h>
+#include <messages/clan/get_clan_applications_request.h>
+#include <messages/clan/get_clan_applications_response.h>
 #include <repositories/clans_repository.h>
 #include <repositories/clan_members_repository.h>
 #include <repositories/clan_member_applications_repository.h>
@@ -41,26 +41,26 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_get_clan_applicants(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
+    void handle_get_clan_applications(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                    moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_LOGIN_CHECK(get_clan_applicants_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(get_clan_applications_request);
 
         clans_repository<database_transaction> clans_repo{};
-        clan_members_repository<database_transaction> members_repo{};
-        clan_member_applications_repository<database_transaction> applications_repo{};
         characters_repository<database_transaction> chars_repo{};
+        clan_member_applications_repository<database_transaction> applications_repo{};
+        clan_members_repository<database_transaction> clan_members_repo{};
 
-        auto clan_member = members_repo.get_by_character_id(user_data->playing_character_id, transaction);
+        auto clan_member = clan_members_repo.get_by_character_id(user_data->playing_character_id, transaction);
         if(!clan_member) {
-            get_clan_applicants_response response{"Not a member of a clan", {}};
+            get_clan_applications_response response{"Not a member of a clan", {}};
             auto response_msg = response.serialize();
             s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
             return;
         }
 
         if(clan_member->member_level != CLAN_SAGE && clan_member->member_level != CLAN_ADMIN) {
-            get_clan_applicants_response response{"Not a sage or admin of clan", {}};
+            get_clan_applications_response response{"Not a sage or admin of clan", {}};
             auto response_msg = response.serialize();
             s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
             return;
@@ -77,16 +77,16 @@ namespace ibh {
             members.emplace_back(character->id, character->level, move(character->name));
         }
 
-        get_clan_applicants_response response{"", move(members)};
+        get_clan_applications_response response{"", move(members)};
         auto response_msg = response.serialize();
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
     }
 
-    template void handle_get_clan_applicants<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_get_clan_applications<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                                  per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
-    template void handle_get_clan_applicants<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_get_clan_applications<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                      per_socket_data<custom_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
 #endif
 }

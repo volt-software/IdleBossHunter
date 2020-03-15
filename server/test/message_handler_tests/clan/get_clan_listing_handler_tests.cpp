@@ -17,7 +17,6 @@
 */
 
 #include <catch2/catch.hpp>
-#include <spdlog/spdlog.h>
 #include "../../test_helpers/startup_helper.h"
 #include <message_handlers/clan/get_clan_listing_handler.h>
 #include <messages/clan/get_clan_listing_request.h>
@@ -57,6 +56,5 @@ TEST_CASE("get clan listing handler tests") {
         auto inserted_clan = find_if(begin(new_msg->clans), end(new_msg->clans), [clan_name = new_clan.name](clan const &c){ return c.name == clan_name; });
         REQUIRE(inserted_clan != end(new_msg->clans));
         REQUIRE(inserted_clan->name == new_clan.name);
-        clans_repo.remove(new_clan, transaction);
     }
 }

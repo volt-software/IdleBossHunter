@@ -36,7 +36,7 @@
 #include <messages/battle/battle_finished_response.h>
 #include <messages/clan/accept_application_response.h>
 #include <messages/clan/create_clan_response.h>
-#include <messages/clan/get_clan_applicants_response.h>
+#include <messages/clan/get_clan_applications_response.h>
 #include <messages/clan/get_clan_listing_response.h>
 #include <messages/clan/increase_bonus_response.h>
 #include <messages/clan/join_clan_response.h>
@@ -156,8 +156,8 @@ unique_ptr<message> deserialize_message(uint64_t const &type, rapidjson::Documen
             return accept_application_response::deserialize(d);
         case create_clan_response::type:
             return create_clan_response::deserialize(d);
-        case get_clan_applicants_response::type:
-            return get_clan_applicants_response::deserialize(d);
+        case get_clan_applications_response::type:
+            return get_clan_applications_response::deserialize(d);
         case get_clan_listing_response::type:
             return get_clan_listing_response::deserialize(d);
         case increase_bonus_response::type:

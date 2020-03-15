@@ -152,11 +152,9 @@ namespace ibh {
     struct db_clan {
         uint64_t id;
         string name;
-        vector<db_clan_stat> stats;
-        vector<db_clan_building> buildings;
 
-        db_clan() : id(), name(), stats(), buildings() {}
-        db_clan(uint64_t id, string name, vector<db_clan_stat> stats, vector<db_clan_building> buildings) : id(id), name(move(name)), stats(move(stats)), buildings(move(buildings)) {}
+        db_clan() : id(), name() {}
+        db_clan(uint64_t id, string name, vector<db_clan_stat> stats, vector<db_clan_building> buildings) : id(id), name(move(name)) {}
     };
 }
 
