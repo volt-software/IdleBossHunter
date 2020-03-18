@@ -23,6 +23,8 @@
 #include <repositories/clans_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
+#include <messages/clan/create_clan_response.h>
+#include "../game_queue_helpers.h"
 
 using namespace std;
 using namespace ibh;
@@ -56,6 +58,8 @@ TEST_CASE("create clan handler tests") {
 
         auto ret = handle_create_clan(&msg, registry, q, transaction);
         REQUIRE(ret == true);
+
+        test_outmsg<create_clan_response>(q, true);
 
         auto &pc = registry.get<pc_component>(entt);
         auto gold_it = pc.stats.find(stat_gold_id);
@@ -93,6 +97,8 @@ TEST_CASE("create clan handler tests") {
 
         auto ret = handle_create_clan(&msg, registry, q, transaction);
         REQUIRE(ret == false);
+
+        test_outmsg<create_clan_response>(q, false);
 
         auto &pc = registry.get<pc_component>(entt);
         auto gold_it = pc.stats.find(stat_gold_id);
@@ -133,6 +139,8 @@ TEST_CASE("create clan handler tests") {
 
         auto ret = handle_create_clan(&msg, registry, q, transaction);
         REQUIRE(ret == false);
+
+        test_outmsg<create_clan_response>(q, false);
 
         auto &pc = registry.get<pc_component>(entt);
         auto gold_it = pc.stats.find(stat_gold_id);

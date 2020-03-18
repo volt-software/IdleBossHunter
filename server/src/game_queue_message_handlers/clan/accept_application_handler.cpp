@@ -74,12 +74,14 @@ namespace ibh {
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
                 return false;
             }
+
+            clan_member_applications_repo.remove(*clan_application, subtransaction);
             subtransaction->commit();
 
             auto new_err_msg = make_unique<accept_application_response>("");
             outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
 
-            spdlog::trace("[{}] accepted applicant {} clan {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, pc.name, pc.connection_id);
+            spdlog::trace("[{}] accepted applicant {} clan {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
 
             return true;
         }

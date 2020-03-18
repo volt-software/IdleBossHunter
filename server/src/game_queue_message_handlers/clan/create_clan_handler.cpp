@@ -65,7 +65,7 @@ namespace ibh {
             clan_members_repository<database_subtransaction> clan_members_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            db_clan new_clan{0, create_msg->clan_name, {}, {}};
+            db_clan new_clan{0, create_msg->clan_name};
             if(!clan_repo.insert(new_clan, subtransaction)) {
                 auto new_err_msg = make_unique<create_clan_response>("Clan name already exists");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});

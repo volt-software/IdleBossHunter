@@ -68,13 +68,13 @@ namespace ibh {
                 return false;
             }
 
-            clan_members_repo.remove(*clan_application, subtransaction);
+            clan_member_applications_repo.remove(*clan_application, subtransaction);
             subtransaction->commit();
 
             auto new_err_msg = make_unique<reject_application_response>("");
             outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
 
-            spdlog::trace("[{}] rejected applicant {} clan {} by pc {} connection id {}", __FUNCTION__, reject_msg->applicant_id, pc.name, pc.connection_id);
+            spdlog::trace("[{}] rejected applicant {} clan {} by pc {} connection id {}", __FUNCTION__, reject_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
 
             return true;
         }

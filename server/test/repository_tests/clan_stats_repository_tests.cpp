@@ -32,7 +32,7 @@ TEST_CASE("clan stats repository tests") {
 
     SECTION("clan stats inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_stat stat{0, clan.id, "test", 2};
@@ -48,7 +48,7 @@ TEST_CASE("clan stats repository tests") {
 
     SECTION( "update stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_stat stat{0, clan.id, "test", 2};
@@ -67,7 +67,7 @@ TEST_CASE("clan stats repository tests") {
 
     SECTION( "get all for character stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_stat stat{0, clan.id, "test", 2};

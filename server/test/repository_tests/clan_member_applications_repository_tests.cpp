@@ -42,7 +42,7 @@ TEST_CASE("clan member applications repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clan_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_member member{clan.id, player.id, 1};
@@ -62,7 +62,7 @@ TEST_CASE("clan member applications repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clan_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_member member{clan.id, player.id, 1};
@@ -78,7 +78,7 @@ TEST_CASE("clan member applications repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clan_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_member member{clan.id, player.id, 1};
@@ -105,7 +105,7 @@ TEST_CASE("clan member applications repository tests") {
         char_repo.insert(player2, transaction);
         REQUIRE(player.id > 0);
         REQUIRE(player2.id > 0);
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clan_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_member member{clan.id, player.id, 1};
@@ -134,7 +134,7 @@ TEST_CASE("clan member applications repository tests") {
         char_repo.insert(player2, transaction);
         REQUIRE(player.id > 0);
         REQUIRE(player2.id > 0);
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clan_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
         db_clan_member member{clan.id, player.id, 1};

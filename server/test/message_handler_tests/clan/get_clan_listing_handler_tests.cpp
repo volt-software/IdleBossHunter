@@ -42,7 +42,7 @@ TEST_CASE("get clan listing handler tests") {
         d.Parse(&message[0], message.size());
 
         auto transaction = db_pool->create_transaction();
-        db_clan new_clan{0, "test", {}, {}};
+        db_clan new_clan{0, "test"};
         clans_repo.insert(new_clan, transaction);
         REQUIRE(new_clan.id > 0);
 

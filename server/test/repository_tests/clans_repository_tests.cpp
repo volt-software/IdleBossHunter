@@ -30,7 +30,7 @@ TEST_CASE("clans repository tests") {
 
     SECTION("clan inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
 
@@ -41,7 +41,7 @@ TEST_CASE("clans repository tests") {
 
     SECTION( "update clan" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
 
@@ -55,7 +55,7 @@ TEST_CASE("clans repository tests") {
 
     SECTION( "remove clan" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
 
@@ -69,7 +69,7 @@ TEST_CASE("clans repository tests") {
         auto transaction = db_pool->create_transaction();
         auto clans_existing = clans_repo.get_all(transaction);
 
-        db_clan clan{0, "clan", {}, {}};
+        db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
 

@@ -65,7 +65,7 @@ optional<db_clan> clans_repository<transaction_T>::get(int id, unique_ptr<transa
         return {};
     }
 
-    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
+    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
 }
 
 template<DatabaseTransaction transaction_T>
@@ -78,7 +78,7 @@ optional<db_clan> clans_repository<transaction_T>::get(string const &name, uniqu
         return {};
     }
 
-    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
+    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
 }
 
 template<DatabaseTransaction transaction_T>
@@ -91,7 +91,7 @@ vector<db_clan> clans_repository<transaction_T>::get_all(const unique_ptr<transa
     clans.reserve(result.size());
 
     for(auto const & res : result) {
-        clans.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}), vector<db_clan_stat>{}, vector<db_clan_building>{});
+        clans.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}));
     }
 
     return clans;

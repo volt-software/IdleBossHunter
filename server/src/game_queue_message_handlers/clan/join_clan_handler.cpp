@@ -50,8 +50,8 @@ namespace ibh {
             clan_member_applications_repository<database_subtransaction> clan_member_applications_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            auto clan = clans_repo.get(pc.id, subtransaction);
-            if(clan) {
+            auto clan = clans_repo.get(join_msg->clan_name, subtransaction);
+            if(!clan) {
                 auto new_err_msg = make_unique<join_clan_response>("No clan by that name.");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
                 return false;
