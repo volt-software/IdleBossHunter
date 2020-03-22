@@ -26,14 +26,14 @@ using namespace ibh;
 using namespace rapidjson;
 
 void emplace_maxhp_maxmp(vector<stat_component> &stat_mods) {
-    auto hp_it = find_if(begin(stat_mods), end(stat_mods), [](stat_component const &sc){ return sc.name == stat_hp;});
+    auto hp_it = find_if(begin(stat_mods), end(stat_mods), [](stat_component const &sc){ return sc.stat_id == stat_hp_id;});
     if(hp_it != end(stat_mods)) {
-        stat_mods.emplace_back(stat_max_hp, hp_it->value);
+        stat_mods.emplace_back(stat_max_hp_id, hp_it->value);
     }
 
-    auto mp_it = find_if(begin(stat_mods), end(stat_mods), [](stat_component const &sc){ return sc.name == stat_mp;});
+    auto mp_it = find_if(begin(stat_mods), end(stat_mods), [](stat_component const &sc){ return sc.stat_id == stat_mp_id;});
     if(mp_it != end(stat_mods)) {
-        stat_mods.emplace_back(stat_max_mp, mp_it->value);
+        stat_mods.emplace_back(stat_max_mp_id, mp_it->value);
     }
 }
 
@@ -80,7 +80,11 @@ void read_classes(Value const &class_array, vector<character_class> &classes) {
         vector<skill_object> skills;
         for (auto const &stat : stat_names) {
             if(_class.HasMember(stat.c_str())) {
-                stat_mods.emplace_back(stat, _class[stat.c_str()].GetInt64());
+                auto mapper_it = stat_name_to_id_mapper.find(stat);
+                if(mapper_it == end(stat_name_to_id_mapper)) {
+                    throw runtime_error(fmt::format("Couldn't map stat {}", stat));
+                }
+                stat_mods.emplace_back(mapper_it->second, _class[stat.c_str()].GetInt64());
             }
         }
 
@@ -104,7 +108,11 @@ void read_races(Value const &race_array, vector<character_race> &races) {
         vector<stat_component> stat_mods;
         for (auto const &stat : stat_names) {
             if(race.HasMember(stat.c_str())) {
-                stat_mods.emplace_back(stat, race[stat.c_str()].GetInt64());
+                auto mapper_it = stat_name_to_id_mapper.find(stat);
+                if(mapper_it == end(stat_name_to_id_mapper)) {
+                    throw runtime_error(fmt::format("Couldn't map stat {}", stat));
+                }
+                stat_mods.emplace_back(mapper_it->second, race[stat.c_str()].GetInt64());
             }
         }
 

@@ -134,7 +134,7 @@ namespace ibh {
                 vector<stat_component> stats;
                 stats.reserve(db_stats.size());
                 for(auto const &stat : db_stats) {
-                    stats.emplace_back(stat.name, stat.value);
+                    stats.emplace_back(stat.stat_id, stat.value);
                 }
                 vector<item_object> items;
                 vector<skill_object> skills;

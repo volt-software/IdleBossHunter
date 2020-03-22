@@ -32,18 +32,18 @@ bool items_repository<transaction_T>::insert(db_item &item, unique_ptr<transacti
             item.character_id, transaction->escape(item.name), transaction->escape(item.slot), transaction->escape(item.equip_slot)));
 
     if(result.empty()) {
-        spdlog::error("[{}] contains {} entries", __FUNCTION__, result.size());
+        spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
         return false;
     }
 
     item.id = result[0][1].as(uint64_t{});
 
     if(result[0][0].as(uint64_t{}) == 0) {
-        spdlog::debug("[{}] inserted db_item {}", __FUNCTION__, item.id);
+        spdlog::trace("[{}] inserted db_item {}", __FUNCTION__, item.id);
         return true;
     }
 
-    spdlog::debug("[{}] could not insert db_item {} {}", __FUNCTION__, item.id, item.name);
+    spdlog::trace("[{}] could not insert db_item {} {}", __FUNCTION__, item.id, item.name);
     return false;
 }
 
@@ -51,14 +51,14 @@ template<DatabaseTransaction transaction_T>
 void items_repository<transaction_T>::update_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE items SET character_id = {}, equip_slot = '{}' WHERE id = {}", item.character_id, transaction->escape(item.equip_slot), item.id));
 
-    spdlog::debug("[{}] updated db_item {}", __FUNCTION__, item.id);
+    spdlog::trace("[{}] updated db_item {}", __FUNCTION__, item.id);
 }
 
 template<DatabaseTransaction transaction_T>
 void items_repository<transaction_T>::delete_item(db_item const &item, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("DELETE FROM items WHERE id = {}", item.id));
 
-    spdlog::debug("[{}] deleted db_item {}", __FUNCTION__, item.id);
+    spdlog::trace("[{}] deleted db_item {}", __FUNCTION__, item.id);
 }
 
 template<DatabaseTransaction transaction_T>
@@ -66,7 +66,7 @@ optional<db_item> items_repository<transaction_T>::get_item(uint64_t id, unique_
     auto result = transaction->execute(fmt::format("SELECT p.id, p.character_id, p.item_name, p.item_slot, p.equip_slot FROM items p WHERE id = {}", id));
 
     if(result.empty()) {
-        spdlog::debug("[{}] found no db_item by id {}", __FUNCTION__, id);
+        spdlog::trace("[{}] found no db_item by id {}", __FUNCTION__, id);
         return {};
     }
 
@@ -74,7 +74,7 @@ optional<db_item> items_repository<transaction_T>::get_item(uint64_t id, unique_
                                       result[0][2].as(string{}),
                                       result[0][3].as(string{}), result[0][4].as(string{}));
 
-    spdlog::debug("[{}] found db_item by id {}", __FUNCTION__, id);
+    spdlog::trace("[{}] found db_item by id {}", __FUNCTION__, id);
 
     return ret;
 }
@@ -83,7 +83,7 @@ template<DatabaseTransaction transaction_T>
 vector<db_item> items_repository<transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
     pqxx::result result = transaction->execute(fmt::format("SELECT p.id, p.character_id, p.item_name, p.item_slot, p.equip_slot FROM items p WHERE character_id = {}", character_id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     vector<db_item> items;
     items.reserve(result.size());

@@ -21,6 +21,7 @@
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
 #include <working_directory_manipulation.h>
+#include <common_components.h>
 #include "on_leaving_scope.h"
 #include "macros.h"
 
@@ -31,6 +32,7 @@ int main(int argc, char **argv) {
     set_cwd(get_selfpath());
     locale::global(locale("en_US.UTF-8"));
     spdlog::set_level(spdlog::level::trace);
+    fill_mappers();
 
     MEASURE_TIME_OF_FUNCTION(trace);
     int result = Catch::Session().run( argc, argv );

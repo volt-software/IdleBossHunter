@@ -24,6 +24,7 @@
 #include <repositories/clans_repository.h>
 #include <repositories/clan_members_repository.h>
 #include <repositories/clan_member_applications_repository.h>
+#include <game_queue_message_handlers/handler_helpers.h>
 
 using namespace std;
 
@@ -81,9 +82,29 @@ namespace ibh {
             auto new_err_msg = make_unique<accept_application_response>("");
             outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
 
-            spdlog::trace("[{}] accepted applicant {} clan {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
+            auto clan_view = es.view<clan_component>();
+            for(auto clan_entity : clan_view) {
+                auto &clan = clan_view.get(clan_entity);
 
-            return true;
+                if(clan.id != clan_member->clan_id) {
+                    continue;
+                }
+
+                clan.members.emplace(clan_application->character_id, CLAN_MEMBER);
+
+                auto accepted_player = get_player_entity(clan_application->character_id, es);
+                if(accepted_player != nullptr) {
+                    send_message_to_all_clan_members(clan, pc.name, fmt::format("{} got accepted into the clan!", accepted_player->name), "system-clan", es, outward_queue);
+                } else {
+                    spdlog::error("[{}] Couldn't find recently accepted player {}", __FUNCTION__, clan_application->character_id);
+                }
+
+                spdlog::trace("[{}] accepted applicant {} clan {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
+
+                return true;
+            }
+
+            spdlog::trace("[{}] could not find clan id {} for player {}", __FUNCTION__, clan_member->clan_id, pc.id);
         }
 
         spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, accept_msg->connection_id);

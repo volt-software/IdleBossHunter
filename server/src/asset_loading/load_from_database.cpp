@@ -34,7 +34,7 @@
 using namespace std;
 using namespace ibh;
 
-void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool> db_pool, atomic<bool> const &quit) {
+void ibh::load_from_database(entt::registry &registry, const shared_ptr<database_pool> &db_pool, atomic<bool> const &quit) {
     item_stats_repository<database_transaction> stat_repo{};
     items_repository<database_transaction> items_repo{};
     item_stats_repository<database_transaction> item_stats_repo{};
@@ -67,19 +67,14 @@ void ibh::load_from_database(entt::registry &registry, shared_ptr<database_pool>
         vector<item_component> items;
 
         for(auto &stat : character.stats) {
-            auto mapper_it = stat_name_to_id_mapper.find(stat.name);
-            if(mapper_it == end(stat_name_to_id_mapper)) {
-                spdlog::error("[{}] missing mapper for stat name {}", __FUNCTION__, stat.name);
-                continue;
-            }
-            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{mapper_it->second, stat.value});
+            stats.insert(decltype(stats)::value_type{stat.stat_id, stat.value});
         }
 
         for(auto &item : character.items) {
             vector<stat_component> item_stats;
             item_stats.reserve(item.stats.size());
             for(auto &stat : item.stats) {
-                item_stats.emplace_back(stat.name, stat.value);
+                item_stats.emplace_back(stat.stat_id, stat.value);
             }
             items.emplace_back(item.name, "", item.slot, 0, 0, 0, 0, 0, false, false, move(item_stats));
         }

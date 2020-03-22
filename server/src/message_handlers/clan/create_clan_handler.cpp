@@ -39,7 +39,7 @@ namespace ibh {
     void handle_create_clan(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                             moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_LOGIN_CHECK(create_clan_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(create_clan_request);
 
         q.enqueue(make_unique<create_clan_message>(user_data->connection_id, msg->name));
     }

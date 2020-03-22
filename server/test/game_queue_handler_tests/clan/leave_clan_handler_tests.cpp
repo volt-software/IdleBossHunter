@@ -61,7 +61,15 @@ TEST_CASE("leave clan handler tests") {
             pc_component pc{};
             pc.id = clan_applicant.id;
             pc.connection_id = 1;
+            pc.clan_id = existing_clan.id;
             registry.assign<pc_component>(entt, move(pc));
+        }
+
+        auto clan_entt = registry.create();
+        {
+            clan_component clan{existing_clan.id, existing_clan.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
+                                ibh_flat_map<uint32_t, int64_t>{}};
+            registry.assign<clan_component>(clan_entt, move(clan));
         }
 
         leave_clan_message msg(1);
@@ -76,6 +84,9 @@ TEST_CASE("leave clan handler tests") {
 
         auto all_members = clan_members_repo.get_by_clan_id(existing_clan.id, transaction);
         REQUIRE(all_members.empty());
+
+        auto &clan = registry.get<clan_component>(clan_entt);
+        REQUIRE(clan.members.empty());
     }
 
     SECTION( "cannot leave clan when not a member of any" ) {

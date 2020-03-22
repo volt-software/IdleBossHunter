@@ -35,14 +35,14 @@ TEST_CASE("clan stats repository tests") {
         db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, "test", 2};
+        db_clan_stat stat{0, clan.id, 121, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->clan_id == stat.clan_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -51,7 +51,7 @@ TEST_CASE("clan stats repository tests") {
         db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, "test", 2};
+        db_clan_stat stat{0, clan.id, 122, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -61,19 +61,39 @@ TEST_CASE("clan stats repository tests") {
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->clan_id == stat.clan_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
-    SECTION( "get all for character stats" ) {
+    SECTION( "get one for clan stats" ) {
         auto transaction = db_pool->create_transaction();
         db_clan clan{0, "clan"};
         clans_repo.insert(clan, transaction);
         REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, "test", 2};
+        db_clan_stat stat{0, clan.id, 123, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        db_clan_stat stat2{0, clan.id, "test2", 20};
+        db_clan_stat stat2{0, clan.id, 124, 20};
+        stat_repo.insert(stat2, transaction);
+        REQUIRE(stat2.id > 0);
+
+        auto retrieved_stat = stat_repo.get_by_stat(clan.id, stat.stat_id, transaction);
+        REQUIRE(retrieved_stat);
+        REQUIRE(retrieved_stat->id == stat.id);
+        REQUIRE(retrieved_stat->clan_id == stat.clan_id);
+        REQUIRE(retrieved_stat->stat_id == stat.stat_id);
+        REQUIRE(retrieved_stat->value == stat.value);
+    }
+
+    SECTION( "get all for clan stats" ) {
+        auto transaction = db_pool->create_transaction();
+        db_clan clan{0, "clan"};
+        clans_repo.insert(clan, transaction);
+        REQUIRE(clan.id > 0);
+        db_clan_stat stat{0, clan.id, 125, 2};
+        stat_repo.insert(stat, transaction);
+        REQUIRE(stat.id > 0);
+        db_clan_stat stat2{0, clan.id, 126, 20};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 
@@ -81,11 +101,11 @@ TEST_CASE("clan stats repository tests") {
         REQUIRE(stats.size() == 2);
         REQUIRE(stats[0].id == stat.id);
         REQUIRE(stats[0].clan_id == stat.clan_id);
-        REQUIRE(stats[0].name == stat.name);
+        REQUIRE(stats[0].stat_id == stat.stat_id);
         REQUIRE(stats[0].value == stat.value);
         REQUIRE(stats[1].id == stat2.id);
         REQUIRE(stats[1].clan_id == stat2.clan_id);
-        REQUIRE(stats[1].name == stat2.name);
+        REQUIRE(stats[1].stat_id == stat2.stat_id);
         REQUIRE(stats[1].value == stat2.value);
     }
 }

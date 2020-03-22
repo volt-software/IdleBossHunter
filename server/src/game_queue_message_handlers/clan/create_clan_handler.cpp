@@ -72,17 +72,10 @@ namespace ibh {
                 return false;
             }
 
-            vector<stat_id_component> clan_stats;
-            for(auto &name : stat_names) {
-                auto mapper_it = stat_name_to_id_mapper.find(name);
-
-                if(mapper_it == end(stat_name_to_id_mapper)) {
-                    spdlog::error("[{}] couldn't map {}", __FUNCTION__, name);
-                    continue;
-                }
-
-                db_clan_stat stat{0, new_clan.id, name, mapper_it->second == stat_xp_id || mapper_it->second == stat_gold_id ? 5 : 0};
-                clan_stats.emplace_back(stat_id_component{mapper_it->second, stat.value});
+            ibh_flat_map<uint32_t, int64_t> clan_stats;
+            for(auto &stat_id : stat_name_ids) {
+                db_clan_stat stat{0, new_clan.id, stat_id, stat_id == stat_xp_id || stat_id == stat_gold_id ? 5 : 0};
+                clan_stats.emplace(stat_id, stat.value);
                 clan_stats_repo.insert(stat, subtransaction);
             }
 
@@ -91,7 +84,7 @@ namespace ibh {
             subtransaction->commit();
 
             auto clan_entt = es.create();
-            es.assign<clan_component>(clan_entt, new_clan.id, create_msg->clan_name, vector<clan_member_component>{{pc.id, CLAN_ADMIN}}, clan_stats);
+            es.assign<clan_component>(clan_entt, new_clan.id, create_msg->clan_name, ibh_flat_map<uint64_t, uint16_t>{{pc.id, CLAN_ADMIN}}, clan_stats);
             pc.clan_id = new_clan.id;
 
             gold_it->second -= 10'000;

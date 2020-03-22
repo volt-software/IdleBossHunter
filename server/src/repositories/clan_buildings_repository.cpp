@@ -29,7 +29,7 @@ template<DatabaseTransaction transaction_T>
 bool clan_buildings_repository<transaction_T>::insert(db_clan_building &clan, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("INSERT INTO clan_buildings (name, clan_id) VALUES ('{}', {}) ON CONFLICT DO NOTHING RETURNING id", transaction->escape(clan.name), clan.clan_id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     if(result.empty()) {
         //already exists
@@ -45,14 +45,14 @@ template<DatabaseTransaction transaction_T>
 void clan_buildings_repository<transaction_T>::update(db_clan_building const &clan, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("UPDATE clan_buildings SET name = '{}' WHERE id = {}", transaction->escape(clan.name), clan.id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 }
 
 template<DatabaseTransaction transaction_T>
 optional<db_clan_building> clan_buildings_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT id, clan_id, name FROM clan_buildings WHERE id = {}", id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     if(result.empty()) {
         return {};

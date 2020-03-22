@@ -33,7 +33,7 @@ bool clan_members_repository<transaction_T>::insert(db_clan_member const &member
         return false;
     }
 
-    spdlog::debug("[{}] inserted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
+    spdlog::trace("[{}] inserted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
     return true;
 }
 
@@ -41,14 +41,14 @@ template<DatabaseTransaction transaction_T>
 void clan_members_repository<transaction_T>::update(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE clan_members SET member_level = {} WHERE clan_id = {} AND character_id = {}", member.member_level, member.clan_id, member.character_id));
 
-    spdlog::debug("[{}] updated member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
+    spdlog::trace("[{}] updated member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
 }
 
 template<DatabaseTransaction transaction_T>
 void clan_members_repository<transaction_T>::remove(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("DELETE FROM clan_members WHERE clan_id = {} AND character_id = {}", member.clan_id, member.character_id));
 
-    spdlog::debug("[{}] deleted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
+    spdlog::trace("[{}] deleted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
 }
 
 template<DatabaseTransaction transaction_T>
@@ -56,7 +56,7 @@ optional<db_clan_member> clan_members_repository<transaction_T>::get(uint64_t cl
     auto result = transaction->execute(fmt::format("SELECT m.clan_id, m.character_id, m.member_level FROM clan_members m WHERE m.clan_id = {} AND m.character_id = {}" , clan_id, character_id));
 
     if(result.empty()) {
-        spdlog::error("[{}] found no member by clan_id {} character_id {}", __FUNCTION__, clan_id, character_id);
+        spdlog::trace("[{}] found no member by clan_id {} character_id {}", __FUNCTION__, clan_id, character_id);
         return {};
     }
 
@@ -71,7 +71,7 @@ template<DatabaseTransaction transaction_T>
 vector<db_clan_member> clan_members_repository<transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT m.clan_id, m.character_id, m.member_level FROM clan_members m WHERE m.clan_id = {}", clan_id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     vector<db_clan_member> members;
     members.reserve(result.size());
@@ -88,7 +88,7 @@ optional<db_clan_member> clan_members_repository<transaction_T>::get_by_characte
     auto result = transaction->execute(fmt::format("SELECT m.clan_id, m.character_id, m.member_level FROM clan_members m WHERE m.character_id = {} LIMIT 1", character_id));
 
     if(result.empty()) {
-        spdlog::error("[{}] found no member character_id {}", __FUNCTION__, character_id);
+        spdlog::trace("[{}] found no member character_id {}", __FUNCTION__, character_id);
         return {};
     }
 

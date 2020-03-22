@@ -39,7 +39,7 @@ void ibh::write_item_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, 
     for(auto const &stat : obj.stats) {
         writer.StartObject();
         writer.String(KEY_STRING("name"));
-        writer.String(stat.name.c_str(), stat.name.size());
+        writer.Uint64(stat.stat_id);
 
         writer.String(KEY_STRING("value"));
         writer.Int64(stat.value);
@@ -66,7 +66,7 @@ bool ibh::read_item_object_into_vector(rapidjson::Value const &value, vector<ite
             return false;
         }
 
-        stats.emplace_back(stats_array[i]["name"].GetString(), stats_array[i]["value"].GetUint());
+        stats.emplace_back(stats_array[i]["stat_id"].GetUint64(), stats_array[i]["value"].GetUint());
     }
 
     objs.emplace_back(value["value"].GetUint(), value["name"].GetString(), value["description"].GetString(),

@@ -35,14 +35,14 @@ TEST_CASE("boss stats repository tests") {
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);
-        db_boss_stat stat{0, boss.id, "test", 2};
+        db_boss_stat stat{0, boss.id, 120, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->boss_id == stat.boss_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -51,7 +51,7 @@ TEST_CASE("boss stats repository tests") {
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);
-        db_boss_stat stat{0, boss.id, "test", 2};
+        db_boss_stat stat{0, boss.id, 121, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -61,7 +61,7 @@ TEST_CASE("boss stats repository tests") {
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->boss_id == stat.boss_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -70,10 +70,10 @@ TEST_CASE("boss stats repository tests") {
         db_boss boss{0, "boss", {}};
         bosses_repo.insert(boss, transaction);
         REQUIRE(boss.id > 0);
-        db_boss_stat stat{0, boss.id, "test", 2};
+        db_boss_stat stat{0, boss.id, 122, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        db_boss_stat stat2{0, boss.id, "test2", 20};
+        db_boss_stat stat2{0, boss.id, 123, 20};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 
@@ -81,11 +81,11 @@ TEST_CASE("boss stats repository tests") {
         REQUIRE(stats.size() == 2);
         REQUIRE(stats[0].id == stat.id);
         REQUIRE(stats[0].boss_id == stat.boss_id);
-        REQUIRE(stats[0].name == stat.name);
+        REQUIRE(stats[0].stat_id == stat.stat_id);
         REQUIRE(stats[0].value == stat.value);
         REQUIRE(stats[1].id == stat2.id);
         REQUIRE(stats[1].boss_id == stat2.boss_id);
-        REQUIRE(stats[1].name == stat2.name);
+        REQUIRE(stats[1].stat_id == stat2.stat_id);
         REQUIRE(stats[1].value == stat2.value);
     }
 }

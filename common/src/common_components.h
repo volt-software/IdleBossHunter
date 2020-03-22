@@ -26,20 +26,11 @@ using namespace std;
 
 namespace ibh {
     struct stat_component {
-        string name;
+        uint64_t stat_id;
         int64_t value;
 
-        stat_component(string name, int64_t value) : name(move(name)), value(value) {}
+        stat_component(uint64_t stat_id, int64_t value) : stat_id(stat_id), value(value) {}
     };
-
-    struct stat_id_component {
-        uint32_t id;
-        int64_t value;
-
-        stat_id_component(uint32_t id, int64_t value) : id(id), value(value) {}
-    };
-
-
 
     extern string const stat_str;
     extern string const stat_dex;
@@ -97,8 +88,19 @@ namespace ibh {
     extern string const gear_slot_feet;
     extern string const gear_slot_ear;
 
+    extern string const clan_stat_tax;
+    extern string const clan_stat_str_bonus;
+    extern string const clan_stat_agi_bonus;
+    extern string const clan_stat_int_bonus;
+    extern string const clan_stat_vit_bonus;
+    extern string const clan_stat_spd_bonus;
+    extern string const clan_stat_gold_bonus;
+    extern string const clan_stat_gold;
+    extern string const clan_stat_xp_bonus;
+
     extern array<string const, 42> const stat_names;
     extern array<string const, 12> const slot_names;
+    extern array<string const, 9> const clan_stat_names;
 
     uint32_t constexpr stat_str_id = 1;
     uint32_t constexpr stat_dex_id = 2;
@@ -156,9 +158,27 @@ namespace ibh {
     uint32_t constexpr gear_slot_feet_id = 1013;
     uint32_t constexpr gear_slot_ear_id = 1014;
 
+    uint32_t constexpr clan_stat_tax_id = 2001;
+    uint32_t constexpr clan_stat_str_bonus_id = 2002;
+    uint32_t constexpr clan_stat_agi_bonus_id = 2003;
+    uint32_t constexpr clan_stat_int_bonus_id = 2004;
+    uint32_t constexpr clan_stat_vit_bonus_id = 2005;
+    uint32_t constexpr clan_stat_spd_bonus_id = 2006;
+    uint32_t constexpr clan_stat_gold_bonus_id = 2007;
+    uint32_t constexpr clan_stat_gold_id = 2008;
+    uint32_t constexpr clan_stat_xp_bonus_id = 2009;
+
+
     extern array<uint32_t const, 42> const stat_name_ids;
     extern array<uint32_t const, 12> const slot_name_ids;
+    extern array<uint32_t const, 9> const clan_stat_name_ids;
 
     extern ibh_flat_map<string, uint32_t> stat_name_to_id_mapper;
+    extern ibh_flat_map<uint32_t, string> stat_id_to_name_mapper;
     extern ibh_flat_map<string, uint32_t> slot_name_to_id_mapper;
+    extern ibh_flat_map<uint32_t, string> slot_id_to_name_mapper;
+    extern ibh_flat_map<string, uint32_t> clan_stat_name_to_id_mapper;
+    extern ibh_flat_map<uint32_t, string> clan_stat_id_to_name_mapper;
+
+    void fill_mappers();
 }

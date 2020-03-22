@@ -108,7 +108,7 @@ namespace ibh {
         vector<stat_component> player_stats;
         player_stats.reserve(db_stats.size());
         for(auto const &stat : db_stats) {
-            player_stats.emplace_back(stat.name, stat.value);
+            player_stats.emplace_back(stat.stat_id, stat.value);
         }
         spdlog::debug("[{}] enqueing character {} slot {}", __FUNCTION__, character->name, character->slot);
         q.enqueue(make_unique<player_enter_message>(character->id, character->name, character->race, character->_class, move(player_stats),

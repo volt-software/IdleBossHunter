@@ -50,8 +50,8 @@ namespace ibh {
             clan_member_applications_repository<database_subtransaction> clan_member_applications_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            auto clan = clans_repo.get(join_msg->clan_name, subtransaction);
-            if(!clan) {
+            auto db_clan = clans_repo.get(join_msg->clan_name, subtransaction);
+            if(!db_clan) {
                 auto new_err_msg = make_unique<join_clan_response>("No clan by that name.");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
                 return false;
@@ -64,21 +64,21 @@ namespace ibh {
                 return false;
             }
 
-            auto clan_application = clan_member_applications_repo.get(clan->id, pc.id, subtransaction);
+            auto clan_application = clan_member_applications_repo.get(db_clan->id, pc.id, subtransaction);
             if(clan_application) {
                 auto new_err_msg = make_unique<join_clan_response>("Already applied to clan, please be patient.");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            db_clan_member new_member{clan->id, pc.id, CLAN_MEMBER};
+            db_clan_member new_member{db_clan->id, pc.id, CLAN_MEMBER};
             if(!clan_member_applications_repo.insert(new_member, subtransaction)) {
                 auto new_err_msg = make_unique<join_clan_response>("Server error.");
                 outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            send_message_to_all_clan_admins(clan->id, pc.name, "has applied for the clan.", "system-clan", es, outward_queue, transaction);
+            send_message_to_all_clan_admins(db_clan->id, pc.name, "has applied for the clan.", "system-clan", es, outward_queue, transaction);
             subtransaction->commit();
 
             auto new_err_msg = make_unique<join_clan_response>("");

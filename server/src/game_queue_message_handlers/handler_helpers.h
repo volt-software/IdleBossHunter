@@ -18,13 +18,17 @@
 
 #pragma once
 
-#include <entt/entity/registry.hpp>
 #include <database/database_transaction.h>
 #include <game_queue_messages/messages.h>
+#include <ecs/components.h>
 
 using namespace std;
 
 namespace ibh {
     void send_message_to_all_clan_members(uint64_t clan_id, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction);
+    void send_message_to_all_clan_members(clan_component const &clan, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues& outward_queue);
     void send_message_to_all_clan_admins(uint64_t clan_id, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction);
+    void send_message_to_all_clan_admins(clan_component const &clan, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues& outward_queue);
+    pc_component* get_player_entity_for_connection(uint64_t connection_id, entt::registry &es);
+    pc_component* get_player_entity(uint64_t player_id, entt::registry &es);
 }

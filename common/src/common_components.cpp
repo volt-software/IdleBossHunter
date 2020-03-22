@@ -77,6 +77,16 @@ namespace ibh {
     string const gear_slot_feet = "feet";
     string const gear_slot_ear = "ear";
 
+    string const clan_stat_tax = "tax";
+    string const clan_stat_str_bonus = "str_bonus";
+    string const clan_stat_agi_bonus = "agi_bonus";
+    string const clan_stat_int_bonus = "int_bonus";
+    string const clan_stat_vit_bonus = "vit_bonus";
+    string const clan_stat_spd_bonus = "spd_bonus";
+    string const clan_stat_gold_bonus = "gold_bonus";
+    string const clan_stat_gold = "gold";
+    string const clan_stat_xp_bonus = "xp_bonus";
+
     array<string const, 42> const stat_names = {stat_str, stat_dex, stat_agi, stat_int, stat_spd, stat_vit, stat_luk, stat_cha, stat_con, stat_move,
                                                 stat_hpregen, stat_mpregen, stat_hp, stat_mp, stat_max_hp, stat_max_mp, stat_xp, stat_gold, stat_hweapon_damage_rolls, stat_weapon_armor_class, stat_armor_class,
                                                 stat_accuracy, stat_offense, stat_defense, stat_stealth, stat_perception, stat_physical_damage_boost, stat_magical_damage_boost,
@@ -87,6 +97,9 @@ namespace ibh {
     array<string const, 12> const slot_names = {gear_slot_armor, gear_slot_robe1, gear_slot_robe2, gear_slot_ring1,
                                                 gear_slot_ring2, gear_slot_head, gear_slot_neck, gear_slot_waist, gear_slot_wrist, gear_slot_hands,
                                                 gear_slot_feet, gear_slot_ear};
+
+    array<string const, 9> const clan_stat_names = {clan_stat_tax, clan_stat_str_bonus, clan_stat_agi_bonus, clan_stat_int_bonus,
+                                                     clan_stat_vit_bonus, clan_stat_spd_bonus, clan_stat_gold_bonus, clan_stat_gold, clan_stat_xp_bonus};
 
 
     /*, "damageFactor"s TODO damage factor is a double :< */
@@ -101,12 +114,33 @@ namespace ibh {
                                                 stat_poison_resist_id, stat_disease_resist_id, stat_action_speed_id };
 
     array<uint32_t const, 12> const slot_name_ids = {gear_slot_armor_id, gear_slot_robe1_id, gear_slot_robe2_id, gear_slot_ring1_id,
-                                                gear_slot_ring2_id, gear_slot_head_id, gear_slot_neck_id, gear_slot_waist_id, gear_slot_wrist_id, gear_slot_hands_id,
-                                                gear_slot_feet_id, gear_slot_ear_id };
+                                                     gear_slot_ring2_id, gear_slot_head_id, gear_slot_neck_id, gear_slot_waist_id, gear_slot_wrist_id, gear_slot_hands_id,
+                                                     gear_slot_feet_id, gear_slot_ear_id };
 
-    ibh_flat_map<string, uint32_t> stat_name_to_id_mapper{{stat_str, stat_str_id}, {stat_dex, stat_dex_id}, {stat_agi, stat_agi_id}, {stat_int, stat_int_id}, {stat_spd, stat_spd_id}, {stat_vit, stat_vit_id}, {stat_luk, stat_luk_id},
-                                                          {stat_cha, stat_cha_id}, {stat_con, stat_con_id}, {stat_move, stat_move_id}};
-    ibh_flat_map<string, uint32_t> slot_name_to_id_mapper{{gear_slot_armor, gear_slot_armor_id}, {gear_slot_robe1, gear_slot_robe1_id}, {gear_slot_robe2, gear_slot_robe2_id}, {gear_slot_ring1, gear_slot_ring1_id},
-                                                          {gear_slot_ring2, gear_slot_ring2_id}, {gear_slot_head, gear_slot_head_id}, {gear_slot_neck, gear_slot_neck_id}, {gear_slot_waist, gear_slot_waist_id},
-                                                          {gear_slot_wrist, gear_slot_wrist_id}, {gear_slot_hands, gear_slot_hands_id}, {gear_slot_feet, gear_slot_feet_id}, {gear_slot_ear, gear_slot_ear_id}};
+    array<uint32_t const, 9> const clan_stat_ids = {clan_stat_tax_id, clan_stat_str_bonus_id, clan_stat_agi_bonus_id, clan_stat_int_bonus_id,
+                                                    clan_stat_vit_bonus_id, clan_stat_spd_bonus_id, clan_stat_gold_id, clan_stat_xp_bonus_id};
+
+    ibh_flat_map<string, uint32_t> stat_name_to_id_mapper;
+    ibh_flat_map<uint32_t, string> stat_id_to_name_mapper;
+    ibh_flat_map<string, uint32_t> slot_name_to_id_mapper;
+    ibh_flat_map<uint32_t, string> slot_id_to_name_mapper;
+    ibh_flat_map<string, uint32_t> clan_stat_name_to_id_mapper;
+    ibh_flat_map<uint32_t, string> clan_stat_id_to_name_mapper;
+
+    void fill_mappers() {
+        for(uint32_t i = 0; i < stat_names.size(); i++) {
+            stat_name_to_id_mapper.insert({stat_names[i], stat_name_ids[i]});
+            stat_id_to_name_mapper.insert({stat_name_ids[i], stat_names[i]});
+        }
+
+        for(uint32_t i = 0; i < slot_names.size(); i++) {
+            slot_name_to_id_mapper.insert({slot_names[i], slot_name_ids[i]});
+            slot_id_to_name_mapper.insert({slot_name_ids[i], slot_names[i]});
+        }
+
+        for(uint32_t i = 0; i < clan_stat_names.size(); i++) {
+            clan_stat_name_to_id_mapper.insert({clan_stat_names[i], clan_stat_ids[i]});
+            clan_stat_id_to_name_mapper.insert({clan_stat_ids[i], clan_stat_names[i]});
+        }
+    }
 }

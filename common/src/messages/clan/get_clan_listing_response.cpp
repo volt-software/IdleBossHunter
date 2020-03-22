@@ -59,8 +59,8 @@ string get_clan_listing_response::serialize() const {
         for(auto &bonus : clan.bonuses) {
             writer.StartObject();
 
-            writer.String(KEY_STRING("name"));
-            writer.String(bonus.name.c_str(), bonus.name.size());
+            writer.String(KEY_STRING("stat_id"));
+            writer.Uint64(bonus.stat_id);
 
             writer.String(KEY_STRING("amount"));
             writer.Uint64(bonus.amount);
@@ -132,12 +132,12 @@ unique_ptr<get_clan_listing_response> get_clan_listing_response::deserialize(rap
 
                 for (SizeType i2 = 0; i2 < bonus_array.Size(); i2++) {
                     if (!bonus_array[i2].IsObject() ||
-                        !bonus_array[i2].HasMember("name") ||
+                        !bonus_array[i2].HasMember("stat_id") ||
                         !bonus_array[i2].HasMember("amount")) {
                         spdlog::warn("[get_clan_listing_response] deserialize failed14");
                         return nullptr;
                     }
-                    bonuses.emplace_back(bonus_array[i2]["name"].GetString(), bonus_array[i2]["amount"].GetUint64());
+                    bonuses.emplace_back(bonus_array[i2]["stat_id"].GetUint64(), bonus_array[i2]["amount"].GetUint64());
                 }
             }
 

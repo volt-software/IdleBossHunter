@@ -118,7 +118,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
                 continue;
             }
 
-            double value = level * 6 * stat_it->second.value / 100.;
+            double value = level * 6 * stat_it->second / 100.;
             if(special >= 0) {
                 monster_special_definition_component &special_def = es.get<monster_special_definition_component>(*(mob_special_view.begin() + special));
                 auto special_stat_it = special_def.stats.find(mob_stat_id);
@@ -158,15 +158,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
             }
 
             for(auto &stat : item->second.stats) {
-                auto mapper_it = stat_name_to_id_mapper.find(stat.name);
-
-                if(mapper_it == end(stat_name_to_id_mapper)) {
-                    spdlog::error("[{}] no mapper for stat {}", __FUNCTION__, stat.name);
-                    continue;
-
-                }
-
-                GET_STAT(pc.battle->total_player_stats, stat_iter, mapper_it->second);
+                GET_STAT(pc.battle->total_player_stats, stat_iter, stat.stat_id);
                 stat_iter->second += stat.value;
             }
         }
@@ -270,7 +262,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
         if(plyr_xp->second >= level_threshold) {
             plyr_xp->second -= level_threshold;
             pc.level++;
-            ibh_flat_map<string, stat_component> stats;
+            ibh_flat_map<uint64_t, stat_component> stats;
 
             for(auto &race : select_response.races) {
                 if(race.name != pc.race) {
@@ -281,24 +273,15 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
                 }
 
                 for(auto &extra_stat : race.level_stat_mods) {
-                    auto mapper_it = stat_name_to_id_mapper.find(extra_stat.name);
-
-                    if(mapper_it == end(stat_name_to_id_mapper)) {
-                        spdlog::error("[{}] no mapper for stat {}", __FUNCTION__, extra_stat.name);
-                        continue;
-                    }
-
-                    auto stat_it = pc.stats.find(mapper_it->second);
+                    auto stat_it = pc.stats.find(extra_stat.stat_id);
                     
                     if(stat_it == end(pc.stats)) {
-                        spdlog::error("[{}] missing stat {} for pc {} - {}", __FUNCTION__, extra_stat.name, pc.name, pc.id);
+                        spdlog::error("[{}] missing stat {} for pc {} - {}", __FUNCTION__, extra_stat.stat_id, pc.name, pc.id);
                         continue;
                     }
                     stat_it->second += extra_stat.value;
                     if(pc.connection_id > 0) {
-                        stats.insert(ibh_flat_map<string, stat_component>::value_type{extra_stat.name,
-                                                                                      stat_component{extra_stat.name,
-                                                                                                     extra_stat.value}});
+                        stats.insert(decltype(stats)::value_type{extra_stat.stat_id, stat_component{extra_stat.stat_id, extra_stat.value}});
                     }
                 }
 
@@ -311,22 +294,15 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
                 }
 
                 for(auto &extra_stat : c.stat_mods) {
-                    auto mapper_it = stat_name_to_id_mapper.find(extra_stat.name);
-
-                    if(mapper_it == end(stat_name_to_id_mapper)) {
-                        spdlog::error("[{}] no mapper for stat {}", __FUNCTION__, extra_stat.name);
-                        continue;
-                    }
-
-                    auto stat_it = pc.stats.find(mapper_it->second);
+                    auto stat_it = pc.stats.find(extra_stat.stat_id);
 
                     if(stat_it == end(pc.stats)) {
-                        spdlog::error("[{}] missing stat {} for pc {} - {}", __FUNCTION__, extra_stat.name, pc.name, pc.id);
+                        spdlog::error("[{}] missing stat {} for pc {} - {}", __FUNCTION__, extra_stat.stat_id, pc.name, pc.id);
                         continue;
                     }
                     stat_it->second += extra_stat.value;
                     if(pc.connection_id > 0) {
-                        auto msg_stats_it = stats.find(extra_stat.name);
+                        auto msg_stats_it = stats.find(extra_stat.stat_id);
                         msg_stats_it->second.value += extra_stat.value;
                     }
                 }

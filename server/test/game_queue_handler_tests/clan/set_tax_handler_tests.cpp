@@ -19,25 +19,25 @@
 #include <catch2/catch.hpp>
 #include "../../test_helpers/startup_helper.h"
 #include "../game_queue_helpers.h"
-#include <game_queue_message_handlers/clan/accept_application_handler.h>
+#include <game_queue_message_handlers/clan/set_tax_handler.h>
 #include <ecs/components.h>
 #include <repositories/clans_repository.h>
 #include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <repositories/clan_stats_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
-#include <messages/clan/accept_application_response.h>
+#include <messages/clan/set_tax_response.h>
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("accept application handler tests") {
-    SECTION( "accepts application" ) {
+TEST_CASE("set tax handler tests") {
+    SECTION( "rejects application" ) {
         entt::registry registry;
         outward_queues q;
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        clan_stats_repository<database_transaction> clan_stats_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
@@ -48,9 +48,6 @@ TEST_CASE("accept application handler tests") {
         db_character clan_admin{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(clan_admin, transaction);
         REQUIRE(clan_admin.id > 0);
-        db_character clan_applicant{0, user.id, 1, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
-        char_repo.insert(clan_applicant, transaction);
-        REQUIRE(clan_applicant.id > 0);
 
         db_clan existing_clan{0, "test_clan"};
         clan_repo.insert(existing_clan, transaction);
@@ -59,42 +56,39 @@ TEST_CASE("accept application handler tests") {
         db_clan_member existing_member{existing_clan.id, clan_admin.id, CLAN_ADMIN};
         REQUIRE(clan_members_repo.insert(existing_member, transaction) == true);
 
-        db_clan_member new_member{existing_clan.id, clan_applicant.id, 0};
-        REQUIRE(clan_applications_repo.insert(new_member, transaction) == true);
+        db_clan_stat existing_stat{0, existing_clan.id, clan_stat_tax_id, 5};
+        clan_stats_repo.insert(existing_stat, transaction);
+        REQUIRE(existing_stat.id > 0);
 
         auto entt = registry.create();
         {
             pc_component pc{};
             pc.id = clan_admin.id;
             pc.connection_id = 1;
+            pc.clan_id = existing_clan.id;
             registry.assign<pc_component>(entt, move(pc));
         }
 
         auto clan_entt = registry.create();
         {
-            clan_component clan{existing_clan.id, existing_clan.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{}};
+            clan_component clan{existing_clan.id, existing_clan.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}}, ibh_flat_map<uint32_t, int64_t>{{existing_stat.stat_id, existing_stat.value}}};
             registry.assign<clan_component>(clan_entt, move(clan));
         }
 
-        accept_application_message msg(1, clan_applicant.id);
+        set_tax_message msg(1, 50);
 
-        auto ret = handle_accept_application(&msg, registry, q, transaction);
+        auto ret = handle_set_tax(&msg, registry, q, transaction);
         REQUIRE(ret == true);
 
-        test_outmsg<accept_application_response>(q, true);
+        test_outmsg<set_tax_response>(q, true);
 
-        auto all_applicants = clan_applications_repo.get_by_clan_id(existing_clan.id, transaction);
-        auto applicant_it = find_if(begin(all_applicants), end(all_applicants), [&](const auto &a){ return a.character_id == clan_applicant.id; });
-        REQUIRE(applicant_it == end(all_applicants));
-
-        auto all_members = clan_members_repo.get_by_clan_id(existing_clan.id, transaction);
-        auto member_it = find_if(begin(all_members), end(all_members), [&](const auto &m){ return m.character_id == clan_applicant.id; });
-        REQUIRE(member_it != end(all_members));
+        auto retrieved_stat = clan_stats_repo.get_by_stat(existing_clan.id, clan_stat_tax_id, transaction);
+        REQUIRE(retrieved_stat);
+        REQUIRE(retrieved_stat->value == 50);
 
         auto &clan = registry.get<clan_component>(clan_entt);
-        REQUIRE(clan.members.size() == 2);
-        REQUIRE(clan.members.find(clan_applicant.id) != end(clan.members));
+        REQUIRE(clan.stats.find(clan_stat_tax_id) != end(clan.stats));
+        REQUIRE(clan.stats.find(clan_stat_tax_id)->second == retrieved_stat->value);
     }
 
     SECTION( "rejects attempt when missing admin rights" ) {
@@ -102,7 +96,7 @@ TEST_CASE("accept application handler tests") {
         outward_queues q;
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        clan_stats_repository<database_transaction> clan_stats_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
@@ -113,9 +107,6 @@ TEST_CASE("accept application handler tests") {
         db_character clan_admin{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(clan_admin, transaction);
         REQUIRE(clan_admin.id > 0);
-        db_character clan_applicant{0, user.id, 1, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
-        char_repo.insert(clan_applicant, transaction);
-        REQUIRE(clan_applicant.id > 0);
 
         db_clan existing_clan{0, "test_clan"};
         clan_repo.insert(existing_clan, transaction);
@@ -124,41 +115,38 @@ TEST_CASE("accept application handler tests") {
         db_clan_member existing_member{existing_clan.id, clan_admin.id, CLAN_MEMBER};
         REQUIRE(clan_members_repo.insert(existing_member, transaction) == true);
 
-        db_clan_member new_member{existing_clan.id, clan_applicant.id, 0};
-        REQUIRE(clan_applications_repo.insert(new_member, transaction) == true);
+        db_clan_stat existing_stat{0, existing_clan.id, clan_stat_tax_id, 5};
+        clan_stats_repo.insert(existing_stat, transaction);
+        REQUIRE(existing_stat.id > 0);
 
         auto entt = registry.create();
         {
             pc_component pc{};
             pc.id = clan_admin.id;
             pc.connection_id = 1;
+            pc.clan_id = existing_clan.id;
             registry.assign<pc_component>(entt, move(pc));
         }
 
         auto clan_entt = registry.create();
         {
-            clan_component clan{existing_clan.id, existing_clan.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{}};
+            clan_component clan{existing_clan.id, existing_clan.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}}, ibh_flat_map<uint32_t, int64_t>{{existing_stat.stat_id, existing_stat.value}}};
             registry.assign<clan_component>(clan_entt, move(clan));
         }
 
-        accept_application_message msg(1, clan_applicant.id);
+        set_tax_message msg(1, 50);
 
-        auto ret = handle_accept_application(&msg, registry, q, transaction);
+        auto ret = handle_set_tax(&msg, registry, q, transaction);
         REQUIRE(ret == false);
 
-        test_outmsg<accept_application_response>(q, false);
+        test_outmsg<set_tax_response>(q, false);
 
-        auto all_applicants = clan_applications_repo.get_by_clan_id(existing_clan.id, transaction);
-        auto applicant_it = find_if(begin(all_applicants), end(all_applicants), [&](const auto &a){ return a.character_id == clan_applicant.id; });
-        REQUIRE(applicant_it != end(all_applicants));
-
-        auto all_members = clan_members_repo.get_by_clan_id(existing_clan.id, transaction);
-        auto member_it = find_if(begin(all_members), end(all_members), [&](const auto &m){ return m.character_id == clan_applicant.id; });
-        REQUIRE(member_it == end(all_members));
+        auto retrieved_stat = clan_stats_repo.get_by_stat(existing_clan.id, clan_stat_tax_id, transaction);
+        REQUIRE(retrieved_stat);
+        REQUIRE(retrieved_stat->value == 5);
 
         auto &clan = registry.get<clan_component>(clan_entt);
-        REQUIRE(clan.members.size() == 1);
-        REQUIRE(clan.members.find(clan_applicant.id) == end(clan.members));
+        REQUIRE(clan.stats.find(clan_stat_tax_id) != end(clan.stats));
+        REQUIRE(clan.stats.find(clan_stat_tax_id)->second == retrieved_stat->value);
     }
 }

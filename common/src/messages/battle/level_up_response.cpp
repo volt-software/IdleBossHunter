@@ -23,7 +23,7 @@
 using namespace ibh;
 using namespace rapidjson;
 
-level_up_response::level_up_response(ibh_flat_map<string, stat_component> added_stats, uint64_t new_xp_goal, uint64_t current_xp) noexcept : added_stats(move(added_stats)), new_xp_goal(new_xp_goal), current_xp(current_xp) {
+level_up_response::level_up_response(ibh_flat_map<uint64_t, stat_component> added_stats, uint64_t new_xp_goal, uint64_t current_xp) noexcept : added_stats(move(added_stats)), new_xp_goal(new_xp_goal), current_xp(current_xp) {
 
 }
 
@@ -39,7 +39,8 @@ string level_up_response::serialize() const {
     writer.String(KEY_STRING("added_stats"));
     writer.StartObject();
     for(auto &stat : added_stats) {
-        writer.String(stat.first.c_str(), stat.first.size());
+        auto stat_name = fmt::format("{}", stat.first);
+        writer.String(stat_name.c_str(), stat_name.length());
         writer.Int64(stat.second.value);
     }
     writer.EndObject();
@@ -65,10 +66,11 @@ unique_ptr<level_up_response> level_up_response::deserialize(rapidjson::Document
         return nullptr;
     }
 
-    ibh_flat_map<string, stat_component> stats;
+    ibh_flat_map<uint64_t, stat_component> stats;
     stats.reserve(d["added_stats"].MemberCount());
     for(auto &it : d["added_stats"].GetObject()) {
-        stats.insert(ibh_flat_map<string, stat_component>::value_type{it.name.GetString(), stat_component{it.name.GetString(), it.value.GetInt64()}});
+        uint64_t stat_id = stoul(it.name.GetString());
+        stats.insert(decltype(stats)::value_type{stat_id, stat_component{stat_id, it.value.GetInt64()}});
     }
 
     return make_unique<level_up_response>(move(stats), d["new_xp_goal"].GetUint64(), d["current_xp"].GetUint64());

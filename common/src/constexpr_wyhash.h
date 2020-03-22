@@ -22,6 +22,7 @@
 using namespace std;
 
 #pragma once
+
 namespace ibh {
     static constexpr uint64_t constexpr_wyrotr(uint64_t v, unsigned k) { return (v >> k) | (v << (64 - k)); }
 

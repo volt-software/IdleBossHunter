@@ -54,6 +54,7 @@
 #include "init/logger_init.h"
 #include "scenes/gui_scenes/connection_lost_scene.h"
 #include <messages/user_access/login_request.h>
+#include <common_components.h>
 
 using namespace std;
 using namespace ibh;
@@ -288,6 +289,7 @@ int main(int argc, char* argv[]) {
     emscripten_set_main_loop([]{ /* Only setting main loop so that an emscripten warning gets quenched */ }, 0, 0);
 #endif
 
+    fill_mappers();
     entt::registry es{};
     scene_system ss(&config, es);
 

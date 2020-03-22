@@ -43,7 +43,7 @@ namespace ibh {
     void handle_get_clan_listing(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                  moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_LOGIN_CHECK(get_clan_listing_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(get_clan_listing_request);
 
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_member_repo{};
@@ -66,7 +66,7 @@ namespace ibh {
 
             auto bonuses = clan_stat_repo.get_by_clan_id(c.id, transaction);
             for(auto &bonus : bonuses) {
-                msg_bonuses.emplace_back(bonus.name, bonus.value);
+                msg_bonuses.emplace_back(bonus.stat_id, bonus.value);
             }
 
             msg_clans.emplace_back(c.name, msg_members, msg_bonuses);

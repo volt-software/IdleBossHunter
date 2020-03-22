@@ -32,7 +32,7 @@ bool clan_member_applications_repository<transaction_T>::insert(db_clan_member &
         return false;
     }
 
-    spdlog::debug("[{}] inserted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
+    spdlog::trace("[{}] inserted member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
     return true;
 }
 
@@ -40,7 +40,7 @@ template<DatabaseTransaction transaction_T>
 void clan_member_applications_repository<transaction_T>::remove(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("DELETE FROM clan_member_applications WHERE clan_id = {} AND character_id = {}", member.clan_id, member.character_id));
 
-    spdlog::debug("[{}] updated member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
+    spdlog::trace("[{}] updated member {}-{}", __FUNCTION__, member.clan_id, member.character_id);
 }
 
 template<DatabaseTransaction transaction_T>
@@ -48,7 +48,7 @@ optional<db_clan_member> clan_member_applications_repository<transaction_T>::get
     auto result = transaction->execute(fmt::format("SELECT m.clan_id, m.character_id FROM clan_member_applications m WHERE m.clan_id = {} AND m.character_id = {}" , clan_id, character_id));
 
     if(result.empty()) {
-        spdlog::error("[{}] found no member by clan_id {} character_id {}", __FUNCTION__, clan_id, character_id);
+        spdlog::trace("[{}] found no member by clan_id {} character_id {}", __FUNCTION__, clan_id, character_id);
         return {};
     }
 
@@ -63,7 +63,7 @@ template<DatabaseTransaction transaction_T>
 vector<db_clan_member> clan_member_applications_repository<transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT m.clan_id, m.character_id FROM clan_member_applications m WHERE m.clan_id = {}", clan_id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     vector<db_clan_member> members;
     members.reserve(result.size());
@@ -79,7 +79,7 @@ template<DatabaseTransaction transaction_T>
 vector<db_clan_member> clan_member_applications_repository<transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT m.clan_id, m.character_id FROM clan_member_applications m WHERE m.character_id = {}", character_id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     vector<db_clan_member> members;
     members.reserve(result.size());

@@ -95,12 +95,12 @@ namespace ibh {
     struct monster_definition_component {
         string name;
 
-        ibh_flat_map<uint32_t, stat_component> stats;
+        ibh_flat_map<uint32_t, int64_t> stats;
         //vector<random_stat_component> random_stats;
         //vector<item_component> items;
         //vector<skill_component> skills;
 
-        monster_definition_component(string name, ibh_flat_map<uint32_t, stat_component> stats) :
+        monster_definition_component(string name, ibh_flat_map<uint32_t, int64_t> stats) :
         name(move(name)), stats(move(stats)) {}
     };
 
@@ -116,26 +116,21 @@ namespace ibh {
         string name;
         string special_name;
         uint32_t level;
-        vector<stat_component> stats;
+        ibh_flat_map<uint32_t, int64_t> stats;
         bool teleport_when_beat;
-    };
-
-    struct clan_member_component {
-        uint64_t character_id;
-        uint16_t member_level;
     };
 
     struct clan_building_definition_component {
         string name;
-        vector<stat_id_component> bonuses;
+        vector<stat_component> bonuses;
         uint64_t cost;
     };
 
     struct clan_component {
         uint64_t id;
         string name;
-        vector<clan_member_component> members;
-        vector<stat_id_component> stats;
+        ibh_flat_map<uint64_t, uint16_t> members;
+        ibh_flat_map<uint32_t, int64_t> stats;
     };
 
     struct battle_component {
@@ -168,10 +163,10 @@ namespace ibh {
         ibh_flat_map<string, skill_component> skills;
 
         pc_component() : id(), connection_id(), name(), race(), dir(), _class(), spawn_message(),
-                          level(), skill_points(), stats(), equipped_items(), inventory(), skills() {}
+                          level(), skill_points(), clan_id(), stats(), equipped_items(), inventory(), skills() {}
         pc_component(uint64_t id, uint64_t connection_id, string name, string race, string dir, string _class, string spawn_message, uint64_t level, uint64_t skill_points, ibh_flat_map<uint32_t, int64_t> stats, ibh_flat_map<uint32_t, item_component> equipped_items, vector<item_component> inventory, ibh_flat_map<string, skill_component> skills)
         : id(id), connection_id(connection_id), name(move(name)), race(move(race)), dir(move(dir)), _class(move(_class)), spawn_message(move(spawn_message)),
-                          level(level), skill_points(skill_points), stats(move(stats)), equipped_items(move(equipped_items)), inventory(move(inventory)), skills(move(skills)) {}
+                          level(level), skill_points(skill_points), clan_id(), stats(move(stats)), equipped_items(move(equipped_items)), inventory(move(inventory)), skills(move(skills)) {}
     };
 
     struct user_component {
@@ -191,7 +186,10 @@ namespace ibh {
 
 
     // constants
+
+    // clan member levels
     constexpr uint32_t CLAN_ADMIN = 3;
     constexpr uint32_t CLAN_SAGE = 2;
     constexpr uint32_t CLAN_MEMBER = 1;
+
 }

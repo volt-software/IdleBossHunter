@@ -30,6 +30,7 @@ namespace ibh {
     public:
         void insert(db_boss_stat &stat, unique_ptr<transaction_T> const &transaction) const;
         void update(db_boss_stat const &stat, unique_ptr<transaction_T> const &transaction) const;
+        void update_by_stat_id(db_boss_stat const &stat, unique_ptr<transaction_T> const &transaction) const;
         [[nodiscard]] optional<db_boss_stat> get(uint64_t id, unique_ptr<transaction_T> const &transaction) const;
         [[nodiscard]] vector<db_boss_stat> get_by_boss_id(uint64_t boss_id, unique_ptr<transaction_T> const &transaction) const;
     };

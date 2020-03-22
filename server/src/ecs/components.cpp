@@ -16,13 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include <entt/entt.hpp>
-#include <database/database_pool.h>
+#include "components.h"
 
 using namespace std;
+using namespace ibh;
 
 namespace ibh {
-    void load_from_database(entt::registry &registry, const shared_ptr<database_pool> &db_pool, atomic<bool> const &quit);
+
 }

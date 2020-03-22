@@ -72,6 +72,7 @@ int main() {
     locale::global(locale("en_US.UTF-8"));
 
     sensor.add_dictionary("assets/profanity_locales/en.json");
+    fill_mappers();
 
     config config;
     try {

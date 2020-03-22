@@ -196,7 +196,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
         }
 
         if(!_selected_class.empty() && !_selected_race.empty()) {
-            ibh_flat_map<string, int64_t> combined_stats;
+            ibh_flat_map<uint64_t, int64_t> combined_stats;
 
             vector<character_race>::iterator r = find_if(begin(_races), end(_races), [&_selected_race = _selected_race](const character_race &race){return race.name == _selected_race;});
             vector<character_class>::iterator c = find_if(begin(_classes), end(_classes), [&_selected_class = _selected_class](const character_class &_class){return _class.name == _selected_class;});
@@ -208,17 +208,29 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             }
 
             for(auto const &stat : r->level_stat_mods) {
-                ImGui::Text("%s %s: %lli", r->name.c_str(), stat.name.c_str(), stat.value);
-                combined_stats[stat.name] += stat.value;
+                auto stat_name_it = stat_id_to_name_mapper.find(stat.stat_id);
+                if(stat_name_it == end(stat_id_to_name_mapper)) {
+                    throw runtime_error("");
+                }
+                ImGui::Text("%s %s: %lli", r->name.c_str(), stat_name_it->second.c_str(), stat.value) ;
+                combined_stats[stat.stat_id] += stat.value;
             }
 
             for(auto const &stat : c->stat_mods) {
-                ImGui::Text("%s %s: %lli", c->name.c_str(), stat.name.c_str(), stat.value);
-                combined_stats[stat.name] += stat.value;
+                auto stat_name_it = stat_id_to_name_mapper.find(stat.stat_id);
+                if(stat_name_it == end(stat_id_to_name_mapper)) {
+                    throw runtime_error("");
+                }
+                ImGui::Text("%s %s: %lli", c->name.c_str(), stat_name_it->second.c_str(), stat.value);
+                combined_stats[stat.stat_id] += stat.value;
             }
 
             for(auto const &stat : c->stat_mods) {
-                ImGui::Text("%s: %lli", stat.name.c_str(), combined_stats[stat.name]);
+                auto stat_name_it = stat_id_to_name_mapper.find(stat.stat_id);
+                if(stat_name_it == end(stat_id_to_name_mapper)) {
+                    throw runtime_error("");
+                }
+                ImGui::Text("%s: %lli", stat_name_it->second.c_str(), combined_stats[stat.stat_id]);
             }
         }
     }

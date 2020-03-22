@@ -26,36 +26,43 @@ template class ibh::clan_stats_repository<database_subtransaction>;
 
 template<DatabaseTransaction transaction_T>
 void clan_stats_repository<transaction_T>::insert(db_clan_stat &stat, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("INSERT INTO clan_stats (clan_id, stat_name, value) VALUES ({}, '{}', {}) RETURNING id", stat.clan_id, transaction->escape(stat.name), stat.value));
+    auto result = transaction->execute(fmt::format("INSERT INTO clan_stats (clan_id, stat_id, value) VALUES ({}, {}, {}) RETURNING id", stat.clan_id, stat.stat_id, stat.value));
 
     if(result.empty()) {
-        spdlog::error("[{}] contains {} entries", __FUNCTION__, result.size());
+        spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
         return;
     }
 
     stat.id = result[0][0].as(uint32_t{});
 
-    spdlog::debug("[{}] inserted stat {}", __FUNCTION__, stat.id);
+    spdlog::trace("[{}] inserted stat {}", __FUNCTION__, stat.id);
 }
 
 template<DatabaseTransaction transaction_T>
 void clan_stats_repository<transaction_T>::update(db_clan_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
     transaction->execute(fmt::format("UPDATE clan_stats SET value = {} WHERE id = {}", stat.value, stat.id));
 
-    spdlog::debug("[{}] updated stat {}", __FUNCTION__, stat.id);
+    spdlog::trace("[{}] updated stat {}", __FUNCTION__, stat.id);
+}
+
+template<DatabaseTransaction transaction_T>
+void clan_stats_repository<transaction_T>::update_by_stat_id(db_clan_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
+    transaction->execute(fmt::format("UPDATE clan_stats SET value = {} WHERE clan_id = {} AND stat_id = {}", stat.value, stat.clan_id, stat.stat_id));
+
+    spdlog::trace("[{}] updated stat {}", __FUNCTION__, stat.id);
 }
 
 template<DatabaseTransaction transaction_T>
 optional<db_clan_stat> clan_stats_repository<transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_name, s.value FROM clan_stats s WHERE s.id = {}" , id));
+    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_id, s.value FROM clan_stats s WHERE s.id = {}" , id));
 
     if(result.empty()) {
-        spdlog::error("[{}] found no stat by id {}", __FUNCTION__, id);
+        spdlog::trace("[{}] found no stat by id {}", __FUNCTION__, id);
         return {};
     }
 
     auto ret = make_optional<db_clan_stat>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}),
-                                          result[0][2].as(string{}), result[0][3].as(int64_t{}));
+                                          result[0][2].as(uint64_t{}), result[0][3].as(int64_t{}));
 
     spdlog::trace("[{}] found stat by id {}", __FUNCTION__, id);
 
@@ -63,17 +70,34 @@ optional<db_clan_stat> clan_stats_repository<transaction_T>::get(uint64_t id, un
 }
 
 template<DatabaseTransaction transaction_T>
-vector<db_clan_stat> clan_stats_repository<transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_name, s.value FROM clan_stats s WHERE s.clan_id = {}", clan_id));
+optional<db_clan_stat> clan_stats_repository<transaction_T>::get_by_stat(uint64_t clan_id, uint64_t stat_id, const unique_ptr<transaction_T> &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_id, s.value FROM clan_stats s WHERE s.clan_id = {} AND s.stat_id = {}" , clan_id, stat_id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    if(result.empty()) {
+        spdlog::error("[{}] found no stat {} for clan {}", __FUNCTION__, stat_id, clan_id);
+        return {};
+    }
+
+    auto ret = make_optional<db_clan_stat>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}),
+                                           result[0][2].as(uint64_t{}), result[0][3].as(int64_t{}));
+
+    spdlog::trace("[{}] found stat {} for clan {}", __FUNCTION__, stat_id, clan_id);
+
+    return ret;
+}
+
+template<DatabaseTransaction transaction_T>
+vector<db_clan_stat> clan_stats_repository<transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_id, s.value FROM clan_stats s WHERE s.clan_id = {}", clan_id));
+
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     vector<db_clan_stat> stats;
     stats.reserve(result.size());
 
     for(auto const & res : result) {
         stats.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}),
-                           res[2].as(string{}), res[3].as(int64_t{}));
+                           res[2].as(uint64_t{}), res[3].as(int64_t{}));
     }
 
     return stats;

@@ -40,7 +40,7 @@ namespace ibh {
     void handle_public_chat(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                             moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_LOGIN_CHECK(message_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(message_request);
 
         auto now = system_clock::now();
         auto chat_msg = message_response(user_data->username, sensor.clean_profanity_ish(msg->content), "game", duration_cast<milliseconds>(now.time_since_epoch()).count()).serialize();

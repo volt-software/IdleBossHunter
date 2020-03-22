@@ -50,21 +50,21 @@ namespace ibh {
     struct db_character_stat {
         uint64_t id;
         uint64_t character_id;
-        string name;
+        uint64_t stat_id;
         int64_t value;
 
-        db_character_stat() : id(), character_id(), name(), value() {}
-        db_character_stat(uint64_t id, uint64_t character_id, string name, int64_t value) : id(id), character_id(character_id), name(move(name)), value(value) {}
+        db_character_stat() : id(), character_id(), stat_id(), value() {}
+        db_character_stat(uint64_t id, uint64_t character_id, uint64_t stat_id, int64_t value) : id(id), character_id(character_id), stat_id(stat_id), value(value) {}
     };
 
     struct db_item_stat {
         uint64_t id;
         uint64_t item_id;
-        string name;
+        uint64_t stat_id;
         int64_t value;
 
-        db_item_stat() : id(), item_id(), name(), value() {}
-        db_item_stat(uint64_t id, uint64_t item_id, string name, int64_t value) : id(id), item_id(item_id), name(move(name)), value(value) {}
+        db_item_stat() : id(), item_id(), stat_id(), value() {}
+        db_item_stat(uint64_t id, uint64_t item_id, uint64_t stat_id, int64_t value) : id(id), item_id(item_id), stat_id(stat_id), value(value) {}
     };
 
     struct db_item {
@@ -105,11 +105,11 @@ namespace ibh {
     struct db_boss_stat {
         uint64_t id;
         uint64_t boss_id;
-        string name;
+        uint64_t stat_id;
         int64_t value;
 
-        db_boss_stat() : id(), boss_id(), name(), value() {}
-        db_boss_stat(uint64_t id, uint64_t boss_id, string name, int64_t value) : id(id), boss_id(boss_id), name(move(name)), value(value) {}
+        db_boss_stat() : id(), boss_id(), stat_id(), value() {}
+        db_boss_stat(uint64_t id, uint64_t boss_id, uint64_t stat_id, int64_t value) : id(id), boss_id(boss_id), stat_id(stat_id), value(value) {}
     };
 
     struct db_boss {
@@ -133,11 +133,11 @@ namespace ibh {
     struct db_clan_stat {
         uint64_t id;
         uint64_t clan_id;
-        string name;
+        uint64_t stat_id;
         int64_t value;
 
-        db_clan_stat() : id(), clan_id(), name(), value() {}
-        db_clan_stat(uint64_t id, uint64_t clan_id, string name, int64_t value) : id(id), clan_id(clan_id), name(move(name)), value(value) {}
+        db_clan_stat() : id(), clan_id(), stat_id(), value() {}
+        db_clan_stat(uint64_t id, uint64_t clan_id, uint64_t stat_id, int64_t value) : id(id), clan_id(clan_id), stat_id(stat_id), value(value) {}
     };
 
     struct db_clan_building {

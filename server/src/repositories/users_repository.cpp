@@ -30,7 +30,7 @@ bool users_repository<transaction_T>::insert_if_not_exists(db_user &usr, unique_
             "INSERT INTO users (username, password, email, login_attempts, verification_code, is_game_master, max_characters) VALUES ('{}', '{}', '{}', {}, '{}', {}, {}) ON CONFLICT DO NOTHING RETURNING id",
             transaction->escape(usr.username), transaction->escape(usr.password), transaction->escape(usr.email), usr.login_attempts, transaction->escape(usr.verification_code), usr.is_game_master, usr.max_characters));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     if(result.empty()) {
         //already exists
@@ -47,14 +47,14 @@ void users_repository<transaction_T>::update(db_user const &usr, unique_ptr<tran
     auto result = transaction->execute(fmt::format("UPDATE users SET username = '{}', password = '{}', email = '{}', login_attempts = {}, verification_code = '{}', is_game_master = {}, max_characters = {} WHERE id = {}",
                                                    transaction->escape(usr.username), transaction->escape(usr.password), transaction->escape(usr.email), usr.login_attempts, transaction->escape(usr.verification_code), usr.is_game_master, usr.max_characters, usr.id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 }
 
 template<DatabaseTransaction transaction_T>
 optional<db_user> users_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT * FROM users WHERE id = {}", id));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     if(result.empty()) {
         return {};
@@ -70,7 +70,7 @@ template<DatabaseTransaction transaction_T>
 optional<db_user> users_repository<transaction_T>::get(string const &username, unique_ptr<transaction_T> const &transaction) const {
     auto result = transaction->execute(fmt::format("SELECT * FROM users WHERE username = '{}'", transaction->escape(username)));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     if(result.empty()) {
         return {};
@@ -86,7 +86,7 @@ template<DatabaseTransaction transaction_T>
 vector<db_user> users_repository<transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
     pqxx::result result = transaction->execute(fmt::format("SELECT * FROM users u LEFT JOIN banned_users bu ON bu.user_id = u.id WHERE bu.id IS NULL"));
 
-    spdlog::debug("[{}] contains {} entries", __FUNCTION__, result.size());
+    spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
     vector<db_user> users;
     users.reserve(result.size());

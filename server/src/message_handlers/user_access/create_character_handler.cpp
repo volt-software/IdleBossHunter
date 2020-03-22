@@ -124,10 +124,10 @@ namespace ibh {
         }
 
         vector<stat_component> player_stats;
-        for(auto const &stat : stat_names) {
+        for(auto const &stat : stat_name_ids) {
             auto value = 0;
-            auto race_value_it = find_if(begin(race_it->level_stat_mods), end(race_it->level_stat_mods), [&stat](stat_component const &sc){ return sc.name == stat; });
-            auto class_value_it = find_if(begin(classes_it->stat_mods), end(classes_it->stat_mods), [&stat](stat_component const &sc){ return sc.name == stat; });
+            auto race_value_it = find_if(begin(race_it->level_stat_mods), end(race_it->level_stat_mods), [&stat](stat_component const &sc){ return sc.stat_id == stat; });
+            auto class_value_it = find_if(begin(classes_it->stat_mods), end(classes_it->stat_mods), [&stat](stat_component const &sc){ return sc.stat_id == stat; });
 
             if(race_value_it != end(race_it->level_stat_mods)) {
                 value += race_value_it->value;
@@ -145,9 +145,9 @@ namespace ibh {
         }
 
         for(auto const &stat : player_stats) {
-            db_character_stat char_stat{0, new_player.id, stat.name, stat.value};
+            db_character_stat char_stat{0, new_player.id, stat.stat_id, stat.value};
             stats_repo.insert(char_stat, subtransaction);
-            player_stats.emplace_back(stat.name, stat.value);
+            player_stats.emplace_back(stat.stat_id, stat.value);
         }
 
         subtransaction->commit();

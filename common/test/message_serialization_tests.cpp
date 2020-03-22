@@ -178,7 +178,7 @@ TEST_CASE("message serialization tests") {
             vector<item_object> items;
             vector<skill_object> skills;
 
-            stat_mods.emplace_back("test2", 234);
+            stat_mods.emplace_back(123, 234);
             items.emplace_back(1, "test3", "4", "5", vector<stat_component>{});
             skills.emplace_back("test4", 345);
             classes.emplace_back("test5", "test6", stat_mods, items, skills);
@@ -187,7 +187,7 @@ TEST_CASE("message serialization tests") {
         vector<character_race> races;
         {
             vector<stat_component> stat_mods;
-            stat_mods.emplace_back("test7", 456);
+            stat_mods.emplace_back(678, 456);
             races.emplace_back("test8", "test9", stat_mods);
         }
         SERDE(character_select_response, races, classes);
@@ -200,14 +200,14 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg.races[0].description == msg2->races[0].description);
         REQUIRE(msg.races[0].level_stat_mods.size() == 1);
         REQUIRE(msg.races[0].level_stat_mods.size() == msg2->races[0].level_stat_mods.size());
-        REQUIRE(msg.races[0].level_stat_mods[0].name == msg2->races[0].level_stat_mods[0].name);
+        REQUIRE(msg.races[0].level_stat_mods[0].stat_id == msg2->races[0].level_stat_mods[0].stat_id);
         REQUIRE(msg.races[0].level_stat_mods[0].value == msg2->races[0].level_stat_mods[0].value);
 
         REQUIRE(msg.classes[0].name == msg2->classes[0].name);
         REQUIRE(msg.classes[0].description == msg2->classes[0].description);
         REQUIRE(msg.classes[0].stat_mods.size() == 1);
         REQUIRE(msg.classes[0].stat_mods.size() == msg2->classes[0].stat_mods.size());
-        REQUIRE(msg.classes[0].stat_mods[0].name == msg2->classes[0].stat_mods[0].name);
+        REQUIRE(msg.classes[0].stat_mods[0].stat_id == msg2->classes[0].stat_mods[0].stat_id);
         REQUIRE(msg.classes[0].stat_mods[0].value == msg2->classes[0].stat_mods[0].value);
         REQUIRE(msg.classes[0].items.size() == 1);
         REQUIRE(msg.classes[0].items.size() == msg2->classes[0].items.size());
@@ -282,18 +282,18 @@ TEST_CASE("message serialization tests") {
     }
 
     SECTION("level up response") {
-        ibh_flat_map<string, stat_component> stats;
-        stats.insert(ibh_flat_map<string, stat_component>::value_type{"s1", stat_component{"s1", 10}});
-        stats.insert(ibh_flat_map<string, stat_component>::value_type{"s2", stat_component{"s2", 20}});
+        ibh_flat_map<uint64_t, stat_component> stats;
+        stats.insert(decltype(stats)::value_type{stat_hp_id, stat_component{stat_hp_id, 10}});
+        stats.insert(decltype(stats)::value_type{stat_mp_id, stat_component{stat_mp_id, 20}});
         SERDE(level_up_response, stats, 1, 2);
         REQUIRE(msg2->added_stats.size() == 2);
-        auto as1 = msg2->added_stats.find("s1");
-        auto as2 = msg2->added_stats.find("s2");
-        auto s1 = stats.find("s1");
-        auto s2 = stats.find("s2");
-        REQUIRE(as1->second.name == s1->second.name);
+        auto as1 = msg2->added_stats.find(stat_hp_id);
+        auto as2 = msg2->added_stats.find(stat_mp_id);
+        auto s1 = stats.find(stat_hp_id);
+        auto s2 = stats.find(stat_mp_id);
+        REQUIRE(as1->second.stat_id == s1->second.stat_id);
         REQUIRE(as1->second.value == s1->second.value);
-        REQUIRE(as2->second.name == s2->second.name);
+        REQUIRE(as2->second.stat_id == s2->second.stat_id);
         REQUIRE(as2->second.value == s2->second.value);
         REQUIRE(msg2->new_xp_goal == 1);
         REQUIRE(msg2->current_xp == 2);
@@ -359,12 +359,12 @@ TEST_CASE("message serialization tests") {
         vector<bonus> bonuses2;
         vector<string> members2;
 
-        bonuses1.emplace_back("b1", 2);
-        bonuses1.emplace_back("b2", 3);
+        bonuses1.emplace_back(123, 2);
+        bonuses1.emplace_back(234, 3);
         members1.emplace_back("m1");
         members1.emplace_back("m2");
-        bonuses2.emplace_back("b3", 4);
-        bonuses2.emplace_back("b4", 5);
+        bonuses2.emplace_back(345, 4);
+        bonuses2.emplace_back(456, 5);
         members2.emplace_back("m3");
         members2.emplace_back("m4");
         clans.emplace_back("c1", members1, bonuses1);
@@ -377,18 +377,18 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg2->clans[0].members[0] == "m1");
         REQUIRE(msg2->clans[0].members[1] == "m2");
         REQUIRE(msg2->clans[0].bonuses.size() == 2);
-        REQUIRE(msg2->clans[0].bonuses[0].name == "b1");
+        REQUIRE(msg2->clans[0].bonuses[0].stat_id == 123);
         REQUIRE(msg2->clans[0].bonuses[0].amount == 2);
-        REQUIRE(msg2->clans[0].bonuses[1].name == "b2");
+        REQUIRE(msg2->clans[0].bonuses[1].stat_id == 234);
         REQUIRE(msg2->clans[0].bonuses[1].amount == 3);
         REQUIRE(msg2->clans[1].name == "c2");
         REQUIRE(msg2->clans[1].members.size() == 2);
         REQUIRE(msg2->clans[1].members[0] == "m3");
         REQUIRE(msg2->clans[1].members[1] == "m4");
         REQUIRE(msg2->clans[1].bonuses.size() == 2);
-        REQUIRE(msg2->clans[1].bonuses[0].name == "b3");
+        REQUIRE(msg2->clans[1].bonuses[0].stat_id == 345);
         REQUIRE(msg2->clans[1].bonuses[0].amount == 4);
-        REQUIRE(msg2->clans[1].bonuses[1].name == "b4");
+        REQUIRE(msg2->clans[1].bonuses[1].stat_id == 456);
         REQUIRE(msg2->clans[1].bonuses[1].amount == 5);
     }
 

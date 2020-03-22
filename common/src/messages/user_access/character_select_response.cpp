@@ -62,8 +62,8 @@ string character_select_response::serialize() const {
         writer.StartArray();
         for(auto const &stat : _class.stat_mods) {
             writer.StartObject();
-            writer.String(KEY_STRING("name"));
-            writer.String(stat.name.c_str(), stat.name.size());
+            writer.String(KEY_STRING("stat_id"));
+            writer.Uint64(stat.stat_id);
 
             writer.String(KEY_STRING("value"));
             writer.Int64(stat.value);
@@ -112,8 +112,8 @@ string character_select_response::serialize() const {
         writer.StartArray();
         for(auto const &stat : race.level_stat_mods) {
             writer.StartObject();
-            writer.String(KEY_STRING("name"));
-            writer.String(stat.name.c_str(), stat.name.size());
+            writer.String(KEY_STRING("stat_id"));
+            writer.Uint64(stat.stat_id);
 
             writer.String(KEY_STRING("value"));
             writer.Int64(stat.value);
@@ -169,12 +169,12 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
 
                 for (SizeType i2 = 0; i2 < race_stat_mods_array.Size(); i2++) {
                     if (!race_stat_mods_array[i2].IsObject() ||
-                        !race_stat_mods_array[i2].HasMember("name") ||
+                        !race_stat_mods_array[i2].HasMember("stat_id") ||
                         !race_stat_mods_array[i2].HasMember("value")) {
                         spdlog::warn("[character_select_response] deserialize failed6");
                         return nullptr;
                     }
-                    class_base_stats.emplace_back(race_stat_mods_array[i2]["name"].GetString(), race_stat_mods_array[i2]["value"].GetInt64());
+                    class_base_stats.emplace_back(race_stat_mods_array[i2]["stat_id"].GetUint64(), race_stat_mods_array[i2]["value"].GetInt64());
                 }
             }
 
@@ -249,12 +249,12 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
 
                 for (SizeType i2 = 0; i2 < class_stat_mods_array.Size(); i2++) {
                     if (!class_stat_mods_array[i2].IsObject() ||
-                        !class_stat_mods_array[i2].HasMember("name") ||
+                        !class_stat_mods_array[i2].HasMember("stat_id") ||
                         !class_stat_mods_array[i2].HasMember("value")) {
                         spdlog::warn("[character_select_response] deserialize failed14");
                         return nullptr;
                     }
-                    race_stat_mods.emplace_back(class_stat_mods_array[i2]["name"].GetString(), class_stat_mods_array[i2]["value"].GetInt64());
+                    race_stat_mods.emplace_back(class_stat_mods_array[i2]["stat_id"].GetUint64(), class_stat_mods_array[i2]["value"].GetInt64());
                 }
             }
 

@@ -40,14 +40,14 @@ TEST_CASE("character stats repository tests") {
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
         characters_repo.insert(character, transaction);
         REQUIRE(character.id > 0);
-        db_character_stat stat{0, character.id, "test", 2};
+        db_character_stat stat{0, character.id, 121, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->character_id == stat.character_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -59,7 +59,7 @@ TEST_CASE("character stats repository tests") {
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
         characters_repo.insert(character, transaction);
         REQUIRE(character.id > 0);
-        db_character_stat stat{0, character.id, "test", 2};
+        db_character_stat stat{0, character.id, 122, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -69,7 +69,7 @@ TEST_CASE("character stats repository tests") {
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->character_id == stat.character_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -81,10 +81,10 @@ TEST_CASE("character stats repository tests") {
         db_character character{0, usr.id, 1, 2, 3, 4, 5, 6, 7, "john doe"s, "race", "class", "map", {}, {}};
         characters_repo.insert(character, transaction);
         REQUIRE(character.id > 0);
-        db_character_stat stat{0, character.id, "test", 20};
+        db_character_stat stat{0, character.id, 123, 20};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        db_character_stat stat2{0, character.id, "test2", 30};
+        db_character_stat stat2{0, character.id, 124, 30};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 
@@ -92,11 +92,11 @@ TEST_CASE("character stats repository tests") {
         REQUIRE(stats.size() == 2);
         REQUIRE(stats[0].id == stat.id);
         REQUIRE(stats[0].character_id == stat.character_id);
-        REQUIRE(stats[0].name == stat.name);
+        REQUIRE(stats[0].stat_id == stat.stat_id);
         REQUIRE(stats[0].value == stat.value);
         REQUIRE(stats[1].id == stat2.id);
         REQUIRE(stats[1].character_id == stat2.character_id);
-        REQUIRE(stats[1].name == stat2.name);
+        REQUIRE(stats[1].stat_id == stat2.stat_id);
         REQUIRE(stats[1].value == stat2.value);
     }
 }

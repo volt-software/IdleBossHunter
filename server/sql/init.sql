@@ -48,7 +48,7 @@ CREATE TABLE characters (
 CREATE TABLE character_stats (
     id BIGSERIAL PRIMARY KEY,
     character_id BIGINT NOT NULL,
-    stat_name TEXT NOT NULL,
+    stat_id BIGINT NOT NULL,
     value BIGINT NOT NULL
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE items (
 CREATE TABLE item_stats (
     id BIGSERIAL PRIMARY KEY,
     item_id BIGINT NOT NULL,
-    stat_name CITEXT NOT NULL,
+    stat_id BIGINT NOT NULL,
     value BIGINT NOT NULL
 );
 
@@ -83,7 +83,7 @@ CREATE TABLE bosses (
 CREATE TABLE boss_stats (
     id BIGSERIAL PRIMARY KEY,
     boss_id BIGINT NOT NULL,
-    stat_name TEXT NOT NULL,
+    stat_id BIGINT NOT NULL,
     value BIGINT NOT NULL
 );
 
@@ -106,7 +106,7 @@ CREATE TABLE clan_member_applications (
 CREATE TABLE clan_stats (
     id BIGSERIAL PRIMARY KEY,
     clan_id BIGINT NOT NULL,
-    stat_name TEXT NOT NULL,
+    stat_id BIGINT NOT NULL,
     value BIGINT NOT NULL
 );
 
@@ -145,6 +145,11 @@ ALTER TABLE clan_buildings ADD CONSTRAINT "clan_buildings_clans_id_fkey" FOREIGN
 ALTER TABLE clans ADD CONSTRAINT "clan_name_unique" UNIQUE (name);
 ALTER TABLE settings ADD CONSTRAINT "settings_name_unique" UNIQUE (setting_name);
 ALTER TABLE schema_information ADD CONSTRAINT "schema_information_name_unique" UNIQUE (file_name);
+
+CREATE INDEX character_stats_idx ON character_stats (character_id, stat_id);
+CREATE INDEX item_stats_idx ON item_stats (item_id, stat_id);
+CREATE INDEX boss_stats_idx ON boss_stats (boss_id, stat_id);
+CREATE INDEX clan_stats_idx ON clan_stats (clan_id, stat_id);
 
 INSERT INTO schema_information(file_name, date) VALUES ('init.sql', CURRENT_TIMESTAMP);
 

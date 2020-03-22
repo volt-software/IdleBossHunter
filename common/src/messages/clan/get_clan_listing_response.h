@@ -26,10 +26,10 @@ using namespace std;
 
 namespace ibh {
     struct bonus {
-        string name;
+        uint64_t stat_id;
         uint64_t amount;
 
-        bonus(string name, uint64_t amount) noexcept : name(move(name)), amount(amount) {}
+        bonus(uint64_t stat_id, uint64_t amount) noexcept : stat_id(stat_id), amount(amount) {}
     };
     struct clan {
         string name;

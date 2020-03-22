@@ -61,6 +61,17 @@ namespace ibh {
             outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
             subtransaction->commit();
 
+            auto clan_view = es.view<clan_component>();
+            for(auto clan_entity : clan_view) {
+                auto &clan = clan_view.get(clan_entity);
+
+                if (clan.id != pc.clan_id) {
+                    continue;
+                }
+
+                clan.members.erase(pc.id);
+            }
+
             spdlog::trace("[{}] left clan {} for pc {} for connection id {}", __FUNCTION__, clan_member->clan_id, pc.name, pc.connection_id);
 
             return true;

@@ -43,7 +43,7 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
         return {};
     }
 
-    ibh_flat_map<uint32_t, stat_component> stats;
+    ibh_flat_map<uint32_t, int64_t> stats;
     stats.reserve(d["stats"].MemberCount());
     string name = d["name"].GetString();
 
@@ -54,7 +54,7 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
                 spdlog::error("[{}] monster {} could not map stat {}", __FUNCTION__, name, stat);
                 continue;
             }
-            stats.insert(ibh_flat_map<uint32_t, stat_component>::value_type{mapper_it->second, stat_component{stat, d["stats"][stat.c_str()].GetInt64()}});
+            stats.insert(decltype(stats)::value_type{mapper_it->second, d["stats"][stat.c_str()].GetInt64()});
             spdlog::trace("[{}] monster {} found stat {}", __FUNCTION__, name, stat);
         } else {
             spdlog::trace("[{}] monster {} missing stat {}", __FUNCTION__, name, stat);

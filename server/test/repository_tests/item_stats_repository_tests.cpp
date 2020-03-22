@@ -46,14 +46,14 @@ TEST_CASE("item stats repository tests") {
         db_item item{0, c.id, "item", "slot", "equip"};
         items_repo.insert(item, transaction);
         REQUIRE(item.id > 0);
-        db_item_stat stat{0, item.id, "test", 2};
+        db_item_stat stat{0, item.id, 121, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->item_id == stat.item_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -69,7 +69,7 @@ TEST_CASE("item stats repository tests") {
         db_item item{0, c.id, "item", "slot", "equip"};
         items_repo.insert(item, transaction);
         REQUIRE(item.id > 0);
-        db_item_stat stat{0, item.id, "test", 2};
+        db_item_stat stat{0, item.id, 122, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -79,7 +79,7 @@ TEST_CASE("item stats repository tests") {
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
         REQUIRE(stat2->item_id == stat.item_id);
-        REQUIRE(stat2->name == stat.name);
+        REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
@@ -95,10 +95,10 @@ TEST_CASE("item stats repository tests") {
         db_item item{0, c.id, "item", "slot", "equip"};
         items_repo.insert(item, transaction);
         REQUIRE(item.id > 0);
-        db_item_stat stat{0, item.id, "test", 2};
+        db_item_stat stat{0, item.id, 123, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        db_item_stat stat2{0, item.id, "test2", 20};
+        db_item_stat stat2{0, item.id, 124, 20};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 
@@ -106,11 +106,11 @@ TEST_CASE("item stats repository tests") {
         REQUIRE(stats.size() == 2);
         REQUIRE(stats[0].id == stat.id);
         REQUIRE(stats[0].item_id == stat.item_id);
-        REQUIRE(stats[0].name == stat.name);
+        REQUIRE(stats[0].stat_id == stat.stat_id);
         REQUIRE(stats[0].value == stat.value);
         REQUIRE(stats[1].id == stat2.id);
         REQUIRE(stats[1].item_id == stat2.item_id);
-        REQUIRE(stats[1].name == stat2.name);
+        REQUIRE(stats[1].stat_id == stat2.stat_id);
         REQUIRE(stats[1].value == stat2.value);
     }
 }
