@@ -30,6 +30,8 @@ void ibh::reconfigure_logger(config const& config) noexcept {
 
     auto logger = make_shared<spdlog::logger>("multi_sink"s, spdlog::sinks_init_list{console_sink, file_sink});
 
+    auto test = spdlog::get("test");
+
     if(!config.debug_level.empty()) {
         if(config.debug_level == "error") {
             logger->set_level(spdlog::level::err);

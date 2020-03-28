@@ -27,6 +27,7 @@
 #include <game_logic/censor_sensor.h>
 #include <websocket_thread.h>
 #include "macros.h"
+#include <discord/discord_rest.h>
 
 #ifdef TEST_CODE
 #include "../../../test/custom_server.h"
@@ -43,7 +44,9 @@ namespace ibh {
         DESERIALIZE_WITH_PLAYING_CHECK(message_request);
 
         auto now = system_clock::now();
-        auto chat_msg = message_response(user_data->username, sensor.clean_profanity_ish(msg->content), "game", duration_cast<milliseconds>(now.time_since_epoch()).count()).serialize();
+        auto chat_msg = message_response(user_data->username, sensor.clean_profanity_ish(msg->content), "game", duration_cast<milliseconds>(now.time_since_epoch()).count());
+        auto serialized_msg = chat_msg.serialize();
+        send_discord_message(fmt::format("<{}> {}", user_data->username, chat_msg.content));
 
         {
             shared_lock lock(user_connections_mutex);
@@ -52,7 +55,7 @@ namespace ibh {
                     if (other_user_data.ws.expired()) {
                         continue;
                     }
-                    s->send(other_user_data.ws, chat_msg, websocketpp::frame::opcode::value::TEXT);
+                    s->send(other_user_data.ws, serialized_msg, websocketpp::frame::opcode::value::TEXT);
                 } catch (...) {
                     continue;
                 }

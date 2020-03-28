@@ -47,14 +47,13 @@
 #include "logger_init.h"
 #include "config_parsers.h"
 
-#include "repositories/users_repository.h"
-#include "repositories/banned_users_repository.h"
-#include "repositories/characters_repository.h"
 #include "working_directory_manipulation.h"
 
 #include "ecs/battle_system.h"
 
 #include "websocket_thread.h"
+#include "discord/discord_thread.h"
+#include "discord/discord_rest.h"
 
 using namespace std;
 using namespace ibh;
@@ -62,7 +61,7 @@ using namespace ibh;
 atomic<bool> quit{false};
 
 void on_sigint([[maybe_unused]] int sig) {
-    quit = true;
+    quit.store(true, memory_order_release);
     spdlog::info("received sigint");
 }
 
@@ -101,10 +100,8 @@ int main() {
     auto pool = make_shared<database_pool>();
     pool->create_connections(config.connection_string, 1);
 
-    users_repository<database_transaction> user_repo{};
-    banned_users_repository<database_transaction> banned_user_repo{};
-    characters_repository<database_transaction> player_repo{};
     server_handle s_handle{};
+    client_handle c_handle{};
 
     entt::registry es;
 
@@ -129,12 +126,21 @@ int main() {
     outward_queues outward_queue;
     battle_system bs{config.battle_system_each_n_ticks, &outward_queue};
 
-    if(quit) {
+    if(quit.load(memory_order_acquire)) {
         spdlog::warn("[{}] quitting program", __FUNCTION__);
         return 0;
     }
 
     auto websocket_thread = run_websocket(config, pool, s_handle, quit);
+    vector<thread> discord_threads;
+    if(!config.discord_channel_id.empty() && !config.discord_token.empty()) {
+        discord_threads.emplace_back(run_discord(config, c_handle, outward_queue, quit));
+        auto discord_rest_threads = run_discord_rest(quit);
+        discord_threads.insert(end(discord_threads), make_move_iterator(begin(discord_rest_threads)), make_move_iterator(end(discord_rest_threads)));
+        assert(discord_threads.size() == 3);
+    } else {
+        spdlog::warn("[{}] not starting discord threads due to missing channel id or missing token", __FUNCTION__);
+    }
 
     vector<uint64_t> frame_times;
     auto next_tick = chrono::system_clock::now() + chrono::milliseconds(config.tick_length);
@@ -154,7 +160,7 @@ int main() {
     game_queue_message_router.emplace(reject_application_message::_type, handle_reject_application);
     game_queue_message_router.emplace(set_tax_message::_type, handle_set_tax);
 
-    while (!quit) {
+    while (!quit.load(memory_order_acquire)) {
         auto now = chrono::system_clock::now();
         if(now < next_tick) {
             this_thread::sleep_until(next_tick);
@@ -183,6 +189,20 @@ int main() {
             outward_message msg{{}, nullptr};
             while (outward_queue.try_dequeue(msg)) {
                 shared_lock lock(user_connections_mutex);
+
+                if(msg.conn_id == 0) {
+                    auto serializedMsg = msg.msg->serialize();
+                    for(auto &conn : user_connections) {
+                        try {
+                            s_handle.s->send(conn.second.ws, serializedMsg, websocketpp::frame::opcode::value::TEXT);
+                        } catch (...) {
+                            spdlog::warn("[{}] socket expired, wanted to send outward message to all", __FUNCTION__, msg.conn_id);
+                            continue;
+                        }
+                    }
+                    continue;
+                }
+
                 auto user_data = user_connections.find(msg.conn_id);
                 if (user_data != end(user_connections) && !user_data->second.ws.expired()) {
                     try {
@@ -210,8 +230,16 @@ int main() {
 
     spdlog::warn("[{}] quitting program", __FUNCTION__);
     s_handle.s->stop();
+    if(!config.discord_channel_id.empty() && !config.discord_token.empty()) {
+        c_handle.c->stop();
+    }
     websocket_thread.join();
-    spdlog::warn("[{}] websocket thread stopped", __FUNCTION__);
+    spdlog::warn("[{}] websocket_thread stopped", __FUNCTION__);
+    for(auto &t : discord_threads) {
+        t.join();
+        spdlog::warn("[{}] discord_thread stopped", __FUNCTION__);
+    }
+    spdlog::warn("[{}] all discord_threads stopped", __FUNCTION__);
 
     return 0;
 }

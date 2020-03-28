@@ -16,27 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <catch2/catch.hpp>
-#include <spdlog/spdlog.h>
-#include "test_helpers/startup_helper.h"
-#include <ecs/components.h>
+#pragma once
 
-using namespace std;
-using namespace ibh;
+#include <atomic>
+#include <thread>
+#include <config.h>
+#include <game_queue_messages/messages.h>
+#include "per_socket_data.h"
 
-TEST_CASE("ensure xxhash has no collisions for map locations") {
-    ibh_flat_map <uint64_t, bool> hashes;
-    for(int x = -1000; x < 1000; x++) {
-        for(int y = -1000; y < 1000; y++) {
-            auto t = make_tuple(x, y);
-            auto hash = XXH3_64bits(&t, tuple_sum_size(t));
-
-            if(hashes.find(hash) != end(hashes)) {
-                spdlog::error("hash already found! {}", hash);
-                REQUIRE(hashes.find(hash) == end(hashes));
-            } else {
-                hashes[hash] = true;
-            }
-        }
-    }
+namespace ibh {
+    struct client_handle {
+        client* c;
+    };
+    thread run_discord(config const &config, client_handle &c_handle, outward_queues &outward_queue, atomic<bool> &quit);
 }

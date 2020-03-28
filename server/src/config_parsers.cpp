@@ -60,6 +60,8 @@ optional<config> ibh::parse_env_file() {
     PARSE_MEMBER("CERTIFICATE_PASSWORD", certificate_password, GetString());
     PARSE_MEMBER("CERTIFICATE_FILE", certificate_file, GetString());
     PARSE_MEMBER("PRIVATE_KEY_FILE", private_key_file, GetString());
+    PARSE_MEMBER("DISCORD_TOKEN", discord_token, GetString());
+    PARSE_MEMBER("DISCORD_CHANNEL_ID", discord_channel_id, GetString());
 
     return config;
 }

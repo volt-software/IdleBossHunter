@@ -98,7 +98,7 @@ void battle_scene::handle_message(iscene_manager *manager, uint64_t type, messag
                 return;
             }
 
-            fmt::memory_buffer out;
+            fmt::memory_buffer out{};
             format_to(out, "You leveled up! New stats: ");
             for(auto &stat : resp_msg->added_stats) {
                 format_to(out, "{}: +{}, ", stat.first, stat.second.value);

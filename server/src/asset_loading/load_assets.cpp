@@ -33,7 +33,7 @@ void ibh::load_assets(entt::registry &registry, atomic<bool> const &quit) {
     auto loading_start = chrono::system_clock::now();
 
     for(auto& p: filesystem::recursive_directory_iterator("assets/monsters")) {
-        if(!p.is_regular_file() || quit) {
+        if(!p.is_regular_file() || quit.load(memory_order_acquire)) {
             continue;
         }
 
@@ -52,7 +52,7 @@ void ibh::load_assets(entt::registry &registry, atomic<bool> const &quit) {
     auto specials_loading_start = chrono::system_clock::now();
 
     for(auto& p: filesystem::recursive_directory_iterator("assets/monster_specials")) {
-        if(!p.is_regular_file() || quit) {
+        if(!p.is_regular_file() || quit.load(memory_order_acquire)) {
             continue;
         }
 

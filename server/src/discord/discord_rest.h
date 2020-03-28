@@ -16,26 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <catch2/catch.hpp>
-#include <utf.h>
+#pragma once
+
+#include <string>
+#include <vector>
+#include <thread>
 
 using namespace std;
-using namespace ibh;
 
-TEST_CASE("utf character count test") {
-    string input = "ńößôб漢";
-    auto output = To_UTF32(input);
-    REQUIRE(output.size() == 6);
-}
-
-TEST_CASE("utf_to_upper_copy test") {
-    string input = "ńößôб漢";
-    auto output = utf_to_upper_copy(input);
-    REQUIRE(output == "ŃÖßÔБ漢");
-}
-
-TEST_CASE("utf_to_lower_copy test") {
-    string input = "ŃÖßÔБ漢";
-    auto output = utf_to_lower_copy(input);
-    REQUIRE(output == "ńößôб漢");
+namespace ibh {
+    void send_discord_message(const string &ms);
+    vector<thread> run_discord_rest(atomic<bool> &quit);
 }

@@ -20,11 +20,13 @@
 
 #pragma GCC diagnostic ignored "-Wduplicated-branches"
 #include <websocketpp/server.hpp>
+#include <websocketpp/client.hpp>
 #include <websocketpp/config/asio.hpp>
 #pragma GCC diagnostic pop
 
 namespace ibh {
     using server = websocketpp::server<websocketpp::config::asio_tls>;
+    using client = websocketpp::client<websocketpp::config::asio_tls>;
 
     template <class WebSocket>
     struct per_socket_data {

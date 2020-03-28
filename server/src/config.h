@@ -34,5 +34,7 @@ namespace ibh {
         uint32_t tick_length;
         uint32_t battle_system_each_n_ticks;
         bool log_tick_times;
+        string discord_token;
+        string discord_channel_id;
     };
 }
