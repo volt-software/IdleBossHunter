@@ -51,20 +51,20 @@ namespace ibh {
             auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
             if(!clan_member) {
                 auto new_err_msg = make_unique<reject_application_response>("Not a member of a clan");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             if(clan_member->member_level == CLAN_MEMBER) {
                 auto new_err_msg = make_unique<reject_application_response>("Not an admin");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             auto clan_application = clan_member_applications_repo.get(clan_member->clan_id, reject_msg->applicant_id, subtransaction);
             if(!clan_application) {
                 auto new_err_msg = make_unique<reject_application_response>("No applicant by that name.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -72,7 +72,7 @@ namespace ibh {
             subtransaction->commit();
 
             auto new_err_msg = make_unique<reject_application_response>("");
-            outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
             spdlog::trace("[{}] rejected applicant {} clan {} by pc {} connection id {}", __FUNCTION__, reject_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
 

@@ -34,7 +34,8 @@ using namespace ibh;
 TEST_CASE("leave clan handler tests") {
     SECTION( "leaves clan" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};
@@ -91,7 +92,8 @@ TEST_CASE("leave clan handler tests") {
 
     SECTION( "cannot leave clan when not a member of any" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};

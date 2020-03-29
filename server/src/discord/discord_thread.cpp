@@ -166,7 +166,7 @@ namespace ibh {
                     auto discord_user = d["d"]["author"]["username"].GetString();
                     auto now = chrono::system_clock::now();
                     auto new_chat_msg = make_unique<message_response>(discord_user, discord_msg, "discord", duration_cast<chrono::milliseconds>(now.time_since_epoch()).count());
-                    outward_queue->enqueue({0ul, move(new_chat_msg)});
+                    outward_queue->enqueue(outward_message{0ul, move(new_chat_msg)});
                     return;
                 }
 
@@ -253,7 +253,7 @@ namespace ibh {
         spdlog::error("[{}] fail connection {} {} {}", __FUNCTION__, con->get_ec().value(), con->get_ec().message());
     }
 
-    thread run_discord(config const &config, client_handle &c_handle, outward_queues &outward_queue, atomic<bool> &quit) {
+    thread run_discord(config const &config, client_handle &c_handle, moodycamel::ConcurrentQueue<outward_message> &outward_queue, atomic<bool> &quit) {
         discord_token = config.discord_token;
         discord_channel_id = config.discord_channel_id;
         auto t = thread([&config, &c_handle, &outward_queue, &quit] {
@@ -282,6 +282,7 @@ namespace ibh {
 
             while(!quit.load(memory_order_acquire)) {
                 try {
+                    queue_abstraction<outward_message> outward_queue_abstraction(&outward_queue);
                     // Set logging settings
                     //ibh_client.set_access_channels(websocketpp::log::alevel::none);
                     ibh_client.clear_access_channels(websocketpp::log::alevel::all);
@@ -290,7 +291,7 @@ namespace ibh {
                     ibh_client.init_asio();
 
                     // Register our message handler
-                    ibh_client.set_message_handler(bind(&discord_on_message, &ibh_client, &outward_queue, ::_1, ::_2));
+                    ibh_client.set_message_handler(bind(&discord_on_message, &ibh_client, &outward_queue_abstraction, ::_1, ::_2));
 
                     ibh_client.set_fail_handler(bind(&discord_on_fail, &ibh_client, ::_1));
                     ibh_client.set_open_handler(bind(&discord_on_open, &ibh_client, cref(quit), ::_1));

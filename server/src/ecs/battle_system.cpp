@@ -95,12 +95,12 @@ void set_hp_mp(pc_component &pc, ibh_flat_map<uint32_t, int64_t> &stats) {
     max_mp->second = mp->second;
 }
 
-void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outward_queue) {
+void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outward_queue) {
     if(!pc.battle) {
         auto mob_view = es.view<monster_definition_component>();
         auto mob_special_view = es.view<monster_special_definition_component>();
 
-        if(mob_view.size() == 0 || mob_special_view.size() == 0) {
+        if(mob_view.empty() || mob_special_view.empty()) {
             throw std::runtime_error("missing mobs/specials"); \
         }
 
@@ -170,7 +170,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
             auto player_hp = pc.battle->total_player_stats.find(stat_hp_id);
             auto player_max_hp = pc.battle->total_player_stats.find(stat_max_hp_id);
             auto new_battle_msg = make_unique<new_battle_response>(name, level, mob_hp->second, mob_max_hp->second, player_hp->second, player_max_hp->second);
-            outward_queue->enqueue({pc.connection_id, move(new_battle_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_battle_msg)});
         }
     }
 
@@ -312,13 +312,13 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
             if(pc.connection_id > 0) {
                 auto level_up_msg = make_unique<level_up_response>(move(stats), level_calc(pc.level),
                                                                    level_calc(pc.level) - plyr_xp->second);
-                outward_queue->enqueue({pc.connection_id, move(level_up_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(level_up_msg)});
             }
             spdlog::trace("[{}] pc {} level up", __FUNCTION__, pc.name);
         }
         if(pc.connection_id > 0) {
             auto finished_msg = make_unique<battle_finished_response>(true, false, mob_xp->second, mob_gold->second);
-            outward_queue->enqueue({pc.connection_id, move(finished_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(finished_msg)});
         }
 
         pc.battle.reset();
@@ -326,14 +326,14 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues *outwa
         spdlog::trace("[{}] pc {} died against mob {}", __FUNCTION__, pc.name, pc.battle->monster_name);
         if(pc.connection_id > 0) {
             auto finished_msg = make_unique<battle_finished_response>(false, true, 0, 0);
-            outward_queue->enqueue({pc.connection_id, move(finished_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(finished_msg)});
         }
         pc.battle.reset();
     } else {
         spdlog::trace("[{}] pc fought against mob {}", __FUNCTION__, pc.name, pc.battle->monster_name);
         if(pc.connection_id > 0) {
             auto update_msg = make_unique<battle_update_response>(mob_turns, player_turns, mob_hits, player_hits, mob_dmg_to_player, player_dmg_to_mob);
-            outward_queue->enqueue({pc.connection_id, move(update_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(update_msg)});
         }
     }
 }

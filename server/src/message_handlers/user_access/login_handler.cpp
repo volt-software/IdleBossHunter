@@ -43,7 +43,7 @@ using namespace std;
 namespace ibh {
     template <class Server, class WebSocket>
     void handle_login(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
-                      per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                      per_socket_data<WebSocket> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_LOGIN_CHECK(login_request);
 
@@ -139,10 +139,10 @@ namespace ibh {
     }
 
     template void handle_login<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
-                                                                    per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
+                                                                    per_socket_data<websocketpp::connection_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
     template void handle_login<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
-                                                           per_socket_data<custom_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
+                                                           per_socket_data<custom_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
 #endif
 }

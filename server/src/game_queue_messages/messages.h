@@ -21,14 +21,14 @@
 #include <string>
 #include <vector>
 #include <ibh_containers.h>
-#include <concurrentqueue.h>
 #include <messages/message.h>
+#include "queue_abstraction.h"
 
 using namespace std;
 
 namespace ibh {
     struct stat_component;
-    using outward_queues = moodycamel::ConcurrentQueue<outward_message>;
+    using outward_queues = queue_abstraction<outward_message>;
 
     struct queue_message {
         uint64_t type;

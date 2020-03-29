@@ -46,7 +46,7 @@ namespace ibh {
 
             if(pc.clan_id == 0) {
                 auto new_err_msg = make_unique<set_tax_response>("Not a member of a clan");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -61,20 +61,20 @@ namespace ibh {
                 auto member_it = clan.members.find(pc.id);
                 if(member_it == end(clan.members)) {
                     auto new_err_msg = make_unique<set_tax_response>("Not a member of a clan");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 if(member_it->second == CLAN_MEMBER) {
                     auto new_err_msg = make_unique<set_tax_response>("Not an admin");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 auto current_stat = clan.stats.find(clan_stat_tax_id);
                 if(current_stat == end(clan.stats)) {
                     auto new_err_msg = make_unique<set_tax_response>("Couldn't find tax stat, please file a bug report");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
@@ -86,7 +86,7 @@ namespace ibh {
                 subtransaction->commit();
 
                 auto new_err_msg = make_unique<set_tax_response>("");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
                 send_message_to_all_clan_members(clan, pc.name, fmt::format("{} set tax to {}!", pc.name, current_stat->second), "system-clan", es, outward_queue);
 

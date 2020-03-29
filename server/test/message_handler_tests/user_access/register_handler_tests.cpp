@@ -31,7 +31,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit too short usernames") {
         string message = register_request("a", "okay_password", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -40,7 +41,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -51,7 +52,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit too short usernames utf8") {
         string message = register_request("漢", "okay_password", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -60,7 +62,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -71,7 +73,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit too long usernames") {
         string message = register_request("aalishdiquwhgebilugfhkjsdhasdasd", "okay_password", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -80,7 +83,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -91,7 +94,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit too short password") {
         string message = register_request("ab", "shortpw", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -100,7 +104,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -111,7 +115,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit too short password utf8") {
         string message = register_request("ab", "漢字漢字漢字", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -120,7 +125,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -131,7 +136,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit password equal to username") {
         string message = register_request("okay_p$ssword", "okay_p$ssword", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -140,7 +146,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);
@@ -151,7 +157,8 @@ TEST_CASE("register handler tests") {
     SECTION("Prohibit password equal to email") {
         string message = register_request("ab", "an_email", "an_email").serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         auto transaction = db_pool->create_transaction();
         custom_server s;
@@ -160,7 +167,7 @@ TEST_CASE("register handler tests") {
         rapidjson::Document d;
         d.Parse(&message[0], message.size());
 
-        handle_register(&s, d, transaction, &user_data, q, user_connections);
+        handle_register(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = generic_error_response::deserialize(d);

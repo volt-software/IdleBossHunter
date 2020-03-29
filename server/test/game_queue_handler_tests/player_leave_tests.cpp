@@ -34,7 +34,8 @@ TEST_CASE("character leave tests") {
             pc.connection_id = 1;
             registry.assign<pc_component>(entt, move(pc));
         }
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         player_leave_message msg(1);
         handle_player_leave_message(&msg, registry, q, nullptr);
 

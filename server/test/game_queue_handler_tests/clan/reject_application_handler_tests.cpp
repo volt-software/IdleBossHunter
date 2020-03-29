@@ -34,7 +34,8 @@ using namespace ibh;
 TEST_CASE("reject application handler tests") {
     SECTION( "rejects application" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};
@@ -88,7 +89,8 @@ TEST_CASE("reject application handler tests") {
 
     SECTION( "rejects attempt when missing admin rights" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};

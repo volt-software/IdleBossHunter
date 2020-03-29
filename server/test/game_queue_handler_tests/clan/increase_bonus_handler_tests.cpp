@@ -34,7 +34,8 @@ using namespace ibh;
 TEST_CASE("increase bonus handler tests") {
     SECTION( "rejects application" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_stats_repository<database_transaction> clan_stats_repo{};
@@ -100,7 +101,8 @@ TEST_CASE("increase bonus handler tests") {
 
     SECTION( "rejects attempt when missing admin rights" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_stats_repository<database_transaction> clan_stats_repo{};
@@ -166,7 +168,8 @@ TEST_CASE("increase bonus handler tests") {
 
     SECTION( "rejects attempt when not enough clan gold" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_stats_repository<database_transaction> clan_stats_repo{};

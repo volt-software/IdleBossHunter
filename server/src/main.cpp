@@ -123,7 +123,12 @@ int main() {
         return 1;
     }
 
-    outward_queues outward_queue;
+    moodycamel::ConcurrentQueue<outward_message> outward_queue;
+    outward_queues outward_queue_abstraction(&outward_queue);
+    moodycamel::ProducerToken outward_ptok(outward_queue);
+    moodycamel::ConsumerToken outward_ctok(outward_queue);
+    moodycamel::ProducerToken game_loop_ptok(game_loop_queue);
+    moodycamel::ConsumerToken game_loop_ctok(game_loop_queue);
     battle_system bs{config.battle_system_each_n_ticks, &outward_queue};
 
     if(quit.load(memory_order_acquire)) {
@@ -169,10 +174,10 @@ int main() {
 
         {
             unique_ptr<queue_message> msg(nullptr);
-            while (game_loop_queue.try_dequeue(msg)) {
+            while (game_loop_queue.try_dequeue(game_loop_ctok, msg)) {
                 spdlog::trace("[{}] got game loop msg with type {}", __FUNCTION__, msg->type);
                 auto transaction = pool->create_transaction();
-                if(game_queue_message_router[msg->type](msg.get(), es, outward_queue, transaction)) {
+                if(game_queue_message_router[msg->type](msg.get(), es, outward_queue_abstraction, transaction)) {
                     transaction->commit();
                 }
             }
@@ -187,7 +192,7 @@ int main() {
 
         {
             outward_message msg{{}, nullptr};
-            while (outward_queue.try_dequeue(msg)) {
+            while (outward_queue.try_dequeue(outward_ctok, msg)) {
                 shared_lock lock(user_connections_mutex);
 
                 if(msg.conn_id == 0) {
@@ -213,7 +218,7 @@ int main() {
                     }
                 } else {
                     spdlog::warn("[{}] couldn't find connection id {}, wanted to send outward message", __FUNCTION__, msg.conn_id);
-                    game_loop_queue.enqueue(make_unique<player_leave_message>(msg.conn_id));
+                    game_loop_queue.enqueue(game_loop_ptok, make_unique<player_leave_message>(msg.conn_id));
                 }
             }
         }

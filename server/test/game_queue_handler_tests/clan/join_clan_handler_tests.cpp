@@ -34,7 +34,8 @@ using namespace ibh;
 TEST_CASE("join clan handler tests") {
     SECTION( "joins clan" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};
@@ -78,7 +79,8 @@ TEST_CASE("join clan handler tests") {
 
     SECTION( "cannot join clan when already member of another" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};
@@ -128,7 +130,8 @@ TEST_CASE("join clan handler tests") {
 
     SECTION( "cannot join clan when already applied" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         clans_repository<database_transaction> clan_repo{};
         clan_members_repository<database_transaction> clan_members_repo{};
         clan_member_applications_repository<database_transaction> clan_applications_repo{};

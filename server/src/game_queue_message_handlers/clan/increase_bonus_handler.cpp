@@ -46,7 +46,7 @@ namespace ibh {
 
             if(pc.clan_id == 0) {
                 auto new_err_msg = make_unique<increase_bonus_response>("Not a member of a clan");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -61,40 +61,40 @@ namespace ibh {
                 auto member_it = clan.members.find(pc.id);
                 if(member_it == end(clan.members)) {
                     auto new_err_msg = make_unique<increase_bonus_response>("Not a member of a clan");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 if(member_it->second == CLAN_MEMBER) {
                     auto new_err_msg = make_unique<increase_bonus_response>("Not an admin");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 if(increase_bonus_msg->bonus_type == clan_stat_gold_id) {
                     auto new_err_msg = make_unique<increase_bonus_response>("Can't increase gold, silly");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 auto current_stat = clan.stats.find(increase_bonus_msg->bonus_type);
                 if(current_stat == end(clan.stats)) {
                     auto new_err_msg = make_unique<increase_bonus_response>("Couldn't find specified bonus type");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 auto current_gold_stat = clan.stats.find(clan_stat_gold_id);
                 if(current_gold_stat == end(clan.stats)) {
                     auto new_err_msg = make_unique<increase_bonus_response>("Couldn't find clan gold, please report this as a bug.");
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
                 auto gold_requirement = pow(10l, current_stat->second + 2);
                 if(current_gold_stat->second < gold_requirement) {
                     auto new_err_msg = make_unique<increase_bonus_response>(fmt::format("You need {} clan gold to increase this stat.", gold_requirement));
-                    outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                    outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
@@ -111,7 +111,7 @@ namespace ibh {
                 subtransaction->commit();
 
                 auto new_err_msg = make_unique<increase_bonus_response>("");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
                 auto current_stat_name_it = clan_stat_id_to_name_mapper.find(increase_bonus_msg->bonus_type);
                 if(current_stat_name_it == end(clan_stat_id_to_name_mapper)) {

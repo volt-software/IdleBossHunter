@@ -25,13 +25,13 @@
 namespace ibh {
     class battle_system {
     public:
-        battle_system(uint32_t every_n_ticks, outward_queues *outward_queue) :
+        battle_system(uint32_t every_n_ticks, moodycamel::ConcurrentQueue<outward_message> *outward_queue) :
         _tick_count(0), _every_n_ticks(every_n_ticks), _outward_queue(outward_queue) {}
         void do_tick(entt::registry &es);
 
     private:
         uint32_t _tick_count;
         uint32_t _every_n_ticks;
-        outward_queues *_outward_queue;
+        outward_queues _outward_queue;
     };
 }

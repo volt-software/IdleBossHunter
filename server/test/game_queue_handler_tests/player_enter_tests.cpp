@@ -34,7 +34,8 @@ TEST_CASE("character enter tests") {
             pc.id = 1;
             registry.assign<pc_component>(entt, move(pc));
         }
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         player_enter_message msg(1, "name", "race", "class", {}, 2, 3, 4, 5, 6);
         handle_player_enter_message(&msg, registry, q, nullptr);
 

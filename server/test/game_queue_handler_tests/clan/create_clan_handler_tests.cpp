@@ -32,7 +32,8 @@ using namespace ibh;
 TEST_CASE("create clan handler tests") {
     SECTION( "character creates clan" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         create_clan_message msg(1, "clan_name");
         clans_repository<database_transaction> clan_repo{};
         characters_repository<database_transaction> char_repo{};
@@ -71,7 +72,8 @@ TEST_CASE("create clan handler tests") {
 
     SECTION( "not enough gold" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         create_clan_message msg(1, "clan_name");
         clans_repository<database_transaction> clan_repo{};
         characters_repository<database_transaction> char_repo{};
@@ -110,7 +112,8 @@ TEST_CASE("create clan handler tests") {
 
     SECTION( "already exists" ) {
         entt::registry registry;
-        outward_queues q;
+        moodycamel::ConcurrentQueue<outward_message> cq;
+        outward_queues q(&cq);
         create_clan_message msg(1, "clan_name_exists");
         clans_repository<database_transaction> clan_repo{};
         characters_repository<database_transaction> char_repo{};

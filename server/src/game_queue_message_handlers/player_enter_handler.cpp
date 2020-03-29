@@ -50,7 +50,7 @@ namespace ibh {
                 auto player_hp = pc.battle->total_player_stats.find(stat_hp_id);
                 auto player_max_hp = pc.battle->total_player_stats.find(stat_max_hp_id);
                 auto new_battle_msg = make_unique<new_battle_response>(pc.battle->monster_name, pc.battle->monster_level, mob_hp->second, mob_max_hp->second, player_hp->second, player_max_hp->second);
-                outward_queue.enqueue({pc.connection_id, move(new_battle_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_battle_msg)});
             }
 
             return true;

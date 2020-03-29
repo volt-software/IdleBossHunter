@@ -50,13 +50,13 @@ namespace ibh {
             if(gold_it == end(pc.stats)) {
                 spdlog::trace("[{}] pc {} not enough gold", __FUNCTION__, pc.id);
                 auto new_err_msg = make_unique<generic_error_response>("unknown error", "", "", false);
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             if(gold_it->second < 10'000) {
                 auto new_err_msg = make_unique<create_clan_response>("Not enough gold, need 10,000 to create clan.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -68,7 +68,7 @@ namespace ibh {
             db_clan new_clan{0, create_msg->clan_name};
             if(!clan_repo.insert(new_clan, subtransaction)) {
                 auto new_err_msg = make_unique<create_clan_response>("Clan name already exists");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -89,7 +89,7 @@ namespace ibh {
 
             gold_it->second -= 10'000;
             auto new_err_msg = make_unique<create_clan_response>("");
-            outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
             spdlog::trace("[{}] created clan {} for pc {} for connection id {}", __FUNCTION__, create_msg->clan_name, pc.name, pc.connection_id);
 

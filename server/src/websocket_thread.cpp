@@ -63,7 +63,7 @@ using namespace std;
 using namespace ibh;
 
 using message_router_type = ibh_flat_map<uint64_t, function<void(server*, rapidjson::Document const &, unique_ptr<database_transaction> const &, per_socket_data<websocketpp::connection_hdl>*,
-                                                               moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &)>>;
+                                                               queue_abstraction<unique_ptr<queue_message>>*, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &)>>;
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -126,7 +126,7 @@ namespace ibh {
 
         per_socket_data<websocketpp::connection_hdl> user_data{};
         //only called on connect
-        user_data.connection_id = connection_id_counter++;
+        user_data.connection_id = connection_id_counter.fetch_add(1, memory_order_relaxed);
         user_data.user_id = 0;
         user_data.playing_character_slot = -1;
         user_data.username = "";
@@ -141,7 +141,7 @@ namespace ibh {
         }
     }
 
-    void on_message(shared_ptr<database_pool> pool, message_router_type &message_router, server *s, websocketpp::connection_hdl hdl, server::message_ptr msg) {
+    void on_message(shared_ptr<database_pool> pool, message_router_type &message_router, queue_abstraction<unique_ptr<queue_message>> *q, server *s, websocketpp::connection_hdl hdl, server::message_ptr msg) {
         string const &message = msg->get_payload();
 
         if (message.empty() || message.length() < 4) {
@@ -188,7 +188,7 @@ namespace ibh {
         if (handler != message_router.end()) {
             auto transaction = pool->create_transaction();
             try {
-                handler->second(s, d, transaction, user_data, game_loop_queue, user_connections);
+                handler->second(s, d, transaction, user_data, q, user_connections);
                 transaction->commit();
             } catch (exception const &e) {
                 spdlog::error("[{}] some exception {} message_type {} user_id {} connection_id {} hdl_id {}", __FUNCTION__, e.what(), type, user_data->user_id,
@@ -298,6 +298,7 @@ namespace ibh {
             add_routes(message_router);
 
             try {
+                queue_abstraction<unique_ptr<queue_message>> game_loop_queue_abstraction(&game_loop_queue);
                 // Set logging settings
                 //roa_server.set_access_channels(websocketpp::log::alevel::none);
                 roa_server.clear_access_channels(websocketpp::log::alevel::all);
@@ -307,7 +308,7 @@ namespace ibh {
                 roa_server.set_reuse_addr(true);
 
                 // Register our message handler
-                roa_server.set_message_handler(bind(&on_message, pool, message_router, &roa_server, ::_1, ::_2));
+                roa_server.set_message_handler(bind(&on_message, pool, message_router, &game_loop_queue_abstraction, &roa_server, ::_1, ::_2));
 
                 roa_server.set_fail_handler(bind(&on_fail, &roa_server, ::_1));
                 roa_server.set_open_handler(bind(&on_open, cref(quit), ::_1));

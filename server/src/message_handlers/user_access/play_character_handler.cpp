@@ -41,7 +41,7 @@ using namespace std;
 namespace ibh {
     template <class Server, class WebSocket>
     void handle_play_character(Server *s, rapidjson::Document const &d,
-                               unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
+                               unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_PLAYING_CHECK(play_character_request);
 
@@ -111,15 +111,15 @@ namespace ibh {
             player_stats.emplace_back(stat.stat_id, stat.value);
         }
         spdlog::debug("[{}] enqueing character {} slot {}", __FUNCTION__, character->name, character->slot);
-        q.enqueue(make_unique<player_enter_message>(character->id, character->name, character->race, character->_class, move(player_stats),
+        q->enqueue(make_unique<player_enter_message>(character->id, character->name, character->race, character->_class, move(player_stats),
                 user_data->connection_id, character->level, character->gold, character->xp, character->skill_points));
     }
 
     template void handle_play_character<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
-                                                                             per_socket_data<websocketpp::connection_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
+                                                                             per_socket_data<websocketpp::connection_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
     template void handle_play_character<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
-                                                           per_socket_data<custom_hdl> *user_data, moodycamel::ConcurrentQueue<unique_ptr<queue_message>> &q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
+                                                           per_socket_data<custom_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
 #endif
 }

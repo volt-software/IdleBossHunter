@@ -28,5 +28,5 @@ namespace ibh {
     struct client_handle {
         client* c;
     };
-    thread run_discord(config const &config, client_handle &c_handle, outward_queues &outward_queue, atomic<bool> &quit);
+    thread run_discord(config const &config, client_handle &c_handle, moodycamel::ConcurrentQueue<outward_message> &outward_queue, atomic<bool> &quit);
 }

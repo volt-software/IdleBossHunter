@@ -53,28 +53,28 @@ namespace ibh {
             auto db_clan = clans_repo.get(join_msg->clan_name, subtransaction);
             if(!db_clan) {
                 auto new_err_msg = make_unique<join_clan_response>("No clan by that name.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
             if(clan_member) {
                 auto new_err_msg = make_unique<join_clan_response>("Already a member of a clan, leave that clan first.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             auto clan_application = clan_member_applications_repo.get(db_clan->id, pc.id, subtransaction);
             if(clan_application) {
                 auto new_err_msg = make_unique<join_clan_response>("Already applied to clan, please be patient.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             db_clan_member new_member{db_clan->id, pc.id, CLAN_MEMBER};
             if(!clan_member_applications_repo.insert(new_member, subtransaction)) {
                 auto new_err_msg = make_unique<join_clan_response>("Server error.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -82,7 +82,7 @@ namespace ibh {
             subtransaction->commit();
 
             auto new_err_msg = make_unique<join_clan_response>("");
-            outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
             spdlog::trace("[{}] left clan {} for pc {} for connection id {}", __FUNCTION__, clan_member->clan_id, pc.name, pc.connection_id);
 

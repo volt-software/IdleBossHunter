@@ -43,7 +43,7 @@ namespace ibh {
                 }
 
                 auto new_applicant_msg = make_unique<message_response>(playername, message, source, timestamp);
-                outward_queue.enqueue({clan_pc.connection_id, move(new_applicant_msg)});
+                outward_queue.enqueue(outward_message{clan_pc.connection_id, move(new_applicant_msg)});
             }
         }
     }
@@ -68,7 +68,7 @@ namespace ibh {
                 }
 
                 auto new_applicant_msg = make_unique<message_response>(playername, message, source, timestamp);
-                outward_queue.enqueue({clan_pc.connection_id, move(new_applicant_msg)});
+                outward_queue.enqueue(outward_message{clan_pc.connection_id, move(new_applicant_msg)});
             }
         }
     }

@@ -49,7 +49,7 @@ namespace ibh {
             auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
             if(!clan_member) {
                 auto new_err_msg = make_unique<leave_clan_response>("Not a member of a clan");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -58,7 +58,7 @@ namespace ibh {
             send_message_to_all_clan_members(clan_member->clan_id, pc.name, "has left the clan.", "system-clan", es, outward_queue, transaction);
 
             auto new_err_msg = make_unique<leave_clan_response>("");
-            outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
             subtransaction->commit();
 
             auto clan_view = es.view<clan_component>();

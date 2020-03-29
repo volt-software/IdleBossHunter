@@ -216,32 +216,32 @@ void bench_battle() {
         return;
     }
 
-    outward_queues q;
+    moodycamel::ConcurrentQueue<outward_message> q;
     entt::registry es;
 
     for(int64_t i = 0; i < 1'000; i++) {
         auto entt = es.create();
-        ibh_flat_map<uint32_t, stat_component> stats;
+        decltype(monster_definition_component::stats) stats;
         for(auto &stat : stat_name_ids) {
-            stats.insert(ibh_flat_map<uint32_t, stat_component>::value_type{stat, stat_component{"t", i+1}});
+            stats.insert(decltype(monster_definition_component::stats)::value_type{stat, i+1});
         }
-        es.assign<monster_definition_component>(entt, fmt::format("{}", i), stats);
+        es.assign<monster_definition_component>(entt, to_string(i), stats);
     }
 
     for(int64_t i = 0; i < 1'000; i++) {
         auto entt = es.create();
-        ibh_flat_map<uint32_t, int64_t> stats;
+        decltype(monster_special_definition_component::stats) stats;
         for(auto &stat : stat_name_ids) {
-            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat, i+1});
+            stats.insert(decltype(monster_special_definition_component::stats)::value_type{stat, i+1});
         }
         es.assign<monster_special_definition_component>(entt, fmt::format("{}", i), stats, false);
     }
 
     for(int64_t i = 0; i < 1'000; i++) {
         auto entt = es.create();
-        ibh_flat_map<uint32_t, int64_t> stats;
+        decltype(pc_component::stats) stats;
         for(auto &stat : stat_name_ids) {
-            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat, i+1});
+            stats.insert(decltype(pc_component::stats)::value_type{stat, i+1});
         }
         es.assign<pc_component>(entt, i, i,  "name", "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
     }

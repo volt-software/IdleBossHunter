@@ -36,7 +36,8 @@ TEST_CASE("get clan applications handler tests") {
     SECTION("Should return applicant") {
         string message = get_clan_applications_request().serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         custom_server s;
         clans_repository<database_transaction> clans_repo{};
@@ -73,7 +74,7 @@ TEST_CASE("get clan applications handler tests") {
         user_data.playing_character_slot = 0;
         user_data.playing_character_id = requesting_char.id;
 
-        handle_get_clan_applications(&s, d, transaction, &user_data, q, user_connections);
+        handle_get_clan_applications(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = get_clan_applications_response::deserialize(d);
@@ -88,7 +89,8 @@ TEST_CASE("get clan applications handler tests") {
     SECTION("Only sages and admins can retrieve applications") {
         string message = get_clan_applications_request().serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         custom_server s;
         clans_repository<database_transaction> clans_repo{};
@@ -125,7 +127,7 @@ TEST_CASE("get clan applications handler tests") {
         user_data.playing_character_slot = 0;
         user_data.playing_character_id = requesting_char.id;
 
-        handle_get_clan_applications(&s, d, transaction, &user_data, q, user_connections);
+        handle_get_clan_applications(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = get_clan_applications_response::deserialize(d);

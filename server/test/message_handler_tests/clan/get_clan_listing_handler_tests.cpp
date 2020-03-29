@@ -31,7 +31,8 @@ TEST_CASE("get clan listing handler tests") {
     SECTION("Should return clan") {
         string message = get_clan_listing_request().serialize();
         per_socket_data<custom_hdl> user_data;
-        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> q;
+        moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
+        queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         custom_server s;
         clans_repository<database_transaction> clans_repo{};
@@ -46,7 +47,7 @@ TEST_CASE("get clan listing handler tests") {
         clans_repo.insert(new_clan, transaction);
         REQUIRE(new_clan.id > 0);
 
-        handle_get_clan_listing(&s, d, transaction, &user_data, q, user_connections);
+        handle_get_clan_listing(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
         auto new_msg = get_clan_listing_response::deserialize(d);

@@ -23,7 +23,7 @@ namespace ibh {
     template <class T>
     void test_outmsg(outward_queues &q, bool should_be_empty) {
         outward_message outmsg(0, nullptr);
-        REQUIRE(q.try_dequeue(outmsg) == true);
+        REQUIRE(q.try_dequeue_from_producer(outmsg) == true);
         REQUIRE(outmsg.msg);
         auto *outmsgptr = dynamic_cast<T*>(outmsg.msg.get());
         REQUIRE(outmsgptr != nullptr);

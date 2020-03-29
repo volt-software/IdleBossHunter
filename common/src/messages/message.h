@@ -35,6 +35,10 @@ namespace ibh {
 
     struct outward_message {
         outward_message(uint64_t conn_id, unique_ptr<message> msg) noexcept : conn_id(conn_id), msg(move(msg)) {}
+        outward_message(const outward_message&) = delete;
+        outward_message(outward_message&&) noexcept = default;
+        outward_message& operator=(const outward_message&) = delete;
+        outward_message& operator=(outward_message&&) noexcept = default;
 
         uint64_t conn_id;
         unique_ptr<message> msg;

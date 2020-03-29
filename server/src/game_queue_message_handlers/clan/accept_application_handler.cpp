@@ -52,27 +52,27 @@ namespace ibh {
             auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
             if(!clan_member) {
                 auto new_err_msg = make_unique<accept_application_response>("Not a member of a clan");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             if(clan_member->member_level == CLAN_MEMBER) {
                 auto new_err_msg = make_unique<accept_application_response>("Not an admin");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             auto clan_application = clan_member_applications_repo.get(clan_member->clan_id, accept_msg->applicant_id, subtransaction);
             if(!clan_application) {
                 auto new_err_msg = make_unique<accept_application_response>("No applicant by that name.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
             clan_application->member_level = CLAN_MEMBER;
             if(!clan_members_repo.insert(*clan_application, subtransaction)) {
                 auto new_err_msg = make_unique<accept_application_response>("Server error.");
-                outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
@@ -80,7 +80,7 @@ namespace ibh {
             subtransaction->commit();
 
             auto new_err_msg = make_unique<accept_application_response>("");
-            outward_queue.enqueue({pc.connection_id, move(new_err_msg)});
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
             auto clan_view = es.view<clan_component>();
             for(auto clan_entity : clan_view) {
