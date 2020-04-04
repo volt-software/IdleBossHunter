@@ -38,16 +38,12 @@
 using namespace std;
 using namespace ibh;
 
-show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : scene(6), _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true),
+show_characters_scene::show_characters_scene(iscene_manager *manager, vector<character_object> characters) : scene(generate_type<show_characters_scene>()), _characters(move(characters)), _races(), _classes(), _show_create(false), _waiting_for_select(true),
 _waiting_for_reply(false), _error(), _selected_race(), _selected_class(), _selected_slot(0), _selected_play_slot(-1) {
     send_message<character_select_request>(manager);
 }
 
 void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(_waiting_for_select) {
         ImGui::Begin("Waiting for server", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::End();
@@ -55,7 +51,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
 
     if(ImGui::Begin("Characters List", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        if(_error.size() > 0) {
+        if(!_error.empty()) {
             ImGui::Text("%s", _error.c_str());
         }
 
@@ -99,7 +95,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
 
     if(_show_delete) {
         if(ImGui::Begin("Delete Character", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            if(_error.size() > 0) {
+            if(!_error.empty()) {
                 ImGui::Text("%s", _error.c_str());
             }
 
@@ -140,7 +136,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
 
     if(ImGui::Begin("Create Character", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        if(_error.size() > 0) {
+        if(!_error.empty()) {
             ImGui::Text("%s", _error.c_str());
         }
 
@@ -237,10 +233,10 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void show_characters_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void show_characters_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
     switch (type) {
         case update_response::type: {
-            auto resp_msg = dynamic_cast<update_response *>(msg);
+            auto resp_msg = dynamic_cast<update_response const *>(msg);
 
             if (!resp_msg) {
                 return;
@@ -250,7 +246,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case character_select_response::type: {
-            auto resp_msg = dynamic_cast<character_select_response *>(msg);
+            auto resp_msg = dynamic_cast<character_select_response const *>(msg);
 
             if (!resp_msg) {
                 return;
@@ -262,7 +258,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case create_character_response::type: {
-            auto resp_msg = dynamic_cast<create_character_response *>(msg);
+            auto resp_msg = dynamic_cast<create_character_response const *>(msg);
 
             if (!resp_msg) {
                 return;
@@ -274,7 +270,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case delete_character_response::type: {
-            auto resp_msg = dynamic_cast<delete_character_response*>(msg);
+            auto resp_msg = dynamic_cast<delete_character_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -286,7 +282,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case play_character_response::type: {
-            auto resp_msg = dynamic_cast<play_character_response*>(msg);
+            auto resp_msg = dynamic_cast<play_character_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -302,7 +298,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             break;
         }
         case generic_error_response::type: {
-            auto resp_msg = dynamic_cast<generic_error_response*>(msg);
+            auto resp_msg = dynamic_cast<generic_error_response const*>(msg);
 
             if(!resp_msg) {
                 return;

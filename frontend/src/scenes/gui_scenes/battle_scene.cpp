@@ -30,10 +30,6 @@ using namespace std;
 using namespace ibh;
 
 void battle_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(_first_frame) {
         ImGui::SetNextWindowSize(ImVec2{550.0F, 280.0F}, ImGuiCond_Once);
     }
@@ -61,10 +57,10 @@ void battle_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void battle_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void battle_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
     switch (type) {
         case battle_finished_response::type: {
-            auto resp_msg = dynamic_cast<battle_finished_response*>(msg);
+            auto resp_msg = dynamic_cast<battle_finished_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -79,7 +75,7 @@ void battle_scene::handle_message(iscene_manager *manager, uint64_t type, messag
             break;
         }
         case battle_update_response::type: {
-            auto resp_msg = dynamic_cast<battle_update_response*>(msg);
+            auto resp_msg = dynamic_cast<battle_update_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -92,7 +88,7 @@ void battle_scene::handle_message(iscene_manager *manager, uint64_t type, messag
             break;
         }
         case level_up_response::type: {
-            auto resp_msg = dynamic_cast<level_up_response*>(msg);
+            auto resp_msg = dynamic_cast<level_up_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -108,7 +104,7 @@ void battle_scene::handle_message(iscene_manager *manager, uint64_t type, messag
             break;
         }
         case new_battle_response::type: {
-            auto resp_msg = dynamic_cast<new_battle_response*>(msg);
+            auto resp_msg = dynamic_cast<new_battle_response const*>(msg);
 
             if(!resp_msg) {
                 return;

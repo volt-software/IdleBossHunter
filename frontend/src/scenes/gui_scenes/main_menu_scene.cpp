@@ -19,6 +19,7 @@
 #include "main_menu_scene.h"
 #include "settings_menu_scene.h"
 #include "login_menu_scene.h"
+#include "manage_clans_scene.h"
 #include "about_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
@@ -29,8 +30,12 @@ using namespace ibh;
 
 void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::MenuItem("Login")) {
+        if (!manager->get_logged_in() && ImGui::MenuItem("Login")) {
             manager->add(make_unique<login_menu_scene>());
+        }
+
+        if(manager->get_logged_in() && ImGui::MenuItem("Clans")) {
+            manager->add(make_unique<manage_clans_scene>(manager));
         }
 
         if (ImGui::MenuItem("Settings")) {
@@ -45,6 +50,6 @@ void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     }
 }
 
-void main_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void main_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
 
 }

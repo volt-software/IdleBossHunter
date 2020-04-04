@@ -32,12 +32,8 @@ using namespace std;
 using namespace ibh;
 
 void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(ImGui::Begin("Login/Register", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        if(_error.size() > 0) {
+        if(!_error.empty()) {
             ImGui::Text("%s", _error.c_str());
         }
 
@@ -95,11 +91,11 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void login_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void login_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
     spdlog::trace("[{}] received message {}", __FUNCTION__, type);
     switch (type) {
         case login_response::type: {
-            auto resp_msg = dynamic_cast<login_response*>(msg);
+            auto resp_msg = dynamic_cast<login_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -113,7 +109,7 @@ void login_menu_scene::handle_message(iscene_manager *manager, uint64_t type, me
             break;
         }
         case generic_error_response::type: {
-            auto resp_msg = dynamic_cast<generic_error_response*>(msg);
+            auto resp_msg = dynamic_cast<generic_error_response const*>(msg);
 
             if(!resp_msg) {
                 return;

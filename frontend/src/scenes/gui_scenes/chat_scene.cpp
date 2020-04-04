@@ -28,15 +28,11 @@
 using namespace std;
 using namespace ibh;
 
-chat_scene::chat_scene(vector<account_object> online_users) : scene(1), _messages(), _online_users(move(online_users)), _first_frame(true) {
+chat_scene::chat_scene(vector<account_object> online_users) : scene(generate_type<chat_scene>()), _messages(), _online_users(move(online_users)), _first_frame(true) {
 
 }
 
 void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(_first_frame) {
         ImGui::SetNextWindowSize(ImVec2{610.0F, 280.0F}, ImGuiCond_Once);
     }
@@ -101,10 +97,10 @@ void chat_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void chat_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void chat_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
     switch (type) {
         case message_response::type: {
-            auto resp_msg = dynamic_cast<message_response*>(msg);
+            auto resp_msg = dynamic_cast<message_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -114,7 +110,7 @@ void chat_scene::handle_message(iscene_manager *manager, uint64_t type, message 
             break;
         }
         case user_entered_game_response::type: {
-            auto resp_msg = dynamic_cast<user_entered_game_response*>(msg);
+            auto resp_msg = dynamic_cast<user_entered_game_response const*>(msg);
 
             if(!resp_msg) {
                 return;
@@ -125,7 +121,7 @@ void chat_scene::handle_message(iscene_manager *manager, uint64_t type, message 
             break;
         }
         case user_left_game_response::type: {
-            auto resp_msg = dynamic_cast<user_left_game_response*>(msg);
+            auto resp_msg = dynamic_cast<user_left_game_response const*>(msg);
 
             if(!resp_msg) {
                 return;

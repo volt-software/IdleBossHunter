@@ -28,11 +28,11 @@ using namespace std;
 namespace ibh {
     class login_menu_scene : public scene  {
     public:
-        login_menu_scene() : scene(3), _error(), _show_register(), _waiting_for_reply(), _focus_on_open_flag() {}
+        login_menu_scene() : scene(generate_type<login_menu_scene>()), _error(), _show_register(), _waiting_for_reply(), _focus_on_open_flag() {}
         ~login_menu_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
-        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
 
     private:
         string _error;

@@ -24,10 +24,10 @@
 namespace ibh {
     class connection_lost_scene : public scene  {
     public:
-        connection_lost_scene() : scene(2) {}
+        connection_lost_scene() : scene(generate_type<connection_lost_scene>()) {}
         ~connection_lost_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
-        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
     };
 }

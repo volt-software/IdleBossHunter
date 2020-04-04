@@ -24,10 +24,6 @@ using namespace std;
 using namespace ibh;
 
 void alpha_window_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(ImGui::Begin("Alpha quality", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("This build is alpha quality, things may be broken or otherwise.");
         if (ImGui::Button("Gotcha")) {
@@ -37,6 +33,6 @@ void alpha_window_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void alpha_window_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void alpha_window_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
 
 }

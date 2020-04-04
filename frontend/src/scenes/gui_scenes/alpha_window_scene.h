@@ -28,6 +28,6 @@ namespace ibh {
         ~alpha_window_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
-        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
     };
 }

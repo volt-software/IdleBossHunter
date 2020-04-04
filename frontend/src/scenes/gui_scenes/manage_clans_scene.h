@@ -16,25 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <config.h>
-#include <ecs/ecs.h>
+#include "../scene.h"
+#include <messages/clan/get_clan_listing_response.h>
 
 namespace ibh {
-    class scene;
-
-    class iscene_manager {
+    class manage_clans_scene : public scene  {
     public:
-        virtual ~iscene_manager() = default;
+        explicit manage_clans_scene(iscene_manager *manager);
+        ~manage_clans_scene() override = default;
 
-        virtual void remove(scene *scene) = 0;
-        virtual void add(unique_ptr<scene> scene) = 0;
-        virtual void force_goto_scene(unique_ptr<scene> new_scene) = 0;
-        virtual config * get_config() = 0;
-        virtual entt::registry& get_entity_registry() = 0;
-        virtual int get_socket() const = 0;
-        virtual void set_logged_in(bool logged_in) = 0;
-        virtual bool get_logged_in() const = 0;
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
+    private:
+        string _error;
+        bool _waiting_for_reply;
+        bool _waiting_for_clans;
+        string _selected_clan;
+        vector<clan> _clans;
     };
 }

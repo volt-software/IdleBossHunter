@@ -46,7 +46,9 @@ namespace ibh {
         void force_goto_scene(unique_ptr<scene> new_scene) override;
         config * get_config() override;
         entt::registry& get_entity_registry() override;
-        int get_socket() override;
+        int get_socket() const override;
+        void set_logged_in(bool logged_in) override;
+        bool get_logged_in() const override;
 
         // scene_system
         void init_main_menu();
@@ -59,8 +61,10 @@ namespace ibh {
         vector<unsigned int> _scenes_to_erase;
         vector<unique_ptr<scene>> _scenes_to_add;
         unique_ptr<scene> _force_goto_scene;
-        entt::registry &es;
+        entt::registry &_es;
 
         unsigned int _id_counter;
+        bool _logged_in;
+        mutex _m;
     };
 }

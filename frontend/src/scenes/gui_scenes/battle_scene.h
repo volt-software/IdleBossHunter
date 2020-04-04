@@ -29,7 +29,7 @@ namespace ibh {
         ~battle_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
-        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
 
     private:
         vector<string> _current_battle_log;

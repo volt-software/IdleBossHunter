@@ -24,10 +24,6 @@ using namespace std;
 using namespace ibh;
 
 void about_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(ImGui::Begin("About")) {
         ImGui::Text("IdleBossHunter v0.0.1");
         ImGui::Text("Copyright 2020© by sole proprietorship Volt Software, situated in the Netherlands");
@@ -47,6 +43,6 @@ void about_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void about_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void about_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
 
 }

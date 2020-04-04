@@ -49,15 +49,13 @@ using namespace std;
 using namespace ibh;
 
 scene_system::scene_system(config *config, entt::registry &es)
-        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), es(es), _id_counter(0) {
+        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _es(es), _id_counter(0), _logged_in() {
 }
 
 void scene_system::update(entt::registry &unused, TimeDelta dt) {
+    scoped_lock sg(_m);
     for(auto const & scene : _scenes) {
-        {
-            scoped_lock sg(scene->_m);
-            scene->update(this, dt);
-        }
+        scene->update(this, dt);
         if(scene->_closed) {
             remove(scene.get());
         }
@@ -196,18 +194,18 @@ void scene_system::handle_message(rapidjson::Document const &d) {
 
     spdlog::trace("[{}] Handling message type {} for {} scenes", __FUNCTION__, type, _scenes.size());
 
+    scoped_lock sg(_m);
     for(auto const & scene : _scenes) {
-        scoped_lock sg(scene->_m);
         scene->handle_message(this, type, msg.get());
     }
 }
 
 entt::registry &scene_system::get_entity_registry() {
-    return es;
+    return _es;
 }
 
-int scene_system::get_socket() {
-    auto view = es.view<socket_component>();
+int scene_system::get_socket() const {
+    auto view = _es.view<socket_component>();
     for (auto entity : view) {
         socket_component const &socket = view.get<socket_component>(entity);
         return socket.socket;
@@ -215,4 +213,12 @@ int scene_system::get_socket() {
 
     spdlog::error("[{}] Couldn't find socket", __FUNCTION__);
     return -1;
+}
+
+void scene_system::set_logged_in(bool logged_in) {
+    _logged_in = logged_in;
+}
+
+bool scene_system::get_logged_in() const {
+    return _logged_in;
 }

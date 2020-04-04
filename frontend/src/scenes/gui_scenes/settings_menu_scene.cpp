@@ -24,10 +24,6 @@ using namespace std;
 using namespace ibh;
 
 void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(ImGui::Begin("Settings Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         auto *config = manager->get_config();
         string resolution_label = fmt::format("{}x{}", config->screen_width, config->screen_height);
@@ -66,6 +62,6 @@ void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void settings_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void settings_menu_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
 
 }

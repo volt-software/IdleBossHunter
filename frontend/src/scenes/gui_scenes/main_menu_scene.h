@@ -24,10 +24,10 @@
 namespace ibh {
     class main_menu_scene : public scene  {
     public:
-        main_menu_scene() : scene(4) {}
+        main_menu_scene() : scene(generate_type<main_menu_scene>()) {}
         ~main_menu_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
-        void handle_message(iscene_manager *manager, uint64_t type, message* msg) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
     };
 }

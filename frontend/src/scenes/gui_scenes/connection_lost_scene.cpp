@@ -24,16 +24,12 @@ using namespace std;
 using namespace ibh;
 
 void connection_lost_scene::update(iscene_manager *manager, TimeDelta dt) {
-    if(_closed) {
-        return;
-    }
-
     if(ImGui::Begin("Connection lost", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Connection lost with the server. Please refresh the page.");
     }
     ImGui::End();
 }
 
-void connection_lost_scene::handle_message(iscene_manager *manager, uint64_t type, message *msg) {
+void connection_lost_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
 
 }

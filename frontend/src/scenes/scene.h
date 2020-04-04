@@ -29,11 +29,15 @@
 namespace ibh {
     class scene {
     public:
-        scene(uint64_t type) : _id(0), _type(type), _closed(false), _m() {}
+        scene(uint64_t type) : _id(0), _type(type), _closed(false) {}
         virtual ~scene() = default;
+        scene(const scene &) = delete;
+        scene(scene&&) noexcept = default;
+        scene& operator=(const scene &) = delete;
+        scene& operator=(scene&&) noexcept = default;
 
         virtual void update(iscene_manager *manager, TimeDelta dt) = 0;
-        virtual void handle_message(iscene_manager *manager, uint64_t type, message* msg) = 0;
+        virtual void handle_message(iscene_manager *manager, uint64_t type, message const * msg) = 0;
 
         template <class TemplateClass, typename... Args>
         void send_message(iscene_manager *manager, Args&&... args)
@@ -47,7 +51,6 @@ namespace ibh {
         unsigned int _id;
         uint64_t _type;
         bool _closed;
-        mutex _m;
     };
 
     void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr);
