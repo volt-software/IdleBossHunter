@@ -90,7 +90,8 @@ CREATE TABLE boss_stats (
 CREATE TABLE companies (
     id BIGSERIAL PRIMARY KEY,
     name CITEXT NOT NULL,
-    no_of_shares BIGINT NOT NULL
+    no_of_shares BIGINT NOT NULL,
+    company_type SMALLINT NOT NULL
 );
 
 CREATE TABLE company_stats (
@@ -103,7 +104,8 @@ CREATE TABLE company_stats (
 CREATE TABLE company_members (
     company_id BIGINT NOT NULL,
     character_id BIGINT NOT NULL,
-    member_level SMALLINT NOT NULL
+    member_level SMALLINT NOT NULL,
+    wage BIGINT NOT NULL
 );
 
 CREATE TABLE company_member_applications (
@@ -159,30 +161,34 @@ CREATE TABLE schema_information (
     date TIMESTAMPTZ NOT NULL
 );
 
-ALTER TABLE users ADD CONSTRAINT "users_username_unique" UNIQUE (username);
 ALTER TABLE banned_users ADD CONSTRAINT "banned_users_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id);
+ALTER TABLE boss_stats ADD CONSTRAINT "boss_stats_bosses_id_fkey" FOREIGN KEY (boss_id) REFERENCES bosses(id);
 ALTER TABLE characters ADD CONSTRAINT "characters_users_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id);
-ALTER TABLE characters ADD CONSTRAINT "characters_slot_unique" UNIQUE (user_id, slot);
 ALTER TABLE character_stats ADD CONSTRAINT "character_stats_characters_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
+ALTER TABLE company_members ADD CONSTRAINT "company_members_company_id_fkey" FOREIGN KEY (company_id) REFERENCES companies(id);
+ALTER TABLE company_members ADD CONSTRAINT "company_members_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
+ALTER TABLE company_member_applications ADD CONSTRAINT "company_member_applications_company_id_fkey" FOREIGN KEY (company_id) REFERENCES companies(id);
+ALTER TABLE company_member_applications ADD CONSTRAINT "company_member_applications_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
+ALTER TABLE company_stats ADD CONSTRAINT "company_stats_companies_id_fkey" FOREIGN KEY (company_id) REFERENCES companies(id);
+ALTER TABLE company_buildings ADD CONSTRAINT "company_buildings_companies_id_fkey" FOREIGN KEY (company_id) REFERENCES companies(id);
+ALTER TABLE company_building_machines ADD CONSTRAINT "company_building_machines_company_buildings_id_fkey" FOREIGN KEY (company_building_id) REFERENCES company_buildings(id);
+ALTER TABLE company_shareholders ADD CONSTRAINT "company_shareholders_companies_id_fkey" FOREIGN KEY (company_id) REFERENCES companies(id);
+ALTER TABLE company_shareholders ADD CONSTRAINT "company_shareholders_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
 ALTER TABLE items ADD CONSTRAINT "items_characters_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
 ALTER TABLE item_stats ADD CONSTRAINT "item_stats_items_id_fkey" FOREIGN KEY (item_id) REFERENCES items(id);
-ALTER TABLE boss_stats ADD CONSTRAINT "boss_stats_bosses_id_fkey" FOREIGN KEY (boss_id) REFERENCES bosses(id);
-ALTER TABLE clan_members ADD CONSTRAINT "clan_members_clan_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
-ALTER TABLE clan_members ADD CONSTRAINT "clan_members_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
-ALTER TABLE clan_members ADD CONSTRAINT "clan_members_unique" UNIQUE (character_id);
-ALTER TABLE clan_member_applications ADD CONSTRAINT "clan_member_applications_clan_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
-ALTER TABLE clan_member_applications ADD CONSTRAINT "clan_member_applications_character_id_fkey" FOREIGN KEY (character_id) REFERENCES characters(id);
-ALTER TABLE clan_member_applications ADD CONSTRAINT "clan_member_applications_unique" UNIQUE (character_id, clan_id);
-ALTER TABLE clan_stats ADD CONSTRAINT "clan_stats_clans_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
-ALTER TABLE clan_buildings ADD CONSTRAINT "clan_buildings_clans_id_fkey" FOREIGN KEY (clan_id) REFERENCES clans(id);
-ALTER TABLE clans ADD CONSTRAINT "clan_name_unique" UNIQUE (name);
-ALTER TABLE settings ADD CONSTRAINT "settings_name_unique" UNIQUE (setting_name);
-ALTER TABLE schema_information ADD CONSTRAINT "schema_information_name_unique" UNIQUE (file_name);
 
-CREATE INDEX character_stats_idx ON character_stats (character_id, stat_id);
-CREATE INDEX item_stats_idx ON item_stats (item_id, stat_id);
+ALTER TABLE characters ADD CONSTRAINT "characters_slot_unique" UNIQUE (user_id, slot);
+ALTER TABLE companies ADD CONSTRAINT "company_name_unique" UNIQUE (name);
+ALTER TABLE company_members ADD CONSTRAINT "company_members_unique" UNIQUE (character_id);
+ALTER TABLE company_member_applications ADD CONSTRAINT "company_member_applications_unique" UNIQUE (character_id, company_id);
+ALTER TABLE schema_information ADD CONSTRAINT "schema_information_name_unique" UNIQUE (file_name);
+ALTER TABLE settings ADD CONSTRAINT "settings_name_unique" UNIQUE (setting_name);
+ALTER TABLE users ADD CONSTRAINT "users_username_unique" UNIQUE (username);
+
 CREATE INDEX boss_stats_idx ON boss_stats (boss_id, stat_id);
-CREATE INDEX clan_stats_idx ON clan_stats (clan_id, stat_id);
+CREATE INDEX character_stats_idx ON character_stats (character_id, stat_id);
+CREATE INDEX company_stats_idx ON company_stats (company_id, stat_id);
+CREATE INDEX item_stats_idx ON item_stats (item_id, stat_id);
 
 INSERT INTO schema_information(file_name, date) VALUES ('init.sql', CURRENT_TIMESTAMP);
 

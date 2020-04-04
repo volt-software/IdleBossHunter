@@ -125,9 +125,10 @@ namespace ibh {
         uint64_t company_id;
         uint64_t character_id;
         uint16_t member_level;
+        uint64_t wage;
 
-        db_company_member() : company_id(), character_id(), member_level() {}
-        db_company_member(uint64_t company_id, uint64_t character_id, uint16_t member_level) : company_id(company_id), character_id(character_id), member_level(member_level) {}
+        db_company_member() : company_id(), character_id(), member_level(), wage() {}
+        db_company_member(uint64_t company_id, uint64_t character_id, uint16_t member_level, uint64_t wage) : company_id(company_id), character_id(character_id), member_level(member_level), wage(wage) {}
     };
 
     struct db_company_stat {
@@ -152,9 +153,11 @@ namespace ibh {
     struct db_company {
         uint64_t id;
         string name;
+        uint64_t no_of_shares;
+        uint16_t company_type;
 
-        db_company() : id(), name() {}
-        db_company(uint64_t id, string name) : id(id), name(move(name)) {}
+        db_company() : id(), name(), no_of_shares(), company_type() {}
+        db_company(uint64_t id, string name, uint64_t no_of_shares, uint16_t company_type) : id(id), name(move(name)), no_of_shares(no_of_shares), company_type(company_type) {}
     };
 }
 
