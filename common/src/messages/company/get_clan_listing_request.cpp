@@ -16,18 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "join_clan_request.h"
+#include "get_company_listing_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-join_clan_request::join_clan_request(string clan_name) noexcept : clan_name(move(clan_name)) {
+get_company_listing_request::get_company_listing_request() noexcept = default;
 
-}
-
-string join_clan_request::serialize() const {
+string get_company_listing_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -36,23 +34,20 @@ string join_clan_request::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String(KEY_STRING("clan_name"));
-    writer.String(clan_name.c_str(), clan_name.length());
-
     writer.EndObject();
     return sb.GetString();
 }
 
-unique_ptr<join_clan_request> join_clan_request::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("clan_name")) {
-        spdlog::warn("[join_clan_request] deserialize failed");
+unique_ptr<get_company_listing_request> get_company_listing_request::deserialize(rapidjson::Document const &d) {
+    if (!d.HasMember("type")) {
+        spdlog::warn("[get_company_listing_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[join_clan_request] deserialize failed wrong type");
+        spdlog::warn("[get_company_listing_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<join_clan_request>(d["clan_name"].GetString());
+    return make_unique<get_company_listing_request>();
 }

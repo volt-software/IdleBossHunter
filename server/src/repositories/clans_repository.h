@@ -28,13 +28,13 @@ using namespace std;
 
 namespace ibh {
     template<DatabaseTransaction transaction_T>
-    class clans_repository {
+    class companies_repository {
     public:
-        bool insert(db_clan& clan, unique_ptr<transaction_T> const &transaction) const;
-        void update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
-        void remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan> get(int id, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan> get(string const &name, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] vector<db_clan> get_all(unique_ptr<transaction_T> const &transaction) const;
+        bool insert(db_company& company, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_company const &company, unique_ptr<transaction_T> const &transaction) const;
+        void remove(db_company const &company, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_company> get(int id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_company> get(string const &name, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] vector<db_company> get_all(unique_ptr<transaction_T> const &transaction) const;
     };
 }

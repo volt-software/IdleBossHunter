@@ -17,11 +17,11 @@
 */
 
 
-#include "join_clan_handler.h"
+#include "join_company_handler.h"
 
 #include <spdlog/spdlog.h>
 
-#include <messages/clan/join_clan_request.h>
+#include <messages/company/join_company_request.h>
 #include "message_handlers/handler_macros.h"
 #include <websocket_thread.h>
 #include "macros.h"
@@ -35,19 +35,19 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_join_clan(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
+    void handle_join_company(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_PLAYING_CHECK(join_clan_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(join_company_request);
 
-        q->enqueue(make_unique<join_clan_message>(user_data->connection_id, msg->clan_name));
+        q->enqueue(make_unique<join_company_message>(user_data->connection_id, msg->company_name));
     }
 
-    template void handle_join_clan<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_join_company<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                         per_socket_data<websocketpp::connection_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
-    template void handle_join_clan<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_join_company<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                            per_socket_data<custom_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
 #endif
 }

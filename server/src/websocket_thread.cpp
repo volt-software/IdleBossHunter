@@ -28,15 +28,15 @@
 #include <message_handlers/user_access/character_select_handler.h>
 #include <message_handlers/chat/public_chat_handler.h>
 #include <message_handlers/moderator/set_motd_handler.h>
-#include <message_handlers/clan/set_tax_handler.h>
-#include <message_handlers/clan/join_clan_handler.h>
-#include <message_handlers/clan/increase_bonus_handler.h>
-#include <message_handlers/clan/get_clan_listing_handler.h>
-#include <message_handlers/clan/create_clan_handler.h>
-#include <message_handlers/clan/accept_application_handler.h>
-#include <message_handlers/clan/reject_application_handler.h>
-#include <message_handlers/clan/leave_clan_handler.h>
-#include <message_handlers/clan/get_clan_applications_handler.h>
+#include <message_handlers/company/set_tax_handler.h>
+#include <message_handlers/company/join_company_handler.h>
+#include <message_handlers/company/increase_bonus_handler.h>
+#include <message_handlers/company/get_company_listing_handler.h>
+#include <message_handlers/company/create_company_handler.h>
+#include <message_handlers/company/accept_application_handler.h>
+#include <message_handlers/company/reject_application_handler.h>
+#include <message_handlers/company/leave_company_handler.h>
+#include <message_handlers/company/get_company_applications_handler.h>
 #include <messages/user_access/login_request.h>
 #include <messages/user_access/register_request.h>
 #include <messages/user_access/play_character_request.h>
@@ -46,15 +46,15 @@
 #include <messages/user_access/character_select_response.h>
 #include <messages/chat/message_request.h>
 #include <messages/moderator/set_motd_request.h>
-#include <messages/clan/set_tax_request.h>
-#include <messages/clan/join_clan_request.h>
-#include <messages/clan/increase_bonus_request.h>
-#include <messages/clan/get_clan_listing_request.h>
-#include <messages/clan/create_clan_request.h>
-#include <messages/clan/accept_application_request.h>
-#include <messages/clan/reject_application_request.h>
-#include <messages/clan/leave_clan_request.h>
-#include <messages/clan/get_clan_applications_request.h>
+#include <messages/company/set_tax_request.h>
+#include <messages/company/join_company_request.h>
+#include <messages/company/increase_bonus_request.h>
+#include <messages/company/get_company_listing_request.h>
+#include <messages/company/create_company_request.h>
+#include <messages/company/accept_application_request.h>
+#include <messages/company/reject_application_request.h>
+#include <messages/company/leave_company_request.h>
+#include <messages/company/get_company_applications_request.h>
 #include <message_handlers/handler_macros.h>
 #include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
@@ -277,16 +277,16 @@ namespace ibh {
         // admin/moderator
         message_router.emplace(set_motd_request::type, handle_set_motd<server, websocketpp::connection_hdl>);
 
-        // clans
+        // companies
         message_router.emplace(set_tax_request::type, handle_set_tax<server, websocketpp::connection_hdl>);
-        message_router.emplace(join_clan_request::type, handle_join_clan<server, websocketpp::connection_hdl>);
+        message_router.emplace(join_company_request::type, handle_join_company<server, websocketpp::connection_hdl>);
         message_router.emplace(increase_bonus_request::type, handle_increase_bonus<server, websocketpp::connection_hdl>);
-        message_router.emplace(get_clan_listing_request::type, handle_get_clan_listing<server, websocketpp::connection_hdl>);
-        message_router.emplace(create_clan_request::type, handle_create_clan<server, websocketpp::connection_hdl>);
+        message_router.emplace(get_company_listing_request::type, handle_get_company_listing<server, websocketpp::connection_hdl>);
+        message_router.emplace(create_company_request::type, handle_create_company<server, websocketpp::connection_hdl>);
         message_router.emplace(accept_application_request::type, handle_accept_application<server, websocketpp::connection_hdl>);
         message_router.emplace(reject_application_request::type, handle_reject_application<server, websocketpp::connection_hdl>);
-        message_router.emplace(leave_clan_request::type, handle_leave_clan<server, websocketpp::connection_hdl>);
-        message_router.emplace(get_clan_applications_request::type, handle_get_clan_applications<server, websocketpp::connection_hdl>);
+        message_router.emplace(leave_company_request::type, handle_leave_company<server, websocketpp::connection_hdl>);
+        message_router.emplace(get_company_applications_request::type, handle_get_company_applications<server, websocketpp::connection_hdl>);
     }
 
     thread run_websocket(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {

@@ -20,21 +20,21 @@
 #pragma once
 
 #include "../scene.h"
-#include <messages/clan/get_clan_listing_response.h>
+#include <messages/company/get_company_listing_response.h>
 
 namespace ibh {
-    class manage_clans_scene : public scene  {
+    class manage_companies_scene : public scene  {
     public:
-        explicit manage_clans_scene(iscene_manager *manager);
-        ~manage_clans_scene() override = default;
+        explicit manage_companies_scene(iscene_manager *manager);
+        ~manage_companies_scene() override = default;
 
         void update(iscene_manager *manager, TimeDelta dt) override;
         void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
     private:
         string _error;
         bool _waiting_for_reply;
-        bool _waiting_for_clans;
-        string _selected_clan;
-        vector<clan> _clans;
+        bool _waiting_for_companies;
+        string _selected_company;
+        vector<company> _companies;
     };
 }

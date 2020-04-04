@@ -20,61 +20,61 @@
 
 #include <catch2/catch.hpp>
 #include "../test_helpers/startup_helper.h"
-#include "repositories/clans_repository.h"
+#include "repositories/companies_repository.h"
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("clans repository tests") {
-    clans_repository<database_transaction> clans_repo{};
+TEST_CASE("companies repository tests") {
+    companies_repository<database_transaction> companies_repo{};
 
-    SECTION("clan inserted correctly" ) {
+    SECTION("company inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
 
-        auto clan2 = clans_repo.get(clan.id, transaction);
-        REQUIRE(clan2->id == clan.id);
-        REQUIRE(clan2->name == clan.name);
+        auto company2 = companies_repo.get(company.id, transaction);
+        REQUIRE(company2->id == company.id);
+        REQUIRE(company2->name == company.name);
     }
 
-    SECTION( "update clan" ) {
+    SECTION( "update company" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
 
-        clan.name = "notclan";
-        clans_repo.update(clan, transaction);
+        company.name = "notcompany";
+        companies_repo.update(company, transaction);
 
-        auto clan2 = clans_repo.get(clan.id, transaction);
-        REQUIRE(clan2->id == clan.id);
-        REQUIRE(clan2->name == clan.name);
+        auto company2 = companies_repo.get(company.id, transaction);
+        REQUIRE(company2->id == company.id);
+        REQUIRE(company2->name == company.name);
     }
 
-    SECTION( "remove clan" ) {
+    SECTION( "remove company" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
 
-        clans_repo.remove(clan, transaction);
+        companies_repo.remove(company, transaction);
 
-        auto clan2 = clans_repo.get(clan.id, transaction);
-        REQUIRE(!clan2);
+        auto company2 = companies_repo.get(company.id, transaction);
+        REQUIRE(!company2);
     }
 
-    SECTION( "get all clans" ) {
+    SECTION( "get all companies" ) {
         auto transaction = db_pool->create_transaction();
-        auto clans_existing = clans_repo.get_all(transaction);
+        auto companies_existing = companies_repo.get_all(transaction);
 
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
 
-        auto clans = clans_repo.get_all(transaction);
-        REQUIRE(clans.size() == clans_existing.size() + 1);
+        auto companies = companies_repo.get_all(transaction);
+        REQUIRE(companies.size() == companies_existing.size() + 1);
     }
 }
 

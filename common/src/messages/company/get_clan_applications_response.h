@@ -33,20 +33,20 @@ namespace ibh {
         member(uint64_t id, uint64_t level, string name) noexcept : id(id), level(level), name(move(name)) {}
     };
 
-    struct get_clan_applications_response : message {
-        explicit get_clan_applications_response(string error, vector<member> members) noexcept;
+    struct get_company_applications_response : message {
+        explicit get_company_applications_response(string error, vector<member> members) noexcept;
 
-        ~get_clan_applications_response() noexcept override = default;
+        ~get_company_applications_response() noexcept override = default;
 
         [[nodiscard]]
         string serialize() const override;
 
         [[nodiscard]]
-        static unique_ptr<get_clan_applications_response> deserialize(rapidjson::Document const &d);
+        static unique_ptr<get_company_applications_response> deserialize(rapidjson::Document const &d);
 
         string error;
         vector<member> members;
 
-        static constexpr uint64_t type = generate_type<get_clan_applications_response>();
+        static constexpr uint64_t type = generate_type<get_company_applications_response>();
     };
 }

@@ -16,18 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "join_clan_response.h"
+#include "join_company_response.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-join_clan_response::join_clan_response(string error) noexcept : error(move(error)) {
+join_company_response::join_company_response(string error) noexcept : error(move(error)) {
 
 }
 
-string join_clan_response::serialize() const {
+string join_company_response::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -43,16 +43,16 @@ string join_clan_response::serialize() const {
     return sb.GetString();
 }
 
-unique_ptr<join_clan_response> join_clan_response::deserialize(rapidjson::Document const &d) {
+unique_ptr<join_company_response> join_company_response::deserialize(rapidjson::Document const &d) {
     if (!d.HasMember("type") || !d.HasMember("error")) {
-        spdlog::warn("[join_clan_response] deserialize failed");
+        spdlog::warn("[join_company_response] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[join_clan_response] deserialize failed wrong type");
+        spdlog::warn("[join_company_response] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<join_clan_response>(d["error"].GetString());
+    return make_unique<join_company_response>(d["error"].GetString());
 }

@@ -19,7 +19,7 @@
 #include "main_menu_scene.h"
 #include "settings_menu_scene.h"
 #include "login_menu_scene.h"
-#include "manage_clans_scene.h"
+#include "manage_companies_scene.h"
 #include "about_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
@@ -34,8 +34,8 @@ void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             manager->add(make_unique<login_menu_scene>());
         }
 
-        if(manager->get_logged_in() && ImGui::MenuItem("Clans")) {
-            manager->add(make_unique<manage_clans_scene>(manager));
+        if(manager->get_logged_in() && ImGui::MenuItem("Companies")) {
+            manager->add(make_unique<manage_companies_scene>(manager));
         }
 
         if (ImGui::MenuItem("Settings")) {

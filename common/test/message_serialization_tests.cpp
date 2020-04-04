@@ -40,22 +40,22 @@
 #include <messages/battle/level_up_response.h>
 #include <messages/battle/new_battle_response.h>
 #include <messages/battle/battle_finished_response.h>
-#include <messages/clan/accept_application_request.h>
-#include <messages/clan/accept_application_response.h>
-#include <messages/clan/create_clan_request.h>
-#include <messages/clan/create_clan_response.h>
-#include <messages/clan/get_clan_listing_request.h>
-#include <messages/clan/get_clan_listing_response.h>
-#include <messages/clan/increase_bonus_request.h>
-#include <messages/clan/increase_bonus_response.h>
-#include <messages/clan/join_clan_request.h>
-#include <messages/clan/join_clan_response.h>
-#include <messages/clan/leave_clan_request.h>
-#include <messages/clan/leave_clan_response.h>
-#include <messages/clan/reject_application_request.h>
-#include <messages/clan/reject_application_response.h>
-#include <messages/clan/set_tax_request.h>
-#include <messages/clan/set_tax_response.h>
+#include <messages/company/accept_application_request.h>
+#include <messages/company/accept_application_response.h>
+#include <messages/company/create_company_request.h>
+#include <messages/company/create_company_response.h>
+#include <messages/company/get_company_listing_request.h>
+#include <messages/company/get_company_listing_response.h>
+#include <messages/company/increase_bonus_request.h>
+#include <messages/company/increase_bonus_response.h>
+#include <messages/company/join_company_request.h>
+#include <messages/company/join_company_response.h>
+#include <messages/company/leave_company_request.h>
+#include <messages/company/leave_company_response.h>
+#include <messages/company/reject_application_request.h>
+#include <messages/company/reject_application_response.h>
+#include <messages/company/set_tax_request.h>
+#include <messages/company/set_tax_response.h>
 
 using namespace std;
 using namespace ibh;
@@ -325,7 +325,7 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg2->money_gained == 4);
     }
 
-    // clan
+    // company
 
     SECTION("accept application request") {
         SERDE(accept_application_request, 1);
@@ -337,23 +337,23 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg2->error == "error");
     }
 
-    SECTION("create clan request") {
-        SERDE(create_clan_request, "clan");
-        REQUIRE(msg2->name == "clan");
+    SECTION("create company request") {
+        SERDE(create_company_request, "company");
+        REQUIRE(msg2->name == "company");
     }
 
-    SECTION("create clan response") {
-        SERDE(create_clan_response, "error");
+    SECTION("create company response") {
+        SERDE(create_company_response, "error");
         REQUIRE(msg2->error == "error");
     }
 
-    SECTION("get clan listing request") {
-        SERDE_SINGLE(get_clan_listing_request);
+    SECTION("get company listing request") {
+        SERDE_SINGLE(get_company_listing_request);
         REQUIRE(msg2);
     }
 
-    SECTION("get clan listing response") {
-        vector<clan> clans;
+    SECTION("get company listing response") {
+        vector<company> companies;
         vector<bonus> bonuses1;
         vector<string> members1;
         vector<bonus> bonuses2;
@@ -367,29 +367,29 @@ TEST_CASE("message serialization tests") {
         bonuses2.emplace_back(456, 5);
         members2.emplace_back("m3");
         members2.emplace_back("m4");
-        clans.emplace_back("c1", members1, bonuses1);
-        clans.emplace_back("c2", members2, bonuses2);
-        SERDE(get_clan_listing_response, "error", clans);
+        companies.emplace_back("c1", members1, bonuses1);
+        companies.emplace_back("c2", members2, bonuses2);
+        SERDE(get_company_listing_response, "error", companies);
         REQUIRE(msg2->error == "error");
-        REQUIRE(msg2->clans.size() == 2);
-        REQUIRE(msg2->clans[0].name == "c1");
-        REQUIRE(msg2->clans[0].members.size() == 2);
-        REQUIRE(msg2->clans[0].members[0] == "m1");
-        REQUIRE(msg2->clans[0].members[1] == "m2");
-        REQUIRE(msg2->clans[0].bonuses.size() == 2);
-        REQUIRE(msg2->clans[0].bonuses[0].stat_id == 123);
-        REQUIRE(msg2->clans[0].bonuses[0].amount == 2);
-        REQUIRE(msg2->clans[0].bonuses[1].stat_id == 234);
-        REQUIRE(msg2->clans[0].bonuses[1].amount == 3);
-        REQUIRE(msg2->clans[1].name == "c2");
-        REQUIRE(msg2->clans[1].members.size() == 2);
-        REQUIRE(msg2->clans[1].members[0] == "m3");
-        REQUIRE(msg2->clans[1].members[1] == "m4");
-        REQUIRE(msg2->clans[1].bonuses.size() == 2);
-        REQUIRE(msg2->clans[1].bonuses[0].stat_id == 345);
-        REQUIRE(msg2->clans[1].bonuses[0].amount == 4);
-        REQUIRE(msg2->clans[1].bonuses[1].stat_id == 456);
-        REQUIRE(msg2->clans[1].bonuses[1].amount == 5);
+        REQUIRE(msg2->companies.size() == 2);
+        REQUIRE(msg2->companies[0].name == "c1");
+        REQUIRE(msg2->companies[0].members.size() == 2);
+        REQUIRE(msg2->companies[0].members[0] == "m1");
+        REQUIRE(msg2->companies[0].members[1] == "m2");
+        REQUIRE(msg2->companies[0].bonuses.size() == 2);
+        REQUIRE(msg2->companies[0].bonuses[0].stat_id == 123);
+        REQUIRE(msg2->companies[0].bonuses[0].amount == 2);
+        REQUIRE(msg2->companies[0].bonuses[1].stat_id == 234);
+        REQUIRE(msg2->companies[0].bonuses[1].amount == 3);
+        REQUIRE(msg2->companies[1].name == "c2");
+        REQUIRE(msg2->companies[1].members.size() == 2);
+        REQUIRE(msg2->companies[1].members[0] == "m3");
+        REQUIRE(msg2->companies[1].members[1] == "m4");
+        REQUIRE(msg2->companies[1].bonuses.size() == 2);
+        REQUIRE(msg2->companies[1].bonuses[0].stat_id == 345);
+        REQUIRE(msg2->companies[1].bonuses[0].amount == 4);
+        REQUIRE(msg2->companies[1].bonuses[1].stat_id == 456);
+        REQUIRE(msg2->companies[1].bonuses[1].amount == 5);
     }
 
     SECTION("increase bonus request") {
@@ -402,23 +402,23 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg2->error == "error");
     }
 
-    SECTION("join clan request") {
-        SERDE(join_clan_request, "name");
-        REQUIRE(msg2->clan_name == "name");
+    SECTION("join company request") {
+        SERDE(join_company_request, "name");
+        REQUIRE(msg2->company_name == "name");
     }
 
-    SECTION("join clan response") {
-        SERDE(join_clan_response, "error");
+    SECTION("join company response") {
+        SERDE(join_company_response, "error");
         REQUIRE(msg2->error == "error");
     }
 
-    SECTION("leave clan request") {
-        SERDE_SINGLE(leave_clan_request);
+    SECTION("leave company request") {
+        SERDE_SINGLE(leave_company_request);
         REQUIRE(msg2);
     }
 
-    SECTION("leave clan response") {
-        SERDE(leave_clan_response, "error");
+    SECTION("leave company response") {
+        SERDE(leave_company_response, "error");
         REQUIRE(msg2->error == "error");
     }
 

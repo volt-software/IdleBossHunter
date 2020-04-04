@@ -20,10 +20,10 @@
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
-#include <messages/clan/accept_application_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <messages/company/accept_application_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_member_applications_repository.h>
 #include <game_queue_message_handlers/handler_helpers.h>
 
 using namespace std;
@@ -45,66 +45,66 @@ namespace ibh {
                 continue;
             }
 
-            clan_members_repository<database_subtransaction> clan_members_repo{};
-            clan_member_applications_repository<database_subtransaction> clan_member_applications_repo{};
+            company_members_repository<database_subtransaction> company_members_repo{};
+            company_member_applications_repository<database_subtransaction> company_member_applications_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
-            if(!clan_member) {
-                auto new_err_msg = make_unique<accept_application_response>("Not a member of a clan");
+            auto company_member = company_members_repo.get_by_character_id(pc.id, subtransaction);
+            if(!company_member) {
+                auto new_err_msg = make_unique<accept_application_response>("Not a member of a company");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            if(clan_member->member_level == CLAN_MEMBER) {
+            if(company_member->member_level == COMPANY_MEMBER) {
                 auto new_err_msg = make_unique<accept_application_response>("Not an admin");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            auto clan_application = clan_member_applications_repo.get(clan_member->clan_id, accept_msg->applicant_id, subtransaction);
-            if(!clan_application) {
+            auto company_application = company_member_applications_repo.get(company_member->company_id, accept_msg->applicant_id, subtransaction);
+            if(!company_application) {
                 auto new_err_msg = make_unique<accept_application_response>("No applicant by that name.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            clan_application->member_level = CLAN_MEMBER;
-            if(!clan_members_repo.insert(*clan_application, subtransaction)) {
+            company_application->member_level = COMPANY_MEMBER;
+            if(!company_members_repo.insert(*company_application, subtransaction)) {
                 auto new_err_msg = make_unique<accept_application_response>("Server error.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            clan_member_applications_repo.remove(*clan_application, subtransaction);
+            company_member_applications_repo.remove(*company_application, subtransaction);
             subtransaction->commit();
 
             auto new_err_msg = make_unique<accept_application_response>("");
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
-            auto clan_view = es.view<clan_component>();
-            for(auto clan_entity : clan_view) {
-                auto &clan = clan_view.get(clan_entity);
+            auto company_view = es.view<company_component>();
+            for(auto company_entity : company_view) {
+                auto &company = company_view.get(company_entity);
 
-                if(clan.id != clan_member->clan_id) {
+                if(company.id != company_member->company_id) {
                     continue;
                 }
 
-                clan.members.emplace(clan_application->character_id, CLAN_MEMBER);
+                company.members.emplace(company_application->character_id, COMPANY_MEMBER);
 
-                auto accepted_player = get_player_entity(clan_application->character_id, es);
+                auto accepted_player = get_player_entity(company_application->character_id, es);
                 if(accepted_player != nullptr) {
-                    send_message_to_all_clan_members(clan, pc.name, fmt::format("{} got accepted into the clan!", accepted_player->name), "system-clan", es, outward_queue);
+                    send_message_to_all_company_members(company, pc.name, fmt::format("{} got accepted into the company!", accepted_player->name), "system-company", es, outward_queue);
                 } else {
-                    spdlog::error("[{}] Couldn't find recently accepted player {}", __FUNCTION__, clan_application->character_id);
+                    spdlog::error("[{}] Couldn't find recently accepted player {}", __FUNCTION__, company_application->character_id);
                 }
 
-                spdlog::trace("[{}] accepted applicant {} clan {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
+                spdlog::trace("[{}] accepted applicant {} company {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, company_member->company_id, pc.name, pc.connection_id);
 
                 return true;
             }
 
-            spdlog::trace("[{}] could not find clan id {} for player {}", __FUNCTION__, clan_member->clan_id, pc.id);
+            spdlog::trace("[{}] could not find company id {} for player {}", __FUNCTION__, company_member->company_id, pc.id);
         }
 
         spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, accept_msg->connection_id);

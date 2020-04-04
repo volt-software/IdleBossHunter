@@ -16,18 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "leave_clan_response.h"
+#include "get_company_applications_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-leave_clan_response::leave_clan_response(string error) noexcept : error(move(error)) {
+get_company_applications_request::get_company_applications_request() noexcept = default;
 
-}
-
-string leave_clan_response::serialize() const {
+string get_company_applications_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -36,23 +34,20 @@ string leave_clan_response::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String(KEY_STRING("error"));
-    writer.String(error.c_str(), error.size());
-
     writer.EndObject();
     return sb.GetString();
 }
 
-unique_ptr<leave_clan_response> leave_clan_response::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("error")) {
-        spdlog::warn("[leave_clan_response] deserialize failed");
+unique_ptr<get_company_applications_request> get_company_applications_request::deserialize(rapidjson::Document const &d) {
+    if (!d.HasMember("type")) {
+        spdlog::warn("[get_company_applications_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[leave_clan_response] deserialize failed wrong type");
+        spdlog::warn("[get_company_applications_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<leave_clan_response>(d["error"].GetString());
+    return make_unique<get_company_applications_request>();
 }

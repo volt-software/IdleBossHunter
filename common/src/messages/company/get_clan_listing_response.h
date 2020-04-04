@@ -25,19 +25,34 @@
 using namespace std;
 
 namespace ibh {
-    struct create_clan_request : message {
-        create_clan_request(string name) noexcept;
+    struct bonus {
+        uint64_t stat_id;
+        uint64_t amount;
 
-        ~create_clan_request() noexcept override = default;
+        bonus(uint64_t stat_id, uint64_t amount) noexcept : stat_id(stat_id), amount(amount) {}
+    };
+    struct company {
+        string name;
+        vector<string> members;
+        vector<bonus> bonuses;
+
+        company(string name, vector<string> members, vector<bonus> bonuses) noexcept : name(move(name)), members(move(members)), bonuses(move(bonuses)) {}
+    };
+
+    struct get_company_listing_response : message {
+        explicit get_company_listing_response(string error, vector<company> companies) noexcept;
+
+        ~get_company_listing_response() noexcept override = default;
 
         [[nodiscard]]
         string serialize() const override;
 
         [[nodiscard]]
-        static unique_ptr<create_clan_request> deserialize(rapidjson::Document const &d);
+        static unique_ptr<get_company_listing_response> deserialize(rapidjson::Document const &d);
 
-        string name;
+        string error;
+        vector<company> companies;
 
-        static constexpr uint64_t type = generate_type<create_clan_request>();
+        static constexpr uint64_t type = generate_type<get_company_listing_response>();
     };
 }

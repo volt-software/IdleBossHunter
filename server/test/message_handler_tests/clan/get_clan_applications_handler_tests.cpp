@@ -18,12 +18,12 @@
 
 #include <catch2/catch.hpp>
 #include "../../test_helpers/startup_helper.h"
-#include <message_handlers/clan/get_clan_applications_handler.h>
-#include <messages/clan/get_clan_applications_request.h>
-#include <messages/clan/get_clan_applications_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <message_handlers/company/get_company_applications_handler.h>
+#include <messages/company/get_company_applications_request.h>
+#include <messages/company/get_company_applications_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_member_applications_repository.h>
 #include <repositories/users_repository.h>
 #include <repositories/characters_repository.h>
 #include <ecs/components.h>
@@ -32,17 +32,17 @@
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("get clan applications handler tests") {
+TEST_CASE("get company applications handler tests") {
     SECTION("Should return applicant") {
-        string message = get_clan_applications_request().serialize();
+        string message = get_company_applications_request().serialize();
         per_socket_data<custom_hdl> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
         queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         custom_server s;
-        clans_repository<database_transaction> clans_repo{};
-        clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        companies_repository<database_transaction> companies_repo{};
+        company_members_repository<database_transaction> company_members_repo{};
+        company_member_applications_repository<database_transaction> company_applications_repo{};
         users_repository<database_transaction> users_repo{};
         characters_repository<database_transaction> chars_repo{};
         user_data.ws = 1;
@@ -52,9 +52,9 @@ TEST_CASE("get clan applications handler tests") {
         d.Parse(&message[0], message.size());
 
         auto transaction = db_pool->create_transaction();
-        db_clan new_clan{0, "test"};
-        clans_repo.insert(new_clan, transaction);
-        REQUIRE(new_clan.id > 0);
+        db_company new_company{0, "test"};
+        companies_repo.insert(new_company, transaction);
+        REQUIRE(new_company.id > 0);
         db_user new_user{};
         users_repo.insert_if_not_exists(new_user, transaction);
         REQUIRE(new_user.id > 0);
@@ -66,18 +66,18 @@ TEST_CASE("get clan applications handler tests") {
         requesting_char.name = "requesting_char_name";
         chars_repo.insert(requesting_char, transaction);
         REQUIRE(requesting_char.id > 0);
-        db_clan_member requesting_member{new_clan.id, requesting_char.id, CLAN_SAGE};
-        REQUIRE(clan_members_repo.insert(requesting_member, transaction) == true);
-        db_clan_member new_member{new_clan.id, new_char.id, CLAN_MEMBER};
-        REQUIRE(clan_applications_repo.insert(new_member, transaction) == true);
+        db_company_member requesting_member{new_company.id, requesting_char.id, COMPANY_SAGE};
+        REQUIRE(company_members_repo.insert(requesting_member, transaction) == true);
+        db_company_member new_member{new_company.id, new_char.id, COMPANY_MEMBER};
+        REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
         user_data.playing_character_slot = 0;
         user_data.playing_character_id = requesting_char.id;
 
-        handle_get_clan_applications(&s, d, transaction, &user_data, &q, user_connections);
+        handle_get_company_applications(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
-        auto new_msg = get_clan_applications_response::deserialize(d);
+        auto new_msg = get_company_applications_response::deserialize(d);
         REQUIRE(new_msg);
         REQUIRE(new_msg->error.empty());
         REQUIRE(!new_msg->members.empty());
@@ -87,15 +87,15 @@ TEST_CASE("get clan applications handler tests") {
     }
 
     SECTION("Only sages and admins can retrieve applications") {
-        string message = get_clan_applications_request().serialize();
+        string message = get_company_applications_request().serialize();
         per_socket_data<custom_hdl> user_data;
         moodycamel::ConcurrentQueue<unique_ptr<queue_message>> cq;
         queue_abstraction<unique_ptr<queue_message>> q(&cq);
         ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> user_connections;
         custom_server s;
-        clans_repository<database_transaction> clans_repo{};
-        clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        companies_repository<database_transaction> companies_repo{};
+        company_members_repository<database_transaction> company_members_repo{};
+        company_member_applications_repository<database_transaction> company_applications_repo{};
         users_repository<database_transaction> users_repo{};
         characters_repository<database_transaction> chars_repo{};
         user_data.ws = 1;
@@ -105,9 +105,9 @@ TEST_CASE("get clan applications handler tests") {
         d.Parse(&message[0], message.size());
 
         auto transaction = db_pool->create_transaction();
-        db_clan new_clan{0, "test"};
-        clans_repo.insert(new_clan, transaction);
-        REQUIRE(new_clan.id > 0);
+        db_company new_company{0, "test"};
+        companies_repo.insert(new_company, transaction);
+        REQUIRE(new_company.id > 0);
         db_user new_user{};
         users_repo.insert_if_not_exists(new_user, transaction);
         REQUIRE(new_user.id > 0);
@@ -119,18 +119,18 @@ TEST_CASE("get clan applications handler tests") {
         requesting_char.name = "requesting_char_name";
         chars_repo.insert(requesting_char, transaction);
         REQUIRE(requesting_char.id > 0);
-        db_clan_member requesting_member{new_clan.id, requesting_char.id, CLAN_MEMBER};
-        REQUIRE(clan_members_repo.insert(requesting_member, transaction) == true);
-        db_clan_member new_member{new_clan.id, new_char.id, CLAN_MEMBER};
-        REQUIRE(clan_applications_repo.insert(new_member, transaction) == true);
+        db_company_member requesting_member{new_company.id, requesting_char.id, COMPANY_MEMBER};
+        REQUIRE(company_members_repo.insert(requesting_member, transaction) == true);
+        db_company_member new_member{new_company.id, new_char.id, COMPANY_MEMBER};
+        REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
         user_data.playing_character_slot = 0;
         user_data.playing_character_id = requesting_char.id;
 
-        handle_get_clan_applications(&s, d, transaction, &user_data, &q, user_connections);
+        handle_get_company_applications(&s, d, transaction, &user_data, &q, user_connections);
 
         d.Parse(&s.sent_message[0], s.sent_message.size());
-        auto new_msg = get_clan_applications_response::deserialize(d);
+        auto new_msg = get_company_applications_response::deserialize(d);
         REQUIRE(new_msg);
         REQUIRE(!new_msg->error.empty());
     }

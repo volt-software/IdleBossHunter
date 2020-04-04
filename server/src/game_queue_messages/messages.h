@@ -42,7 +42,7 @@ namespace ibh {
         queue_message& operator=(queue_message&&) noexcept = default;
     };
 
-    // clan
+    // company
 
     struct accept_application_message : queue_message {
         uint64_t applicant_id;
@@ -56,16 +56,16 @@ namespace ibh {
         accept_application_message& operator=(accept_application_message&&) noexcept = default;
     };
 
-    struct create_clan_message : queue_message {
-        string clan_name;
-        static constexpr uint64_t _type = generate_type<create_clan_message>();
+    struct create_company_message : queue_message {
+        string company_name;
+        static constexpr uint64_t _type = generate_type<create_company_message>();
 
-        create_clan_message(uint64_t connection_id, string clan_name) noexcept;
-        ~create_clan_message() override = default;
-        create_clan_message(const create_clan_message&) = default;
-        create_clan_message(create_clan_message&&) noexcept = default;
-        create_clan_message& operator=(const create_clan_message &) = default;
-        create_clan_message& operator=(create_clan_message&&) noexcept = default;
+        create_company_message(uint64_t connection_id, string company_name) noexcept;
+        ~create_company_message() override = default;
+        create_company_message(const create_company_message&) = default;
+        create_company_message(create_company_message&&) noexcept = default;
+        create_company_message& operator=(const create_company_message &) = default;
+        create_company_message& operator=(create_company_message&&) noexcept = default;
     };
 
     struct increase_bonus_message : queue_message {
@@ -80,27 +80,27 @@ namespace ibh {
         increase_bonus_message& operator=(increase_bonus_message&&) noexcept = default;
     };
 
-    struct join_clan_message : queue_message {
-        string clan_name;
-        static constexpr uint64_t _type = generate_type<join_clan_message>();
+    struct join_company_message : queue_message {
+        string company_name;
+        static constexpr uint64_t _type = generate_type<join_company_message>();
 
-        join_clan_message(uint64_t connection_id, string clan_name) noexcept;
-        ~join_clan_message() override = default;
-        join_clan_message(const join_clan_message&) = default;
-        join_clan_message(join_clan_message&&) noexcept = default;
-        join_clan_message& operator=(const join_clan_message &) = default;
-        join_clan_message& operator=(join_clan_message&&) noexcept = default;
+        join_company_message(uint64_t connection_id, string company_name) noexcept;
+        ~join_company_message() override = default;
+        join_company_message(const join_company_message&) = default;
+        join_company_message(join_company_message&&) noexcept = default;
+        join_company_message& operator=(const join_company_message &) = default;
+        join_company_message& operator=(join_company_message&&) noexcept = default;
     };
 
-    struct leave_clan_message : queue_message {
-        static constexpr uint64_t _type = generate_type<leave_clan_message>();
+    struct leave_company_message : queue_message {
+        static constexpr uint64_t _type = generate_type<leave_company_message>();
 
-        explicit leave_clan_message(uint64_t connection_id) noexcept;
-        ~leave_clan_message() override = default;
-        leave_clan_message(const leave_clan_message&) noexcept = default;
-        leave_clan_message(leave_clan_message&&) noexcept = default;
-        leave_clan_message& operator=(const leave_clan_message &) noexcept = default;
-        leave_clan_message& operator=(leave_clan_message&&) noexcept = default;
+        explicit leave_company_message(uint64_t connection_id) noexcept;
+        ~leave_company_message() override = default;
+        leave_company_message(const leave_company_message&) noexcept = default;
+        leave_company_message(leave_company_message&&) noexcept = default;
+        leave_company_message& operator=(const leave_company_message &) noexcept = default;
+        leave_company_message& operator=(leave_company_message&&) noexcept = default;
     };
 
     struct reject_application_message : queue_message {

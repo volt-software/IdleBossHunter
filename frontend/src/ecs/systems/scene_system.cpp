@@ -34,15 +34,15 @@
 #include <messages/battle/level_up_response.h>
 #include <messages/battle/battle_update_response.h>
 #include <messages/battle/battle_finished_response.h>
-#include <messages/clan/accept_application_response.h>
-#include <messages/clan/create_clan_response.h>
-#include <messages/clan/get_clan_applications_response.h>
-#include <messages/clan/get_clan_listing_response.h>
-#include <messages/clan/increase_bonus_response.h>
-#include <messages/clan/join_clan_response.h>
-#include <messages/clan/leave_clan_response.h>
-#include <messages/clan/reject_application_response.h>
-#include <messages/clan/set_tax_response.h>
+#include <messages/company/accept_application_response.h>
+#include <messages/company/create_company_response.h>
+#include <messages/company/get_company_applications_response.h>
+#include <messages/company/get_company_listing_response.h>
+#include <messages/company/increase_bonus_response.h>
+#include <messages/company/join_company_response.h>
+#include <messages/company/leave_company_response.h>
+#include <messages/company/reject_application_response.h>
+#include <messages/company/set_tax_response.h>
 
 
 using namespace std;
@@ -149,21 +149,21 @@ unique_ptr<message> deserialize_message(uint64_t const &type, rapidjson::Documen
         case message_response::type:
             return message_response::deserialize(d);
 
-        // Clans
+        // Companies
         case accept_application_response::type:
             return accept_application_response::deserialize(d);
-        case create_clan_response::type:
-            return create_clan_response::deserialize(d);
-        case get_clan_applications_response::type:
-            return get_clan_applications_response::deserialize(d);
-        case get_clan_listing_response::type:
-            return get_clan_listing_response::deserialize(d);
+        case create_company_response::type:
+            return create_company_response::deserialize(d);
+        case get_company_applications_response::type:
+            return get_company_applications_response::deserialize(d);
+        case get_company_listing_response::type:
+            return get_company_listing_response::deserialize(d);
         case increase_bonus_response::type:
             return increase_bonus_response::deserialize(d);
-        case join_clan_response::type:
-            return join_clan_response::deserialize(d);
-        case leave_clan_response::type:
-            return leave_clan_response::deserialize(d);
+        case join_company_response::type:
+            return join_company_response::deserialize(d);
+        case leave_company_response::type:
+            return leave_company_response::deserialize(d);
         case reject_application_response::type:
             return reject_application_response::deserialize(d);
         case set_tax_response::type:

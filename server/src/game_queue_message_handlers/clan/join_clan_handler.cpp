@@ -16,21 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "join_clan_handler.h"
+#include "join_company_handler.h"
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
-#include <messages/clan/join_clan_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <messages/company/join_company_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_member_applications_repository.h>
 #include <game_queue_message_handlers/handler_helpers.h>
 
 using namespace std;
 
 namespace ibh {
-    bool handle_join_clan(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
-        auto *join_msg = dynamic_cast<join_clan_message*>(msg);
+    bool handle_join_company(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
+        auto *join_msg = dynamic_cast<join_company_message*>(msg);
 
         if(join_msg == nullptr) {
             spdlog::error("[{}] nullptr", __FUNCTION__);
@@ -45,46 +45,46 @@ namespace ibh {
                 continue;
             }
 
-            clans_repository<database_subtransaction> clans_repo{};
-            clan_members_repository<database_subtransaction> clan_members_repo{};
-            clan_member_applications_repository<database_subtransaction> clan_member_applications_repo{};
+            companies_repository<database_subtransaction> companies_repo{};
+            company_members_repository<database_subtransaction> company_members_repo{};
+            company_member_applications_repository<database_subtransaction> company_member_applications_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            auto db_clan = clans_repo.get(join_msg->clan_name, subtransaction);
-            if(!db_clan) {
-                auto new_err_msg = make_unique<join_clan_response>("No clan by that name.");
+            auto db_company = companies_repo.get(join_msg->company_name, subtransaction);
+            if(!db_company) {
+                auto new_err_msg = make_unique<join_company_response>("No company by that name.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
-            if(clan_member) {
-                auto new_err_msg = make_unique<join_clan_response>("Already a member of a clan, leave that clan first.");
+            auto company_member = company_members_repo.get_by_character_id(pc.id, subtransaction);
+            if(company_member) {
+                auto new_err_msg = make_unique<join_company_response>("Already a member of a company, leave that company first.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            auto clan_application = clan_member_applications_repo.get(db_clan->id, pc.id, subtransaction);
-            if(clan_application) {
-                auto new_err_msg = make_unique<join_clan_response>("Already applied to clan, please be patient.");
+            auto company_application = company_member_applications_repo.get(db_company->id, pc.id, subtransaction);
+            if(company_application) {
+                auto new_err_msg = make_unique<join_company_response>("Already applied to company, please be patient.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            db_clan_member new_member{db_clan->id, pc.id, CLAN_MEMBER};
-            if(!clan_member_applications_repo.insert(new_member, subtransaction)) {
-                auto new_err_msg = make_unique<join_clan_response>("Server error.");
+            db_company_member new_member{db_company->id, pc.id, COMPANY_MEMBER};
+            if(!company_member_applications_repo.insert(new_member, subtransaction)) {
+                auto new_err_msg = make_unique<join_company_response>("Server error.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            send_message_to_all_clan_admins(db_clan->id, pc.name, "has applied for the clan.", "system-clan", es, outward_queue, transaction);
+            send_message_to_all_company_admins(db_company->id, pc.name, "has applied for the company.", "system-company", es, outward_queue, transaction);
             subtransaction->commit();
 
-            auto new_err_msg = make_unique<join_clan_response>("");
+            auto new_err_msg = make_unique<join_company_response>("");
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
-            spdlog::trace("[{}] left clan {} for pc {} for connection id {}", __FUNCTION__, clan_member->clan_id, pc.name, pc.connection_id);
+            spdlog::trace("[{}] left company {} for pc {} for connection id {}", __FUNCTION__, company_member->company_id, pc.name, pc.connection_id);
 
             return true;
         }

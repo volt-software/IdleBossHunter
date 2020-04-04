@@ -25,9 +25,9 @@
 #include <repositories/users_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/character_stats_repository.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_buildings_repository.h>
-#include <repositories/clan_stats_repository.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_buildings_repository.h>
+#include <repositories/company_stats_repository.h>
 #include <iterator>
 #include <ecs/components.h>
 

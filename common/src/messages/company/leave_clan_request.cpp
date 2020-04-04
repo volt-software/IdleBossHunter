@@ -16,16 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "leave_clan_request.h"
+#include "leave_company_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-leave_clan_request::leave_clan_request() noexcept = default;
+leave_company_request::leave_company_request() noexcept = default;
 
-string leave_clan_request::serialize() const {
+string leave_company_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -38,16 +38,16 @@ string leave_clan_request::serialize() const {
     return sb.GetString();
 }
 
-unique_ptr<leave_clan_request> leave_clan_request::deserialize(rapidjson::Document const &d) {
+unique_ptr<leave_company_request> leave_company_request::deserialize(rapidjson::Document const &d) {
     if (!d.HasMember("type")) {
-        spdlog::warn("[leave_clan_request] deserialize failed");
+        spdlog::warn("[leave_company_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[leave_clan_request] deserialize failed wrong type");
+        spdlog::warn("[leave_company_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<leave_clan_request>();
+    return make_unique<leave_company_request>();
 }

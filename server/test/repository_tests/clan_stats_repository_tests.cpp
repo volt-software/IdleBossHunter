@@ -20,38 +20,38 @@
 
 #include <catch2/catch.hpp>
 #include "../test_helpers/startup_helper.h"
-#include "repositories/clan_stats_repository.h"
-#include "repositories/clans_repository.h"
+#include "repositories/company_stats_repository.h"
+#include "repositories/companies_repository.h"
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("clan stats repository tests") {
-    clan_stats_repository<database_transaction> stat_repo{};
-    clans_repository<database_transaction> clans_repo{};
+TEST_CASE("company stats repository tests") {
+    company_stats_repository<database_transaction> stat_repo{};
+    companies_repository<database_transaction> companies_repo{};
 
-    SECTION("clan stats inserted correctly" ) {
+    SECTION("company stats inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, 121, 2};
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
+        db_company_stat stat{0, company.id, 121, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
-        REQUIRE(stat2->clan_id == stat.clan_id);
+        REQUIRE(stat2->company_id == stat.company_id);
         REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
     SECTION( "update stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, 122, 2};
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
+        db_company_stat stat{0, company.id, 122, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
 
@@ -60,51 +60,51 @@ TEST_CASE("clan stats repository tests") {
 
         auto stat2 = stat_repo.get(stat.id, transaction);
         REQUIRE(stat2->id == stat.id);
-        REQUIRE(stat2->clan_id == stat.clan_id);
+        REQUIRE(stat2->company_id == stat.company_id);
         REQUIRE(stat2->stat_id == stat.stat_id);
         REQUIRE(stat2->value == stat.value);
     }
 
-    SECTION( "get one for clan stats" ) {
+    SECTION( "get one for company stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, 123, 2};
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
+        db_company_stat stat{0, company.id, 123, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        db_clan_stat stat2{0, clan.id, 124, 20};
+        db_company_stat stat2{0, company.id, 124, 20};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 
-        auto retrieved_stat = stat_repo.get_by_stat(clan.id, stat.stat_id, transaction);
+        auto retrieved_stat = stat_repo.get_by_stat(company.id, stat.stat_id, transaction);
         REQUIRE(retrieved_stat);
         REQUIRE(retrieved_stat->id == stat.id);
-        REQUIRE(retrieved_stat->clan_id == stat.clan_id);
+        REQUIRE(retrieved_stat->company_id == stat.company_id);
         REQUIRE(retrieved_stat->stat_id == stat.stat_id);
         REQUIRE(retrieved_stat->value == stat.value);
     }
 
-    SECTION( "get all for clan stats" ) {
+    SECTION( "get all for company stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
-        db_clan_stat stat{0, clan.id, 125, 2};
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
+        db_company_stat stat{0, company.id, 125, 2};
         stat_repo.insert(stat, transaction);
         REQUIRE(stat.id > 0);
-        db_clan_stat stat2{0, clan.id, 126, 20};
+        db_company_stat stat2{0, company.id, 126, 20};
         stat_repo.insert(stat2, transaction);
         REQUIRE(stat2.id > 0);
 
-        auto stats = stat_repo.get_by_clan_id(clan.id, transaction);
+        auto stats = stat_repo.get_by_company_id(company.id, transaction);
         REQUIRE(stats.size() == 2);
         REQUIRE(stats[0].id == stat.id);
-        REQUIRE(stats[0].clan_id == stat.clan_id);
+        REQUIRE(stats[0].company_id == stat.company_id);
         REQUIRE(stats[0].stat_id == stat.stat_id);
         REQUIRE(stats[0].value == stat.value);
         REQUIRE(stats[1].id == stat2.id);
-        REQUIRE(stats[1].clan_id == stat2.clan_id);
+        REQUIRE(stats[1].company_id == stat2.company_id);
         REQUIRE(stats[1].stat_id == stat2.stat_id);
         REQUIRE(stats[1].value == stat2.value);
     }

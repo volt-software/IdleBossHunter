@@ -20,9 +20,9 @@
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
-#include <messages/clan/set_tax_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_stats_repository.h>
+#include <messages/company/set_tax_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_stats_repository.h>
 #include <game_queue_message_handlers/handler_helpers.h>
 
 using namespace std;
@@ -44,56 +44,56 @@ namespace ibh {
                 continue;
             }
 
-            if(pc.clan_id == 0) {
-                auto new_err_msg = make_unique<set_tax_response>("Not a member of a clan");
+            if(pc.company_id == 0) {
+                auto new_err_msg = make_unique<set_tax_response>("Not a member of a company");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            auto clan_view = es.view<clan_component>();
-            for(auto clan_entity : clan_view) {
-                auto &clan = clan_view.get(clan_entity);
+            auto company_view = es.view<company_component>();
+            for(auto company_entity : company_view) {
+                auto &company = company_view.get(company_entity);
 
-                if (clan.id != pc.clan_id) {
+                if (company.id != pc.company_id) {
                     continue;
                 }
 
-                auto member_it = clan.members.find(pc.id);
-                if(member_it == end(clan.members)) {
-                    auto new_err_msg = make_unique<set_tax_response>("Not a member of a clan");
+                auto member_it = company.members.find(pc.id);
+                if(member_it == end(company.members)) {
+                    auto new_err_msg = make_unique<set_tax_response>("Not a member of a company");
                     outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
-                if(member_it->second == CLAN_MEMBER) {
+                if(member_it->second == COMPANY_MEMBER) {
                     auto new_err_msg = make_unique<set_tax_response>("Not an admin");
                     outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
-                auto current_stat = clan.stats.find(clan_stat_tax_id);
-                if(current_stat == end(clan.stats)) {
+                auto current_stat = company.stats.find(company_stat_tax_id);
+                if(current_stat == end(company.stats)) {
                     auto new_err_msg = make_unique<set_tax_response>("Couldn't find tax stat, please file a bug report");
                     outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                     return false;
                 }
 
-                clan_stats_repository<database_subtransaction> clan_stats_repo{};
+                company_stats_repository<database_subtransaction> company_stats_repo{};
                 auto subtransaction = transaction->create_subtransaction();
                 current_stat->second = min(set_tax_msg->tax_percentage, 100u);
-                db_clan_stat db_tax_stat{0, clan.id, clan_stat_tax_id, current_stat->second};
-                clan_stats_repo.update_by_stat_id(db_tax_stat, subtransaction);
+                db_company_stat db_tax_stat{0, company.id, company_stat_tax_id, current_stat->second};
+                company_stats_repo.update_by_stat_id(db_tax_stat, subtransaction);
                 subtransaction->commit();
 
                 auto new_err_msg = make_unique<set_tax_response>("");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
-                send_message_to_all_clan_members(clan, pc.name, fmt::format("{} set tax to {}!", pc.name, current_stat->second), "system-clan", es, outward_queue);
+                send_message_to_all_company_members(company, pc.name, fmt::format("{} set tax to {}!", pc.name, current_stat->second), "system-company", es, outward_queue);
 
                 return true;
             }
 
-            spdlog::trace("[{}] could not find clan id {} for player {}", __FUNCTION__, pc.clan_id, pc.id);
+            spdlog::trace("[{}] could not find company id {} for player {}", __FUNCTION__, pc.company_id, pc.id);
         }
 
         spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, set_tax_msg->connection_id);

@@ -16,18 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "get_clan_applications_response.h"
+#include "get_company_applications_response.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-get_clan_applications_response::get_clan_applications_response(string error, vector<member> members) noexcept : error(move(error)), members(move(members)) {
+get_company_applications_response::get_company_applications_response(string error, vector<member> members) noexcept : error(move(error)), members(move(members)) {
 
 }
 
-string get_clan_applications_response::serialize() const {
+string get_company_applications_response::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -61,14 +61,14 @@ string get_clan_applications_response::serialize() const {
     return sb.GetString();
 }
 
-unique_ptr<get_clan_applications_response> get_clan_applications_response::deserialize(rapidjson::Document const &d) {
+unique_ptr<get_company_applications_response> get_company_applications_response::deserialize(rapidjson::Document const &d) {
     if (!d.HasMember("type") || !d.HasMember("error") || !d.HasMember("members")) {
-        spdlog::warn("[get_clan_applications_response] deserialize failed");
+        spdlog::warn("[get_company_applications_response] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[get_clan_applications_response] deserialize failed wrong type");
+        spdlog::warn("[get_company_applications_response] deserialize failed wrong type");
         return nullptr;
     }
 
@@ -76,7 +76,7 @@ unique_ptr<get_clan_applications_response> get_clan_applications_response::deser
     {
         auto &members_array = d["members"];
         if(!members_array.IsArray()){
-            spdlog::warn("[get_clan_applications_response] deserialize failed11");
+            spdlog::warn("[get_company_applications_response] deserialize failed11");
             return nullptr;
         }
 
@@ -85,7 +85,7 @@ unique_ptr<get_clan_applications_response> get_clan_applications_response::deser
                 !members_array[i].HasMember("id") ||
                 !members_array[i].HasMember("level") ||
                 !members_array[i].HasMember("name")) {
-                spdlog::warn("[get_clan_applications_response] deserialize failed12");
+                spdlog::warn("[get_company_applications_response] deserialize failed12");
                 return nullptr;
             }
 
@@ -94,5 +94,5 @@ unique_ptr<get_clan_applications_response> get_clan_applications_response::deser
         }
     }
 
-    return make_unique<get_clan_applications_response>(d["error"].GetString(), move(members));
+    return make_unique<get_company_applications_response>(d["error"].GetString(), move(members));
 }

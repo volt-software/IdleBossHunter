@@ -87,33 +87,66 @@ CREATE TABLE boss_stats (
     value BIGINT NOT NULL
 );
 
-CREATE TABLE clans (
+CREATE TABLE companies (
     id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL
+    name CITEXT NOT NULL,
+    no_of_shares BIGINT NOT NULL
 );
 
-CREATE TABLE clan_members (
-    clan_id BIGINT NOT NULL,
-    character_id BIGINT NOT NULL,
-    member_level SMALLINT NOT NULL
-);
-
-CREATE TABLE clan_member_applications (
-    clan_id BIGINT NOT NULL,
-    character_id BIGINT NOT NULL
-);
-
-CREATE TABLE clan_stats (
+CREATE TABLE company_stats (
     id BIGSERIAL PRIMARY KEY,
-    clan_id BIGINT NOT NULL,
+    company_id BIGINT NOT NULL,
     stat_id BIGINT NOT NULL,
     value BIGINT NOT NULL
 );
 
-CREATE TABLE clan_buildings (
+CREATE TABLE company_members (
+    company_id BIGINT NOT NULL,
+    character_id BIGINT NOT NULL,
+    member_level SMALLINT NOT NULL
+);
+
+CREATE TABLE company_member_applications (
+    company_id BIGINT NOT NULL,
+    character_id BIGINT NOT NULL
+);
+
+CREATE TABLE company_buildings (
     id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    clan_id BIGINT NOT NULL
+    name CITEXT NOT NULL,
+    company_id BIGINT NOT NULL,
+    size SMALLINT NOT NULL,
+    resource_type SMALLINT NOT NULL
+);
+
+CREATE TABLE company_building_machines (
+    id BIGSERIAL PRIMARY KEY,
+    name CITEXT NOT NULL,
+    company_building_id BIGINT NOT NULL,
+    type SMALLINT NOT NULL,
+    level INT NOT NULL,
+    last_serviced BIGINT NOT NULL
+);
+
+CREATE TABLE company_shareholders (
+    id BIGSERIAL PRIMARY KEY,
+    company_id BIGINT NOT NULL,
+    character_id BIGINT NOT NULL,
+    no_of_shares BIGINT NOT NULL
+);
+
+CREATE TABLE contracts (
+    id BIGSERIAL PRIMARY KEY,
+    name CITEXT NOT NULL,
+    type SMALLINT NOT NULL
+);
+
+CREATE TABLE contract_parties (
+    id BIGSERIAL PRIMARY KEY,
+    contract_id BIGINT NOT NULL,
+    character_id BIGINT NULL,
+    company_id BIGINT NULL,
+    primary_party BOOLEAN NOT NULL
 );
 
 CREATE TABLE settings (

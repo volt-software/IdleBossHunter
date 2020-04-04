@@ -33,13 +33,13 @@
 #include <messages/update_response.h>
 #include <game_queue_message_handlers/player_enter_handler.h>
 #include <game_queue_message_handlers/player_leave_handler.h>
-#include <game_queue_message_handlers/clan/accept_application_handler.h>
-#include <game_queue_message_handlers/clan/create_clan_handler.h>
-#include <game_queue_message_handlers/clan/increase_bonus_handler.h>
-#include <game_queue_message_handlers/clan/join_clan_handler.h>
-#include <game_queue_message_handlers/clan/leave_clan_handler.h>
-#include <game_queue_message_handlers/clan/reject_application_handler.h>
-#include <game_queue_message_handlers/clan/set_tax_handler.h>
+#include <game_queue_message_handlers/company/accept_application_handler.h>
+#include <game_queue_message_handlers/company/create_company_handler.h>
+#include <game_queue_message_handlers/company/increase_bonus_handler.h>
+#include <game_queue_message_handlers/company/join_company_handler.h>
+#include <game_queue_message_handlers/company/leave_company_handler.h>
+#include <game_queue_message_handlers/company/reject_application_handler.h>
+#include <game_queue_message_handlers/company/set_tax_handler.h>
 #include <range/v3/all.hpp>
 #include <asset_loading/load_character_select.h>
 
@@ -156,12 +156,12 @@ int main() {
     game_queue_message_router.emplace(player_enter_message::_type, handle_player_enter_message);
     game_queue_message_router.emplace(player_leave_message::_type, handle_player_leave_message);
 
-    // clans
+    // companies
     game_queue_message_router.emplace(accept_application_message::_type, handle_accept_application);
-    game_queue_message_router.emplace(create_clan_message::_type, handle_create_clan);
+    game_queue_message_router.emplace(create_company_message::_type, handle_create_company);
     game_queue_message_router.emplace(increase_bonus_message::_type, handle_increase_bonus);
-    game_queue_message_router.emplace(join_clan_message::_type, handle_join_clan);
-    game_queue_message_router.emplace(leave_clan_message::_type, handle_leave_clan);
+    game_queue_message_router.emplace(join_company_message::_type, handle_join_company);
+    game_queue_message_router.emplace(leave_company_message::_type, handle_leave_company);
     game_queue_message_router.emplace(reject_application_message::_type, handle_reject_application);
     game_queue_message_router.emplace(set_tax_message::_type, handle_set_tax);
 

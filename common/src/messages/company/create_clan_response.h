@@ -25,19 +25,19 @@
 using namespace std;
 
 namespace ibh {
-    struct join_clan_request : message {
-        explicit join_clan_request(string clan_name) noexcept;
+    struct create_company_response : message {
+        explicit create_company_response(string error) noexcept;
 
-        ~join_clan_request() noexcept override = default;
+        ~create_company_response() noexcept override = default;
 
         [[nodiscard]]
         string serialize() const override;
 
         [[nodiscard]]
-        static unique_ptr<join_clan_request> deserialize(rapidjson::Document const &d);
+        static unique_ptr<create_company_response> deserialize(rapidjson::Document const &d);
 
-        string clan_name;
+        string error;
 
-        static constexpr uint64_t type = generate_type<join_clan_request>();
+        static constexpr uint64_t type = generate_type<create_company_response>();
     };
 }

@@ -21,7 +21,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include <messages/clan/increase_bonus_request.h>
+#include <messages/company/increase_bonus_request.h>
 #include "message_handlers/handler_macros.h"
 #include <websocket_thread.h>
 #include "macros.h"

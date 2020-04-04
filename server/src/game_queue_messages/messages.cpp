@@ -33,16 +33,16 @@ namespace ibh {
     accept_application_message::accept_application_message(uint64_t connection_id, uint64_t applicant_id) noexcept
             : queue_message(_type, connection_id), applicant_id(applicant_id) {}
 
-    create_clan_message::create_clan_message(uint64_t connection_id, string clan_name) noexcept
-            : queue_message(_type, connection_id), clan_name(move(clan_name)) {}
+    create_company_message::create_company_message(uint64_t connection_id, string company_name) noexcept
+            : queue_message(_type, connection_id), company_name(move(company_name)) {}
 
     increase_bonus_message::increase_bonus_message(uint64_t connection_id, uint32_t bonus_type) noexcept
             : queue_message(_type, connection_id), bonus_type(bonus_type) {}
 
-    join_clan_message::join_clan_message(uint64_t connection_id, string clan_name) noexcept
-            : queue_message(_type, connection_id), clan_name(move(clan_name)) {}
+    join_company_message::join_company_message(uint64_t connection_id, string company_name) noexcept
+            : queue_message(_type, connection_id), company_name(move(company_name)) {}
 
-    leave_clan_message::leave_clan_message(uint64_t connection_id) noexcept
+    leave_company_message::leave_company_message(uint64_t connection_id) noexcept
             : queue_message(_type, connection_id) {}
 
     reject_application_message::reject_application_message(uint64_t connection_id, uint64_t applicant_id) noexcept

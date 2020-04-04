@@ -18,28 +18,28 @@
 
 #include <catch2/catch.hpp>
 #include "../../test_helpers/startup_helper.h"
-#include <game_queue_message_handlers/clan/create_clan_handler.h>
+#include <game_queue_message_handlers/company/create_company_handler.h>
 #include <ecs/components.h>
-#include <repositories/clans_repository.h>
+#include <repositories/companies_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
-#include <messages/clan/create_clan_response.h>
+#include <messages/company/create_company_response.h>
 #include "../game_queue_helpers.h"
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("create clan handler tests") {
-    SECTION( "character creates clan" ) {
+TEST_CASE("create company handler tests") {
+    SECTION( "character creates company" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        create_clan_message msg(1, "clan_name");
-        clans_repository<database_transaction> clan_repo{};
+        create_company_message msg(1, "company_name");
+        companies_repository<database_transaction> company_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
-        auto existing_clans = clan_repo.get_all(transaction);
+        auto existing_companies = company_repo.get_all(transaction);
 
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
@@ -57,29 +57,29 @@ TEST_CASE("create clan handler tests") {
             registry.assign<pc_component>(entt, move(pc));
         }
 
-        auto ret = handle_create_clan(&msg, registry, q, transaction);
+        auto ret = handle_create_company(&msg, registry, q, transaction);
         REQUIRE(ret == true);
 
-        test_outmsg<create_clan_response>(q, true);
+        test_outmsg<create_company_response>(q, true);
 
         auto &pc = registry.get<pc_component>(entt);
         auto gold_it = pc.stats.find(stat_gold_id);
         REQUIRE(gold_it != end(pc.stats));
         REQUIRE(gold_it->second == 1);
-        auto current_clans = clan_repo.get_all(transaction);
-        REQUIRE(current_clans.size() == existing_clans.size() + 1);
+        auto current_companies = company_repo.get_all(transaction);
+        REQUIRE(current_companies.size() == existing_companies.size() + 1);
     }
 
     SECTION( "not enough gold" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        create_clan_message msg(1, "clan_name");
-        clans_repository<database_transaction> clan_repo{};
+        create_company_message msg(1, "company_name");
+        companies_repository<database_transaction> company_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
-        auto existing_clans = clan_repo.get_all(transaction);
+        auto existing_companies = company_repo.get_all(transaction);
 
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
@@ -97,32 +97,32 @@ TEST_CASE("create clan handler tests") {
             registry.assign<pc_component>(entt, move(pc));
         }
 
-        auto ret = handle_create_clan(&msg, registry, q, transaction);
+        auto ret = handle_create_company(&msg, registry, q, transaction);
         REQUIRE(ret == false);
 
-        test_outmsg<create_clan_response>(q, false);
+        test_outmsg<create_company_response>(q, false);
 
         auto &pc = registry.get<pc_component>(entt);
         auto gold_it = pc.stats.find(stat_gold_id);
         REQUIRE(gold_it != end(pc.stats));
         REQUIRE(gold_it->second == 9'999);
-        auto current_clans = clan_repo.get_all(transaction);
-        REQUIRE(current_clans.size() == existing_clans.size());
+        auto current_companies = company_repo.get_all(transaction);
+        REQUIRE(current_companies.size() == existing_companies.size());
     }
 
     SECTION( "already exists" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        create_clan_message msg(1, "clan_name_exists");
-        clans_repository<database_transaction> clan_repo{};
+        create_company_message msg(1, "company_name_exists");
+        companies_repository<database_transaction> company_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
-        db_clan new_clan{};
-        new_clan.name = msg.clan_name;
-        REQUIRE(clan_repo.insert(new_clan, transaction) == true);
-        auto existing_clans = clan_repo.get_all(transaction);
+        db_company new_company{};
+        new_company.name = msg.company_name;
+        REQUIRE(company_repo.insert(new_company, transaction) == true);
+        auto existing_companies = company_repo.get_all(transaction);
 
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
@@ -140,16 +140,16 @@ TEST_CASE("create clan handler tests") {
             registry.assign<pc_component>(entt, move(pc));
         }
 
-        auto ret = handle_create_clan(&msg, registry, q, transaction);
+        auto ret = handle_create_company(&msg, registry, q, transaction);
         REQUIRE(ret == false);
 
-        test_outmsg<create_clan_response>(q, false);
+        test_outmsg<create_company_response>(q, false);
 
         auto &pc = registry.get<pc_component>(entt);
         auto gold_it = pc.stats.find(stat_gold_id);
         REQUIRE(gold_it != end(pc.stats));
         REQUIRE(gold_it->second == 10'001);
-        auto current_clans = clan_repo.get_all(transaction);
-        REQUIRE(current_clans.size() == existing_clans.size());
+        auto current_companies = company_repo.get_all(transaction);
+        REQUIRE(current_companies.size() == existing_companies.size());
     }
 }

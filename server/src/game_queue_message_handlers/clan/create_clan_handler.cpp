@@ -16,21 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "create_clan_handler.h"
+#include "create_company_handler.h"
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
 #include <messages/generic_error_response.h>
-#include <messages/clan/create_clan_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_stats_repository.h>
-#include <repositories/clan_members_repository.h>
+#include <messages/company/create_company_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_stats_repository.h>
+#include <repositories/company_members_repository.h>
 
 using namespace std;
 
 namespace ibh {
-    bool handle_create_clan(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
-        auto *create_msg = dynamic_cast<create_clan_message*>(msg);
+    bool handle_create_company(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
+        auto *create_msg = dynamic_cast<create_company_message*>(msg);
 
         if(create_msg == nullptr) {
             spdlog::error("[{}] nullptr", __FUNCTION__);
@@ -55,43 +55,43 @@ namespace ibh {
             }
 
             if(gold_it->second < 10'000) {
-                auto new_err_msg = make_unique<create_clan_response>("Not enough gold, need 10,000 to create clan.");
+                auto new_err_msg = make_unique<create_company_response>("Not enough gold, need 10,000 to create company.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            clans_repository<database_subtransaction> clan_repo{};
-            clan_stats_repository<database_subtransaction> clan_stats_repo{};
-            clan_members_repository<database_subtransaction> clan_members_repo{};
+            companies_repository<database_subtransaction> company_repo{};
+            company_stats_repository<database_subtransaction> company_stats_repo{};
+            company_members_repository<database_subtransaction> company_members_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            db_clan new_clan{0, create_msg->clan_name};
-            if(!clan_repo.insert(new_clan, subtransaction)) {
-                auto new_err_msg = make_unique<create_clan_response>("Clan name already exists");
+            db_company new_company{0, create_msg->company_name};
+            if(!company_repo.insert(new_company, subtransaction)) {
+                auto new_err_msg = make_unique<create_company_response>("Company name already exists");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            ibh_flat_map<uint32_t, int64_t> clan_stats;
+            ibh_flat_map<uint32_t, int64_t> company_stats;
             for(auto &stat_id : stat_name_ids) {
-                db_clan_stat stat{0, new_clan.id, stat_id, stat_id == stat_xp_id || stat_id == stat_gold_id ? 5 : 0};
-                clan_stats.emplace(stat_id, stat.value);
-                clan_stats_repo.insert(stat, subtransaction);
+                db_company_stat stat{0, new_company.id, stat_id, stat_id == stat_xp_id || stat_id == stat_gold_id ? 5 : 0};
+                company_stats.emplace(stat_id, stat.value);
+                company_stats_repo.insert(stat, subtransaction);
             }
 
-            db_clan_member clan_admin{new_clan.id, pc.id, CLAN_ADMIN};
-            clan_members_repo.insert(clan_admin, subtransaction);
+            db_company_member company_admin{new_company.id, pc.id, COMPANY_ADMIN};
+            company_members_repo.insert(company_admin, subtransaction);
             subtransaction->commit();
 
-            auto clan_entt = es.create();
-            es.assign<clan_component>(clan_entt, new_clan.id, create_msg->clan_name, ibh_flat_map<uint64_t, uint16_t>{{pc.id, CLAN_ADMIN}}, clan_stats);
-            pc.clan_id = new_clan.id;
+            auto company_entt = es.create();
+            es.assign<company_component>(company_entt, new_company.id, create_msg->company_name, ibh_flat_map<uint64_t, uint16_t>{{pc.id, COMPANY_ADMIN}}, company_stats);
+            pc.company_id = new_company.id;
 
             gold_it->second -= 10'000;
-            auto new_err_msg = make_unique<create_clan_response>("");
+            auto new_err_msg = make_unique<create_company_response>("");
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
-            spdlog::trace("[{}] created clan {} for pc {} for connection id {}", __FUNCTION__, create_msg->clan_name, pc.name, pc.connection_id);
+            spdlog::trace("[{}] created company {} for pc {} for connection id {}", __FUNCTION__, create_msg->company_name, pc.name, pc.connection_id);
 
             return true;
         }

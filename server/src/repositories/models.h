@@ -121,40 +121,40 @@ namespace ibh {
         db_boss(uint64_t id, string name, vector<db_boss_stat> stats) : id(id), name(move(name)), stats(move(stats)) {}
     };
 
-    struct db_clan_member {
-        uint64_t clan_id;
+    struct db_company_member {
+        uint64_t company_id;
         uint64_t character_id;
         uint16_t member_level;
 
-        db_clan_member() : clan_id(), character_id(), member_level() {}
-        db_clan_member(uint64_t clan_id, uint64_t character_id, uint16_t member_level) : clan_id(clan_id), character_id(character_id), member_level(member_level) {}
+        db_company_member() : company_id(), character_id(), member_level() {}
+        db_company_member(uint64_t company_id, uint64_t character_id, uint16_t member_level) : company_id(company_id), character_id(character_id), member_level(member_level) {}
     };
 
-    struct db_clan_stat {
+    struct db_company_stat {
         uint64_t id;
-        uint64_t clan_id;
+        uint64_t company_id;
         uint64_t stat_id;
         int64_t value;
 
-        db_clan_stat() : id(), clan_id(), stat_id(), value() {}
-        db_clan_stat(uint64_t id, uint64_t clan_id, uint64_t stat_id, int64_t value) : id(id), clan_id(clan_id), stat_id(stat_id), value(value) {}
+        db_company_stat() : id(), company_id(), stat_id(), value() {}
+        db_company_stat(uint64_t id, uint64_t company_id, uint64_t stat_id, int64_t value) : id(id), company_id(company_id), stat_id(stat_id), value(value) {}
     };
 
-    struct db_clan_building {
+    struct db_company_building {
         uint64_t id;
-        uint64_t clan_id;
+        uint64_t company_id;
         string name;
 
-        db_clan_building() : id(), clan_id(), name() {}
-        db_clan_building(uint64_t id, uint64_t clan_id, string name) : id(id), clan_id(clan_id), name(move(name)) {}
+        db_company_building() : id(), company_id(), name() {}
+        db_company_building(uint64_t id, uint64_t company_id, string name) : id(id), company_id(company_id), name(move(name)) {}
     };
 
-    struct db_clan {
+    struct db_company {
         uint64_t id;
         string name;
 
-        db_clan() : id(), name() {}
-        db_clan(uint64_t id, string name) : id(id), name(move(name)) {}
+        db_company() : id(), name() {}
+        db_company(uint64_t id, string name) : id(id), name(move(name)) {}
     };
 }
 

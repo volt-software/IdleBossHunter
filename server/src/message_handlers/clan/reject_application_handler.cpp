@@ -21,7 +21,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include <messages/clan/reject_application_request.h>
+#include <messages/company/reject_application_request.h>
 #include "message_handlers/handler_macros.h"
 #include <websocket_thread.h>
 #include "macros.h"

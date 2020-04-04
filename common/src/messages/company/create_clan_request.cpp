@@ -16,18 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "create_clan_request.h"
+#include "create_company_request.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-create_clan_request::create_clan_request(string name) noexcept : name(move(name)) {
+create_company_request::create_company_request(string name) noexcept : name(move(name)) {
 
 }
 
-string create_clan_request::serialize() const {
+string create_company_request::serialize() const {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -43,16 +43,16 @@ string create_clan_request::serialize() const {
     return sb.GetString();
 }
 
-unique_ptr<create_clan_request> create_clan_request::deserialize(rapidjson::Document const &d) {
+unique_ptr<create_company_request> create_company_request::deserialize(rapidjson::Document const &d) {
     if (!d.HasMember("type") || !d.HasMember("name")) {
-        spdlog::warn("[create_clan_request] deserialize failed");
+        spdlog::warn("[create_company_request] deserialize failed");
         return nullptr;
     }
 
     if(d["type"].GetUint64() != type) {
-        spdlog::warn("[create_clan_request] deserialize failed wrong type");
+        spdlog::warn("[create_company_request] deserialize failed wrong type");
         return nullptr;
     }
 
-    return make_unique<create_clan_request>(d["name"].GetString());
+    return make_unique<create_company_request>(d["name"].GetString());
 }

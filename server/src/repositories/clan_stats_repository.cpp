@@ -16,17 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "clan_stats_repository.h"
+#include "company_stats_repository.h"
 #include <spdlog/spdlog.h>
 
 using namespace ibh;
 
-template class ibh::clan_stats_repository<database_transaction>;
-template class ibh::clan_stats_repository<database_subtransaction>;
+template class ibh::company_stats_repository<database_transaction>;
+template class ibh::company_stats_repository<database_subtransaction>;
 
 template<DatabaseTransaction transaction_T>
-void clan_stats_repository<transaction_T>::insert(db_clan_stat &stat, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("INSERT INTO clan_stats (clan_id, stat_id, value) VALUES ({}, {}, {}) RETURNING id", stat.clan_id, stat.stat_id, stat.value));
+void company_stats_repository<transaction_T>::insert(db_company_stat &stat, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("INSERT INTO company_stats (company_id, stat_id, value) VALUES ({}, {}, {}) RETURNING id", stat.company_id, stat.stat_id, stat.value));
 
     if(result.empty()) {
         spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
@@ -39,29 +39,29 @@ void clan_stats_repository<transaction_T>::insert(db_clan_stat &stat, unique_ptr
 }
 
 template<DatabaseTransaction transaction_T>
-void clan_stats_repository<transaction_T>::update(db_clan_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
-    transaction->execute(fmt::format("UPDATE clan_stats SET value = {} WHERE id = {}", stat.value, stat.id));
+void company_stats_repository<transaction_T>::update(db_company_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
+    transaction->execute(fmt::format("UPDATE company_stats SET value = {} WHERE id = {}", stat.value, stat.id));
 
     spdlog::trace("[{}] updated stat {}", __FUNCTION__, stat.id);
 }
 
 template<DatabaseTransaction transaction_T>
-void clan_stats_repository<transaction_T>::update_by_stat_id(db_clan_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
-    transaction->execute(fmt::format("UPDATE clan_stats SET value = {} WHERE clan_id = {} AND stat_id = {}", stat.value, stat.clan_id, stat.stat_id));
+void company_stats_repository<transaction_T>::update_by_stat_id(db_company_stat const &stat, unique_ptr<transaction_T> const &transaction) const {
+    transaction->execute(fmt::format("UPDATE company_stats SET value = {} WHERE company_id = {} AND stat_id = {}", stat.value, stat.company_id, stat.stat_id));
 
     spdlog::trace("[{}] updated stat {}", __FUNCTION__, stat.id);
 }
 
 template<DatabaseTransaction transaction_T>
-optional<db_clan_stat> clan_stats_repository<transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_id, s.value FROM clan_stats s WHERE s.id = {}" , id));
+optional<db_company_stat> company_stats_repository<transaction_T>::get(uint64_t id, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT s.id, s.company_id, s.stat_id, s.value FROM company_stats s WHERE s.id = {}" , id));
 
     if(result.empty()) {
         spdlog::trace("[{}] found no stat by id {}", __FUNCTION__, id);
         return {};
     }
 
-    auto ret = make_optional<db_clan_stat>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}),
+    auto ret = make_optional<db_company_stat>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}),
                                           result[0][2].as(uint64_t{}), result[0][3].as(int64_t{}));
 
     spdlog::trace("[{}] found stat by id {}", __FUNCTION__, id);
@@ -70,29 +70,29 @@ optional<db_clan_stat> clan_stats_repository<transaction_T>::get(uint64_t id, un
 }
 
 template<DatabaseTransaction transaction_T>
-optional<db_clan_stat> clan_stats_repository<transaction_T>::get_by_stat(uint64_t clan_id, uint64_t stat_id, const unique_ptr<transaction_T> &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_id, s.value FROM clan_stats s WHERE s.clan_id = {} AND s.stat_id = {}" , clan_id, stat_id));
+optional<db_company_stat> company_stats_repository<transaction_T>::get_by_stat(uint64_t company_id, uint64_t stat_id, const unique_ptr<transaction_T> &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT s.id, s.company_id, s.stat_id, s.value FROM company_stats s WHERE s.company_id = {} AND s.stat_id = {}" , company_id, stat_id));
 
     if(result.empty()) {
-        spdlog::error("[{}] found no stat {} for clan {}", __FUNCTION__, stat_id, clan_id);
+        spdlog::error("[{}] found no stat {} for company {}", __FUNCTION__, stat_id, company_id);
         return {};
     }
 
-    auto ret = make_optional<db_clan_stat>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}),
+    auto ret = make_optional<db_company_stat>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}),
                                            result[0][2].as(uint64_t{}), result[0][3].as(int64_t{}));
 
-    spdlog::trace("[{}] found stat {} for clan {}", __FUNCTION__, stat_id, clan_id);
+    spdlog::trace("[{}] found stat {} for company {}", __FUNCTION__, stat_id, company_id);
 
     return ret;
 }
 
 template<DatabaseTransaction transaction_T>
-vector<db_clan_stat> clan_stats_repository<transaction_T>::get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT s.id, s.clan_id, s.stat_id, s.value FROM clan_stats s WHERE s.clan_id = {}", clan_id));
+vector<db_company_stat> company_stats_repository<transaction_T>::get_by_company_id(uint64_t company_id, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT s.id, s.company_id, s.stat_id, s.value FROM company_stats s WHERE s.company_id = {}", company_id));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
-    vector<db_clan_stat> stats;
+    vector<db_company_stat> stats;
     stats.reserve(result.size());
 
     for(auto const & res : result) {

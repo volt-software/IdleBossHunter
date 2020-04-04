@@ -26,13 +26,13 @@
 
 namespace ibh {
     template<DatabaseTransaction transaction_T>
-    class clan_members_repository  {
+    class company_members_repository  {
     public:
-        bool insert(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const;
-        void update(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const;
-        void remove(db_clan_member const &member, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan_member> get(uint64_t id, uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] vector<db_clan_member> get_by_clan_id(uint64_t clan_id, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan_member> get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
+        bool insert(db_company_member const &member, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_company_member const &member, unique_ptr<transaction_T> const &transaction) const;
+        void remove(db_company_member const &member, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_company_member> get(uint64_t id, uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] vector<db_company_member> get_by_company_id(uint64_t company_id, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_company_member> get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const;
     };
 }

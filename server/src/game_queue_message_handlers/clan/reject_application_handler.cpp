@@ -20,10 +20,10 @@
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
-#include <messages/clan/reject_application_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <messages/company/reject_application_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_member_applications_repository.h>
 
 using namespace std;
 
@@ -44,37 +44,37 @@ namespace ibh {
                 continue;
             }
 
-            clan_members_repository<database_subtransaction> clan_members_repo{};
-            clan_member_applications_repository<database_subtransaction> clan_member_applications_repo{};
+            company_members_repository<database_subtransaction> company_members_repo{};
+            company_member_applications_repository<database_subtransaction> company_member_applications_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
-            if(!clan_member) {
-                auto new_err_msg = make_unique<reject_application_response>("Not a member of a clan");
+            auto company_member = company_members_repo.get_by_character_id(pc.id, subtransaction);
+            if(!company_member) {
+                auto new_err_msg = make_unique<reject_application_response>("Not a member of a company");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            if(clan_member->member_level == CLAN_MEMBER) {
+            if(company_member->member_level == COMPANY_MEMBER) {
                 auto new_err_msg = make_unique<reject_application_response>("Not an admin");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            auto clan_application = clan_member_applications_repo.get(clan_member->clan_id, reject_msg->applicant_id, subtransaction);
-            if(!clan_application) {
+            auto company_application = company_member_applications_repo.get(company_member->company_id, reject_msg->applicant_id, subtransaction);
+            if(!company_application) {
                 auto new_err_msg = make_unique<reject_application_response>("No applicant by that name.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            clan_member_applications_repo.remove(*clan_application, subtransaction);
+            company_member_applications_repo.remove(*company_application, subtransaction);
             subtransaction->commit();
 
             auto new_err_msg = make_unique<reject_application_response>("");
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
-            spdlog::trace("[{}] rejected applicant {} clan {} by pc {} connection id {}", __FUNCTION__, reject_msg->applicant_id, clan_member->clan_id, pc.name, pc.connection_id);
+            spdlog::trace("[{}] rejected applicant {} company {} by pc {} connection id {}", __FUNCTION__, reject_msg->applicant_id, company_member->company_id, pc.name, pc.connection_id);
 
             return true;
         }

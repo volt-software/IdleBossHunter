@@ -17,15 +17,15 @@
 */
 
 
-#include "get_clan_applications_handler.h"
+#include "get_company_applications_handler.h"
 
 #include <spdlog/spdlog.h>
 
-#include <messages/clan/get_clan_applications_request.h>
-#include <messages/clan/get_clan_applications_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <messages/company/get_company_applications_request.h>
+#include <messages/company/get_company_applications_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_member_applications_repository.h>
 #include <repositories/characters_repository.h>
 #include "message_handlers/handler_macros.h"
 #include <websocket_thread.h>
@@ -41,33 +41,33 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_get_clan_applications(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
+    void handle_get_company_applications(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                    queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_PLAYING_CHECK(get_clan_applications_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(get_company_applications_request);
 
-        clans_repository<database_transaction> clans_repo{};
+        companies_repository<database_transaction> companies_repo{};
         characters_repository<database_transaction> chars_repo{};
-        clan_member_applications_repository<database_transaction> applications_repo{};
-        clan_members_repository<database_transaction> clan_members_repo{};
+        company_member_applications_repository<database_transaction> applications_repo{};
+        company_members_repository<database_transaction> company_members_repo{};
 
-        auto clan_member = clan_members_repo.get_by_character_id(user_data->playing_character_id, transaction);
-        if(!clan_member) {
-            get_clan_applications_response response{"Not a member of a clan", {}};
+        auto company_member = company_members_repo.get_by_character_id(user_data->playing_character_id, transaction);
+        if(!company_member) {
+            get_company_applications_response response{"Not a member of a company", {}};
             auto response_msg = response.serialize();
             s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
             return;
         }
 
-        if(clan_member->member_level != CLAN_SAGE && clan_member->member_level != CLAN_ADMIN) {
-            get_clan_applications_response response{"Not a sage or admin of clan", {}};
+        if(company_member->member_level != COMPANY_SAGE && company_member->member_level != COMPANY_ADMIN) {
+            get_company_applications_response response{"Not a sage or admin of company", {}};
             auto response_msg = response.serialize();
             s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
             return;
         }
 
-        auto clan = clans_repo.get(clan_member->clan_id, transaction);
-        auto applications = applications_repo.get_by_clan_id(clan->id, transaction);
+        auto company = companies_repo.get(company_member->company_id, transaction);
+        auto applications = applications_repo.get_by_company_id(company->id, transaction);
 
         vector<member> members;
         members.reserve(applications.size());
@@ -77,16 +77,16 @@ namespace ibh {
             members.emplace_back(character->id, character->level, move(character->name));
         }
 
-        get_clan_applications_response response{"", move(members)};
+        get_company_applications_response response{"", move(members)};
         auto response_msg = response.serialize();
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);
     }
 
-    template void handle_get_clan_applications<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_get_company_applications<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                                  per_socket_data<websocketpp::connection_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
-    template void handle_get_clan_applications<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_get_company_applications<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                      per_socket_data<custom_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
 #endif
 }

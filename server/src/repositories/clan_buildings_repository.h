@@ -28,10 +28,10 @@ using namespace std;
 
 namespace ibh {
     template<DatabaseTransaction transaction_T>
-    class clan_buildings_repository {
+    class company_buildings_repository {
     public:
-        bool insert(db_clan_building& boss, unique_ptr<transaction_T> const &transaction) const;
-        void update(db_clan_building const &boss, unique_ptr<transaction_T> const &transaction) const;
-        [[nodiscard]] optional<db_clan_building> get(int id, unique_ptr<transaction_T> const &transaction) const;
+        bool insert(db_company_building& boss, unique_ptr<transaction_T> const &transaction) const;
+        void update(db_company_building const &boss, unique_ptr<transaction_T> const &transaction) const;
+        [[nodiscard]] optional<db_company_building> get(int id, unique_ptr<transaction_T> const &transaction) const;
     };
 }

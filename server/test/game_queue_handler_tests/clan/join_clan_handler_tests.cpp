@@ -19,26 +19,26 @@
 #include <catch2/catch.hpp>
 #include "../../test_helpers/startup_helper.h"
 #include "../game_queue_helpers.h"
-#include <game_queue_message_handlers/clan/join_clan_handler.h>
+#include <game_queue_message_handlers/company/join_company_handler.h>
 #include <ecs/components.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_member_applications_repository.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_member_applications_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
-#include <messages/clan/join_clan_response.h>
+#include <messages/company/join_company_response.h>
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("join clan handler tests") {
-    SECTION( "joins clan" ) {
+TEST_CASE("join company handler tests") {
+    SECTION( "joins company" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        clans_repository<database_transaction> clan_repo{};
-        clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        companies_repository<database_transaction> company_repo{};
+        company_members_repository<database_transaction> company_members_repo{};
+        company_member_applications_repository<database_transaction> company_applications_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
@@ -46,44 +46,44 @@ TEST_CASE("join clan handler tests") {
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
         REQUIRE(user.id > 0);
-        db_character clan_applicant{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
-        char_repo.insert(clan_applicant, transaction);
-        REQUIRE(clan_applicant.id > 0);
+        db_character company_applicant{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
+        char_repo.insert(company_applicant, transaction);
+        REQUIRE(company_applicant.id > 0);
 
-        db_clan existing_clan{0, "test_clan"};
-        clan_repo.insert(existing_clan, transaction);
-        REQUIRE(existing_clan.id > 0);
+        db_company existing_company{0, "test_company"};
+        company_repo.insert(existing_company, transaction);
+        REQUIRE(existing_company.id > 0);
 
         auto entt = registry.create();
         {
             pc_component pc{};
-            pc.id = clan_applicant.id;
+            pc.id = company_applicant.id;
             pc.connection_id = 1;
             registry.assign<pc_component>(entt, move(pc));
         }
 
-        join_clan_message msg(1, existing_clan.name);
+        join_company_message msg(1, existing_company.name);
 
-        auto ret = handle_join_clan(&msg, registry, q, transaction);
+        auto ret = handle_join_company(&msg, registry, q, transaction);
         REQUIRE(ret == true);
 
-        test_outmsg<join_clan_response>(q, true);
+        test_outmsg<join_company_response>(q, true);
 
-        auto all_applicants = clan_applications_repo.get_by_clan_id(existing_clan.id, transaction);
-        auto applicant_it = find_if(begin(all_applicants), end(all_applicants), [&](const auto &a){ return a.character_id == clan_applicant.id; });
+        auto all_applicants = company_applications_repo.get_by_company_id(existing_company.id, transaction);
+        auto applicant_it = find_if(begin(all_applicants), end(all_applicants), [&](const auto &a){ return a.character_id == company_applicant.id; });
         REQUIRE(applicant_it != end(all_applicants));
 
-        auto all_members = clan_members_repo.get_by_clan_id(existing_clan.id, transaction);
+        auto all_members = company_members_repo.get_by_company_id(existing_company.id, transaction);
         REQUIRE(all_members.empty());
     }
 
-    SECTION( "cannot join clan when already member of another" ) {
+    SECTION( "cannot join company when already member of another" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        clans_repository<database_transaction> clan_repo{};
-        clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        companies_repository<database_transaction> company_repo{};
+        company_members_repository<database_transaction> company_members_repo{};
+        company_member_applications_repository<database_transaction> company_applications_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
@@ -91,50 +91,50 @@ TEST_CASE("join clan handler tests") {
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
         REQUIRE(user.id > 0);
-        db_character clan_applicant{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
-        char_repo.insert(clan_applicant, transaction);
-        REQUIRE(clan_applicant.id > 0);
+        db_character company_applicant{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
+        char_repo.insert(company_applicant, transaction);
+        REQUIRE(company_applicant.id > 0);
 
-        db_clan existing_clan{0, "test_clan"};
-        clan_repo.insert(existing_clan, transaction);
-        REQUIRE(existing_clan.id > 0);
+        db_company existing_company{0, "test_company"};
+        company_repo.insert(existing_company, transaction);
+        REQUIRE(existing_company.id > 0);
 
-        db_clan second_existing_clan{0, "test_clan2"};
-        clan_repo.insert(second_existing_clan, transaction);
-        REQUIRE(second_existing_clan.id > 0);
+        db_company second_existing_company{0, "test_company2"};
+        company_repo.insert(second_existing_company, transaction);
+        REQUIRE(second_existing_company.id > 0);
 
-        db_clan_member existing_member{existing_clan.id, clan_applicant.id, 0};
-        REQUIRE(clan_members_repo.insert(existing_member, transaction) == true);
+        db_company_member existing_member{existing_company.id, company_applicant.id, 0};
+        REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
         auto entt = registry.create();
         {
             pc_component pc{};
-            pc.id = clan_applicant.id;
+            pc.id = company_applicant.id;
             pc.connection_id = 1;
             registry.assign<pc_component>(entt, move(pc));
         }
 
-        join_clan_message msg(1, second_existing_clan.name);
+        join_company_message msg(1, second_existing_company.name);
 
-        auto ret = handle_join_clan(&msg, registry, q, transaction);
+        auto ret = handle_join_company(&msg, registry, q, transaction);
         REQUIRE(ret == false);
 
-        test_outmsg<join_clan_response>(q, false);
+        test_outmsg<join_company_response>(q, false);
 
-        auto all_applicants = clan_applications_repo.get_by_clan_id(existing_clan.id, transaction);
+        auto all_applicants = company_applications_repo.get_by_company_id(existing_company.id, transaction);
         REQUIRE(all_applicants.empty());
 
-        auto all_members = clan_members_repo.get_by_clan_id(second_existing_clan.id, transaction);
+        auto all_members = company_members_repo.get_by_company_id(second_existing_company.id, transaction);
         REQUIRE(all_members.empty());
     }
 
-    SECTION( "cannot join clan when already applied" ) {
+    SECTION( "cannot join company when already applied" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        clans_repository<database_transaction> clan_repo{};
-        clan_members_repository<database_transaction> clan_members_repo{};
-        clan_member_applications_repository<database_transaction> clan_applications_repo{};
+        companies_repository<database_transaction> company_repo{};
+        company_members_repository<database_transaction> company_members_repo{};
+        company_member_applications_repository<database_transaction> company_applications_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
         auto transaction = db_pool->create_transaction();
@@ -142,37 +142,37 @@ TEST_CASE("join clan handler tests") {
         db_user user{};
         user_repo.insert_if_not_exists(user, transaction);
         REQUIRE(user.id > 0);
-        db_character clan_applicant{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
-        char_repo.insert(clan_applicant, transaction);
-        REQUIRE(clan_applicant.id > 0);
+        db_character company_applicant{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
+        char_repo.insert(company_applicant, transaction);
+        REQUIRE(company_applicant.id > 0);
 
-        db_clan existing_clan{0, "test_clan"};
-        clan_repo.insert(existing_clan, transaction);
-        REQUIRE(existing_clan.id > 0);
+        db_company existing_company{0, "test_company"};
+        company_repo.insert(existing_company, transaction);
+        REQUIRE(existing_company.id > 0);
 
-        db_clan_member existing_member{existing_clan.id, clan_applicant.id, 0};
-        REQUIRE(clan_applications_repo.insert(existing_member, transaction) == true);
+        db_company_member existing_member{existing_company.id, company_applicant.id, 0};
+        REQUIRE(company_applications_repo.insert(existing_member, transaction) == true);
 
         auto entt = registry.create();
         {
             pc_component pc{};
-            pc.id = clan_applicant.id;
+            pc.id = company_applicant.id;
             pc.connection_id = 1;
             registry.assign<pc_component>(entt, move(pc));
         }
 
-        join_clan_message msg(1, existing_clan.name);
+        join_company_message msg(1, existing_company.name);
 
-        auto ret = handle_join_clan(&msg, registry, q, transaction);
+        auto ret = handle_join_company(&msg, registry, q, transaction);
         REQUIRE(ret == false);
 
-        test_outmsg<join_clan_response>(q, false);
+        test_outmsg<join_company_response>(q, false);
 
-        auto all_applicants = clan_applications_repo.get_by_clan_id(existing_clan.id, transaction);
-        auto applicant_it = find_if(begin(all_applicants), end(all_applicants), [&](const auto &a){ return a.character_id == clan_applicant.id; });
+        auto all_applicants = company_applications_repo.get_by_company_id(existing_company.id, transaction);
+        auto applicant_it = find_if(begin(all_applicants), end(all_applicants), [&](const auto &a){ return a.character_id == company_applicant.id; });
         REQUIRE(applicant_it != end(all_applicants));
 
-        auto all_members = clan_members_repo.get_by_clan_id(existing_clan.id, transaction);
+        auto all_members = company_members_repo.get_by_company_id(existing_company.id, transaction);
         REQUIRE(all_members.empty());
     }
 }

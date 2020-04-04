@@ -16,18 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "clans_repository.h"
+#include "companies_repository.h"
 #include <spdlog/spdlog.h>
 
 using namespace ibh;
 using namespace chrono;
 
-template class ibh::clans_repository<database_transaction>;
-template class ibh::clans_repository<database_subtransaction>;
+template class ibh::companies_repository<database_transaction>;
+template class ibh::companies_repository<database_subtransaction>;
 
 template<DatabaseTransaction transaction_T>
-bool clans_repository<transaction_T>::insert(db_clan &clan, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("INSERT INTO clans (name) VALUES ('{}') ON CONFLICT DO NOTHING RETURNING id", transaction->escape(clan.name)));
+bool companies_repository<transaction_T>::insert(db_company &company, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("INSERT INTO companies (name) VALUES ('{}') ON CONFLICT DO NOTHING RETURNING id", transaction->escape(company.name)));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -36,28 +36,28 @@ bool clans_repository<transaction_T>::insert(db_clan &clan, unique_ptr<transacti
         return false;
     }
 
-    clan.id = result[0][0].as(uint64_t{});
+    company.id = result[0][0].as(uint64_t{});
 
     return true;
 }
 
 template<DatabaseTransaction transaction_T>
-void clans_repository<transaction_T>::update(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("UPDATE clans SET name = '{}' WHERE id = {}", transaction->escape(clan.name), clan.id));
+void companies_repository<transaction_T>::update(db_company const &company, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("UPDATE companies SET name = '{}' WHERE id = {}", transaction->escape(company.name), company.id));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 }
 
 template<DatabaseTransaction transaction_T>
-void clans_repository<transaction_T>::remove(db_clan const &clan, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("DELETE FROM clans WHERE id = {}", clan.id));
+void companies_repository<transaction_T>::remove(db_company const &company, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("DELETE FROM companies WHERE id = {}", company.id));
 
     spdlog::trace("[{}] removed {} entries", __FUNCTION__, result.size());
 }
 
 template<DatabaseTransaction transaction_T>
-optional<db_clan> clans_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT id, name FROM clans WHERE id = {}", id));
+optional<db_company> companies_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT id, name FROM companies WHERE id = {}", id));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -65,12 +65,12 @@ optional<db_clan> clans_repository<transaction_T>::get(int id, unique_ptr<transa
         return {};
     }
 
-    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
+    return make_optional<db_company>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
 }
 
 template<DatabaseTransaction transaction_T>
-optional<db_clan> clans_repository<transaction_T>::get(string const &name, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT id, name FROM clans WHERE name = '{}'", transaction->escape(name)));
+optional<db_company> companies_repository<transaction_T>::get(string const &name, unique_ptr<transaction_T> const &transaction) const {
+    auto result = transaction->execute(fmt::format("SELECT id, name FROM companies WHERE name = '{}'", transaction->escape(name)));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -78,21 +78,21 @@ optional<db_clan> clans_repository<transaction_T>::get(string const &name, uniqu
         return {};
     }
 
-    return make_optional<db_clan>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
+    return make_optional<db_company>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
 }
 
 template<DatabaseTransaction transaction_T>
-vector<db_clan> clans_repository<transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
-    auto result = transaction->execute("SELECT id, name FROM clans");
+vector<db_company> companies_repository<transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
+    auto result = transaction->execute("SELECT id, name FROM companies");
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
-    vector<db_clan> clans;
-    clans.reserve(result.size());
+    vector<db_company> companies;
+    companies.reserve(result.size());
 
     for(auto const & res : result) {
-        clans.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}));
+        companies.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}));
     }
 
-    return clans;
+    return companies;
 }

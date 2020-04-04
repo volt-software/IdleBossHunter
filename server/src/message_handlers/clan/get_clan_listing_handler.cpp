@@ -17,17 +17,17 @@
 */
 
 
-#include "get_clan_listing_handler.h"
+#include "get_company_listing_handler.h"
 
 #include <spdlog/spdlog.h>
 
-#include <messages/clan/get_clan_listing_request.h>
-#include <messages/clan/get_clan_listing_response.h>
+#include <messages/company/get_company_listing_request.h>
+#include <messages/company/get_company_listing_response.h>
 #include "message_handlers/handler_macros.h"
 #include <websocket_thread.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
-#include <repositories/clan_stats_repository.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/company_stats_repository.h>
 #include <repositories/characters_repository.h>
 #include "macros.h"
 
@@ -40,47 +40,47 @@ using namespace chrono;
 
 namespace ibh {
     template <class Server, class WebSocket>
-    void handle_get_clan_listing(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
+    void handle_get_company_listing(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
                                  queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections) {
         MEASURE_TIME_OF_FUNCTION(trace);
-        DESERIALIZE_WITH_PLAYING_CHECK(get_clan_listing_request);
+        DESERIALIZE_WITH_PLAYING_CHECK(get_company_listing_request);
 
-        clans_repository<database_transaction> clan_repo{};
-        clan_members_repository<database_transaction> clan_member_repo{};
-        clan_stats_repository<database_transaction> clan_stat_repo{};
+        companies_repository<database_transaction> company_repo{};
+        company_members_repository<database_transaction> company_member_repo{};
+        company_stats_repository<database_transaction> company_stat_repo{};
         characters_repository<database_transaction> char_repo{};
 
-        auto clans = clan_repo.get_all(transaction);
-        vector<clan> msg_clans;
-        msg_clans.reserve(clans.size());
-        for(auto &c : clans) {
+        auto companies = company_repo.get_all(transaction);
+        vector<company> msg_companies;
+        msg_companies.reserve(companies.size());
+        for(auto &c : companies) {
             vector<string> msg_members;
             vector<bonus> msg_bonuses;
 
-            auto members = clan_member_repo.get_by_clan_id(c.id, transaction);
+            auto members = company_member_repo.get_by_company_id(c.id, transaction);
             msg_members.reserve(members.size());
             for(auto &member : members) {
                 auto player = char_repo.get_character(member.character_id, transaction);
                 msg_members.emplace_back(player->name);
             }
 
-            auto bonuses = clan_stat_repo.get_by_clan_id(c.id, transaction);
+            auto bonuses = company_stat_repo.get_by_company_id(c.id, transaction);
             for(auto &bonus : bonuses) {
                 msg_bonuses.emplace_back(bonus.stat_id, bonus.value);
             }
 
-            msg_clans.emplace_back(c.name, msg_members, msg_bonuses);
+            msg_companies.emplace_back(c.name, msg_members, msg_bonuses);
         }
 
-        get_clan_listing_response resp{"", msg_clans};
+        get_company_listing_response resp{"", msg_companies};
         s->send(user_data->ws, resp.serialize(), websocketpp::frame::opcode::value::TEXT);
     }
 
-    template void handle_get_clan_listing<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_get_company_listing<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                                                per_socket_data<websocketpp::connection_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<websocketpp::connection_hdl>> &user_connections);
 
 #ifdef TEST_CODE
-    template void handle_get_clan_listing<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
+    template void handle_get_company_listing<custom_server, custom_hdl>(custom_server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,
                                                            per_socket_data<custom_hdl> *user_data, queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<custom_hdl>> &user_connections);
 #endif
 }

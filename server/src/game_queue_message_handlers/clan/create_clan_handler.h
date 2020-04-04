@@ -25,5 +25,5 @@
 using namespace std;
 
 namespace ibh {
-    bool handle_create_clan(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &transaction);
+    bool handle_create_company(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &transaction);
 }

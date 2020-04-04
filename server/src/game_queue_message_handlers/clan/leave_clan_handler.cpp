@@ -16,20 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "leave_clan_handler.h"
+#include "leave_company_handler.h"
 
 #include <spdlog/spdlog.h>
 #include <ecs/components.h>
-#include <messages/clan/leave_clan_response.h>
-#include <repositories/clans_repository.h>
-#include <repositories/clan_members_repository.h>
+#include <messages/company/leave_company_response.h>
+#include <repositories/companies_repository.h>
+#include <repositories/company_members_repository.h>
 #include <game_queue_message_handlers/handler_helpers.h>
 
 using namespace std;
 
 namespace ibh {
-    bool handle_leave_clan(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
-        auto *leave_msg = dynamic_cast<leave_clan_message*>(msg);
+    bool handle_leave_company(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
+        auto *leave_msg = dynamic_cast<leave_company_message*>(msg);
 
         if(leave_msg == nullptr) {
             spdlog::error("[{}] nullptr", __FUNCTION__);
@@ -44,35 +44,35 @@ namespace ibh {
                 continue;
             }
 
-            clan_members_repository<database_subtransaction> clan_members_repo{};
+            company_members_repository<database_subtransaction> company_members_repo{};
             auto subtransaction = transaction->create_subtransaction();
-            auto clan_member = clan_members_repo.get_by_character_id(pc.id, subtransaction);
-            if(!clan_member) {
-                auto new_err_msg = make_unique<leave_clan_response>("Not a member of a clan");
+            auto company_member = company_members_repo.get_by_character_id(pc.id, subtransaction);
+            if(!company_member) {
+                auto new_err_msg = make_unique<leave_company_response>("Not a member of a company");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
             }
 
-            clan_members_repo.remove(*clan_member, subtransaction);
+            company_members_repo.remove(*company_member, subtransaction);
 
-            send_message_to_all_clan_members(clan_member->clan_id, pc.name, "has left the clan.", "system-clan", es, outward_queue, transaction);
+            send_message_to_all_company_members(company_member->company_id, pc.name, "has left the company.", "system-company", es, outward_queue, transaction);
 
-            auto new_err_msg = make_unique<leave_clan_response>("");
+            auto new_err_msg = make_unique<leave_company_response>("");
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
             subtransaction->commit();
 
-            auto clan_view = es.view<clan_component>();
-            for(auto clan_entity : clan_view) {
-                auto &clan = clan_view.get(clan_entity);
+            auto company_view = es.view<company_component>();
+            for(auto company_entity : company_view) {
+                auto &company = company_view.get(company_entity);
 
-                if (clan.id != pc.clan_id) {
+                if (company.id != pc.company_id) {
                     continue;
                 }
 
-                clan.members.erase(pc.id);
+                company.members.erase(pc.id);
             }
 
-            spdlog::trace("[{}] left clan {} for pc {} for connection id {}", __FUNCTION__, clan_member->clan_id, pc.name, pc.connection_id);
+            spdlog::trace("[{}] left company {} for pc {} for connection id {}", __FUNCTION__, company_member->company_id, pc.name, pc.connection_id);
 
             return true;
         }

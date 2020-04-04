@@ -20,48 +20,48 @@
 
 #include <catch2/catch.hpp>
 #include "../test_helpers/startup_helper.h"
-#include "repositories/clans_repository.h"
-#include "repositories/clan_buildings_repository.h"
+#include "repositories/companies_repository.h"
+#include "repositories/company_buildings_repository.h"
 
 using namespace std;
 using namespace ibh;
 
-TEST_CASE("clan buildings repository tests") {
-    clans_repository<database_transaction> clans_repo{};
-    clan_buildings_repository<database_transaction> clan_buildings_repo{};
+TEST_CASE("company buildings repository tests") {
+    companies_repository<database_transaction> companies_repo{};
+    company_buildings_repository<database_transaction> company_buildings_repo{};
 
-    SECTION("clan building inserted correctly" ) {
+    SECTION("company building inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
 
-        db_clan_building building{0, clan.id, "building"};
-        clan_buildings_repo.insert(building, transaction);
+        db_company_building building{0, company.id, "building"};
+        company_buildings_repo.insert(building, transaction);
         REQUIRE(building.id > 0);
 
-        auto building2 = clan_buildings_repo.get(building.id, transaction);
+        auto building2 = company_buildings_repo.get(building.id, transaction);
         REQUIRE(building2->id == building.id);
-        REQUIRE(building2->clan_id == building.clan_id);
+        REQUIRE(building2->company_id == building.company_id);
         REQUIRE(building2->name == building.name);
     }
 
-    SECTION( "update clan building" ) {
+    SECTION( "update company building" ) {
         auto transaction = db_pool->create_transaction();
-        db_clan clan{0, "clan"};
-        clans_repo.insert(clan, transaction);
-        REQUIRE(clan.id > 0);
+        db_company company{0, "company"};
+        companies_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
 
-        db_clan_building building{0, clan.id, "building"};
-        clan_buildings_repo.insert(building, transaction);
+        db_company_building building{0, company.id, "building"};
+        company_buildings_repo.insert(building, transaction);
         REQUIRE(building.id > 0);
 
-        building.name = "notclan";
-        clan_buildings_repo.update(building, transaction);
+        building.name = "notcompany";
+        company_buildings_repo.update(building, transaction);
 
-        auto building2 = clan_buildings_repo.get(building.id, transaction);
+        auto building2 = company_buildings_repo.get(building.id, transaction);
         REQUIRE(building2->id == building.id);
-        REQUIRE(building2->clan_id == building.clan_id);
+        REQUIRE(building2->company_id == building.company_id);
         REQUIRE(building2->name == building.name);
     }
 }
