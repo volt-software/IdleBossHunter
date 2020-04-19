@@ -27,7 +27,7 @@ template class ibh::companies_repository<database_subtransaction>;
 
 template<DatabaseTransaction transaction_T>
 bool companies_repository<transaction_T>::insert(db_company &company, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("INSERT INTO companies (name) VALUES ('{}') ON CONFLICT DO NOTHING RETURNING id", transaction->escape(company.name)));
+    auto result = transaction->execute(fmt::format("INSERT INTO companies (name, no_of_shares, company_type) VALUES ('{}', {}, {}) ON CONFLICT DO NOTHING RETURNING id", transaction->escape(company.name), company.no_of_shares, company.company_type));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -43,7 +43,7 @@ bool companies_repository<transaction_T>::insert(db_company &company, unique_ptr
 
 template<DatabaseTransaction transaction_T>
 void companies_repository<transaction_T>::update(db_company const &company, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("UPDATE companies SET name = '{}' WHERE id = {}", transaction->escape(company.name), company.id));
+    auto result = transaction->execute(fmt::format("UPDATE companies SET name = '{}', no_of_shares = {} WHERE id = {}", transaction->escape(company.name), company.no_of_shares, company.id));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 }
@@ -57,7 +57,7 @@ void companies_repository<transaction_T>::remove(db_company const &company, uniq
 
 template<DatabaseTransaction transaction_T>
 optional<db_company> companies_repository<transaction_T>::get(int id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT id, name FROM companies WHERE id = {}", id));
+    auto result = transaction->execute(fmt::format("SELECT id, name, no_of_shares, company_type FROM companies WHERE id = {}", id));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -65,12 +65,12 @@ optional<db_company> companies_repository<transaction_T>::get(int id, unique_ptr
         return {};
     }
 
-    return make_optional<db_company>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
+    return make_optional<db_company>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), result[0]["no_of_shares"].as(uint64_t{}), result[0]["company_type"].as(uint16_t{}));
 }
 
 template<DatabaseTransaction transaction_T>
 optional<db_company> companies_repository<transaction_T>::get(string const &name, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT id, name FROM companies WHERE name = '{}'", transaction->escape(name)));
+    auto result = transaction->execute(fmt::format("SELECT id, name, no_of_shares, company_type FROM companies WHERE name = '{}'", transaction->escape(name)));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -78,12 +78,12 @@ optional<db_company> companies_repository<transaction_T>::get(string const &name
         return {};
     }
 
-    return make_optional<db_company>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}));
+    return make_optional<db_company>(result[0]["id"].as(uint64_t{}), result[0]["name"].as(string{}), result[0]["no_of_shares"].as(uint64_t{}), result[0]["company_type"].as(uint16_t{}));
 }
 
 template<DatabaseTransaction transaction_T>
 vector<db_company> companies_repository<transaction_T>::get_all(const unique_ptr<transaction_T> &transaction) const {
-    auto result = transaction->execute("SELECT id, name FROM companies");
+    auto result = transaction->execute("SELECT id, name, no_of_shares, company_type FROM companies");
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -91,7 +91,7 @@ vector<db_company> companies_repository<transaction_T>::get_all(const unique_ptr
     companies.reserve(result.size());
 
     for(auto const & res : result) {
-        companies.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}));
+        companies.emplace_back(res["id"].as(uint64_t{}), res["name"].as(string{}), res["no_of_shares"].as(uint64_t{}), res["company_type"].as(uint16_t{}));
     }
 
     return companies;

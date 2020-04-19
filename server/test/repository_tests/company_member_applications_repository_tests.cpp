@@ -42,10 +42,10 @@ TEST_CASE("company member applications repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         REQUIRE(member_repo.insert(member, transaction) == true);
 
         auto member2 = member_repo.get(company.id, player.id, transaction);
@@ -62,10 +62,10 @@ TEST_CASE("company member applications repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         REQUIRE(member_repo.insert(member, transaction) == true);
         REQUIRE(member_repo.insert(member, transaction) == false);
     }
@@ -78,10 +78,10 @@ TEST_CASE("company member applications repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         member_repo.insert(member, transaction);
 
         auto member2 = member_repo.get(company.id, player.id, transaction);
@@ -105,11 +105,11 @@ TEST_CASE("company member applications repository tests") {
         char_repo.insert(player2, transaction);
         REQUIRE(player.id > 0);
         REQUIRE(player2.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
-        db_company_member member2{company.id, player2.id, 2};
+        db_company_member member{company.id, player.id, 1, 0};
+        db_company_member member2{company.id, player2.id, 2, 0};
         member_repo.insert(member, transaction);
         member_repo.insert(member2, transaction);
 
@@ -134,11 +134,11 @@ TEST_CASE("company member applications repository tests") {
         char_repo.insert(player2, transaction);
         REQUIRE(player.id > 0);
         REQUIRE(player2.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
-        db_company_member member2{company.id, player2.id, 2};
+        db_company_member member{company.id, player.id, 1, 0};
+        db_company_member member2{company.id, player2.id, 2, 0};
         member_repo.insert(member, transaction);
         member_repo.insert(member2, transaction);
 

@@ -38,6 +38,13 @@ namespace ibh {
             }
         }
 
+        template <typename T>
+        void enqueue_tokenless(T&& t) {
+            if(!q->enqueue(forward<T>(t))){
+                throw runtime_error("Couldn't enqueue, probably because of memory allocation issues");
+            }
+        }
+
         bool try_dequeue_from_producer(queue_T &t) {
             return q->try_dequeue_from_producer(ptok, t);
         }

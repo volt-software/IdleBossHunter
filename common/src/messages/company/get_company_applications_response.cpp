@@ -80,6 +80,7 @@ unique_ptr<get_company_applications_response> get_company_applications_response:
             return nullptr;
         }
 
+        members.reserve(members_array.Size());
         for (SizeType i = 0; i < members_array.Size(); i++) {
             if (!members_array[i].IsObject() ||
                 !members_array[i].HasMember("id") ||

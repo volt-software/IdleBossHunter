@@ -33,8 +33,8 @@ namespace ibh {
     accept_application_message::accept_application_message(uint64_t connection_id, uint64_t applicant_id) noexcept
             : queue_message(_type, connection_id), applicant_id(applicant_id) {}
 
-    create_company_message::create_company_message(uint64_t connection_id, string company_name) noexcept
-            : queue_message(_type, connection_id), company_name(move(company_name)) {}
+    create_company_message::create_company_message(uint64_t connection_id, string company_name, uint16_t company_type) noexcept
+            : queue_message(_type, connection_id), company_name(move(company_name)), company_type(company_type) {}
 
     increase_bonus_message::increase_bonus_message(uint64_t connection_id, uint32_t bonus_type) noexcept
             : queue_message(_type, connection_id), bonus_type(bonus_type) {}

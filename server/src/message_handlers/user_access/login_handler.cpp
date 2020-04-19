@@ -28,6 +28,8 @@
 #include <repositories/banned_users_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/character_stats_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/companies_repository.h>
 #include <on_leaving_scope.h>
 #include <messages/user_access/user_entered_game_response.h>
 #include <websocket_thread.h>
@@ -47,19 +49,22 @@ namespace ibh {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_NOT_LOGIN_CHECK(login_request);
 
-        users_repository<database_transaction> user_repo{};
-        banned_users_repository<database_transaction> banned_user_repo{};
-        characters_repository<database_transaction> character_repo{};
-        character_stats_repository<database_transaction> stats_repo{};
+        users_repository<database_subtransaction> user_repo{};
+        banned_users_repository<database_subtransaction> banned_user_repo{};
+        characters_repository<database_subtransaction> character_repo{};
+        character_stats_repository<database_subtransaction> stats_repo{};
+        company_members_repository<database_subtransaction> company_members_repo{};
+        companies_repository<database_subtransaction> companies_repo{};
 
-        auto banned_usr = banned_user_repo.is_username_or_ip_banned(msg->username, {}, transaction);
+        auto subtransaction = transaction->create_subtransaction();
+        auto banned_usr = banned_user_repo.is_username_or_ip_banned(msg->username, {}, subtransaction);
 
         if (banned_usr) {
             s->close(user_data->ws, 0, "You are banned");
             return;
         }
 
-        auto usr = user_repo.get(msg->username, transaction);
+        auto usr = user_repo.get(msg->username, subtransaction);
 
         if (!usr) {
             SEND_ERROR("User doesn't exist", "", "", true);
@@ -83,11 +88,11 @@ namespace ibh {
         user_data->is_game_master = usr->is_game_master;
 
         vector<character_object> message_characters;
-        auto characters = character_repo.get_by_user_id(usr->id, transaction);
+        auto characters = character_repo.get_by_user_id(usr->id, subtransaction);
         message_characters.reserve(characters.size());
 
         for (auto &character : characters) {
-            auto db_stats = stats_repo.get_by_character_id(character.id, transaction);
+            auto db_stats = stats_repo.get_by_character_id(character.id, subtransaction);
             vector<stat_component> stats;
             stats.reserve(db_stats.size());
             for(auto const &stat : db_stats) {
@@ -95,7 +100,17 @@ namespace ibh {
             }
             vector<item_object> items;
             vector<skill_object> skills;
-            message_characters.emplace_back(character.name, character.race, character._class, character.level, character.slot, character.gold, character.xp, character.skill_points, move(stats), move(items), move(skills));
+
+            auto company_membership = company_members_repo.get_by_character_id(character.id, subtransaction);
+            string company_name;
+            if(company_membership) {
+                auto company = companies_repo.get(company_membership->character_id, subtransaction);
+                if(company) {
+                    company_name = company->name;
+                }
+            }
+
+            message_characters.emplace_back(character.name, character.race, character._class, company_name, character.level, character.slot, character.gold, character.xp, character.skill_points, move(stats), move(items), move(skills));
         }
 
         vector<account_object> online_users;

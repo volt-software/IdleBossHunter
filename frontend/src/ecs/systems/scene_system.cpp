@@ -49,7 +49,7 @@ using namespace std;
 using namespace ibh;
 
 scene_system::scene_system(config *config, entt::registry &es)
-        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _es(es), _id_counter(0), _logged_in() {
+        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _es(es), _character(), _id_counter(0), _logged_in() {
 }
 
 void scene_system::update(entt::registry &unused, TimeDelta dt) {
@@ -221,4 +221,8 @@ void scene_system::set_logged_in(bool logged_in) {
 
 bool scene_system::get_logged_in() const {
     return _logged_in;
+}
+
+optional<character_object>& scene_system::get_character() {
+    return _character;
 }

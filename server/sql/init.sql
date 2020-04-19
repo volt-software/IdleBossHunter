@@ -104,8 +104,7 @@ CREATE TABLE company_stats (
 CREATE TABLE company_members (
     company_id BIGINT NOT NULL,
     character_id BIGINT NOT NULL,
-    member_level SMALLINT NOT NULL,
-    wage BIGINT NOT NULL
+    member_level SMALLINT NOT NULL
 );
 
 CREATE TABLE company_member_applications (

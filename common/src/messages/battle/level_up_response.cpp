@@ -70,7 +70,7 @@ unique_ptr<level_up_response> level_up_response::deserialize(rapidjson::Document
     stats.reserve(d["added_stats"].MemberCount());
     for(auto &it : d["added_stats"].GetObject()) {
         uint64_t stat_id = stoul(it.name.GetString());
-        stats.insert(decltype(stats)::value_type{stat_id, stat_component{stat_id, it.value.GetInt64()}});
+        stats.emplace(stat_id, stat_component{stat_id, it.value.GetInt64()});
     }
 
     return make_unique<level_up_response>(move(stats), d["new_xp_goal"].GetUint64(), d["current_xp"].GetUint64());

@@ -18,33 +18,30 @@
 
 #include "handler_helpers.h"
 #include <repositories/company_members_repository.h>
-#include <ecs/components.h>
 #include <messages/chat/message_response.h>
+#include <magic_enum.hpp>
 
 namespace ibh {
-
     template<bool AdminOnly>
     void send_message(company_component const &company, string const &playername, string const &message, string const &source, entt::registry &es, outward_queues &outward_queue) {
         auto now = chrono::system_clock::now();
         auto timestamp = duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
-        auto pc_view = es.view<pc_component>();
-        for (auto const &member : company.members) {
-            for (auto company_entity : pc_view) {
-                auto &company_pc = pc_view.get(company_entity);
+        auto pc_group = es.group<pc_component>(entt::get<company_component>);
+        for(auto entity : pc_group) {
+            auto [pc, cc] = pc_group.template get<pc_component, company_component>(entity);
 
-                if constexpr(AdminOnly) {
-                    if (member.second == COMPANY_MEMBER) {
-                        continue;
-                    }
-                }
-
-                if (member.first != company_pc.id) {
+            if constexpr(AdminOnly) {
+                if (cc.member_level == magic_enum::enum_integer(company_member_level::COMPANY_MEMBER)) {
                     continue;
                 }
-
-                auto new_applicant_msg = make_unique<message_response>(playername, message, source, timestamp);
-                outward_queue.enqueue(outward_message{company_pc.connection_id, move(new_applicant_msg)});
             }
+
+            if (cc.id != company.id) {
+                continue;
+            }
+
+            auto new_applicant_msg = make_unique<message_response>(playername, message, source, timestamp);
+            outward_queue.enqueue(outward_message{pc.connection_id, move(new_applicant_msg)});
         }
     }
 
@@ -54,21 +51,21 @@ namespace ibh {
         auto timestamp = duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
         auto pc_view = es.view<pc_component>();
         for (auto const &member : data) {
-            for (auto company_entity : pc_view) {
-                auto &company_pc = pc_view.get(company_entity);
-
-                if constexpr(AdminOnly) {
-                    if (member.member_level == COMPANY_MEMBER) {
-                        continue;
-                    }
+            if constexpr(AdminOnly) {
+                if (member.member_level == magic_enum::enum_integer(company_member_level::COMPANY_MEMBER)) {
+                    continue;
                 }
+            }
 
-                if (member.character_id != company_pc.id) {
+            for (auto company_entity : pc_view) {
+                auto &pc = pc_view.template get<pc_component>(company_entity);
+
+                if (member.character_id != pc.id) {
                     continue;
                 }
 
                 auto new_applicant_msg = make_unique<message_response>(playername, message, source, timestamp);
-                outward_queue.enqueue(outward_message{company_pc.connection_id, move(new_applicant_msg)});
+                outward_queue.enqueue(outward_message{pc.connection_id, move(new_applicant_msg)});
             }
         }
     }
@@ -97,12 +94,25 @@ namespace ibh {
         send_message<true>(company, playername, message, source, es, outward_queue);
     }
 
-    pc_component *get_player_entity_for_connection(uint64_t connection_id, entt::registry &es) {
+    optional<entt::entity> get_player_entity_for_connection(uint64_t connection_id, entt::registry &es) {
         auto pc_view = es.view<pc_component>();
         for (auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
 
-            if (pc.connection_id != connection_id) {
+            if (pc.connection_id == connection_id) {
+                return entity;
+            }
+        }
+
+        return {};
+    }
+
+    pc_component *get_player_component_for_connection(uint64_t connection_id, entt::registry &es) {
+        auto pc_view = es.view<pc_component>();
+        for (auto entity : pc_view) {
+            auto &pc = pc_view.get(entity);
+
+            if (pc.connection_id == connection_id) {
                 return &pc;
             }
         }
@@ -110,12 +120,25 @@ namespace ibh {
         return nullptr;
     }
 
-    pc_component* get_player_entity(uint64_t player_id, entt::registry &es) {
+    optional<entt::entity> get_player_entity(uint64_t player_id, entt::registry &es) {
         auto pc_view = es.view<pc_component>();
         for (auto entity : pc_view) {
             auto &pc = pc_view.get(entity);
 
-            if (pc.id != player_id) {
+            if (pc.id == player_id) {
+                return entity;
+            }
+        }
+
+        return {};
+    }
+
+    pc_component* get_player_component(uint64_t player_id, entt::registry &es) {
+        auto pc_view = es.view<pc_component>();
+        for (auto entity : pc_view) {
+            auto &pc = pc_view.get(entity);
+
+            if (pc.id == player_id) {
                 return &pc;
             }
         }

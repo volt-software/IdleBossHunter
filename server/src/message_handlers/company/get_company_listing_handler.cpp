@@ -30,6 +30,7 @@
 #include <repositories/company_stats_repository.h>
 #include <repositories/characters_repository.h>
 #include "macros.h"
+#include <common_components.h>
 
 #ifdef TEST_CODE
 #include "../../../test/custom_server.h"
@@ -51,11 +52,11 @@ namespace ibh {
         characters_repository<database_transaction> char_repo{};
 
         auto companies = company_repo.get_all(transaction);
-        vector<company> msg_companies;
+        vector<company_object> msg_companies;
         msg_companies.reserve(companies.size());
         for(auto &c : companies) {
             vector<string> msg_members;
-            vector<bonus> msg_bonuses;
+            vector<stat_component> msg_bonuses;
 
             auto members = company_member_repo.get_by_company_id(c.id, transaction);
             msg_members.reserve(members.size());

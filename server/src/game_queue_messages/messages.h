@@ -58,9 +58,10 @@ namespace ibh {
 
     struct create_company_message : queue_message {
         string company_name;
+        uint16_t company_type;
         static constexpr uint64_t _type = generate_type<create_company_message>();
 
-        create_company_message(uint64_t connection_id, string company_name) noexcept;
+        create_company_message(uint64_t connection_id, string company_name, uint16_t company_type) noexcept;
         ~create_company_message() override = default;
         create_company_message(const create_company_message&) = default;
         create_company_message(create_company_message&&) noexcept = default;

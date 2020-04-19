@@ -65,6 +65,7 @@ include_directories("${EXTERNAL_DIR}/entt/src")
 include_directories("${EXTERNAL_DIR}/pcg-cpp/include")
 include_directories("${EXTERNAL_DIR}/concurrentqueue")
 include_directories("${EXTERNAL_DIR}/cereal/include")
+include_directories("${EXTERNAL_DIR}/magic_enum/include")
 
 set_target_properties(ibh_frontend.html PROPERTIES LINK_FLAGS "--no-heap-copy --preload-file ${TOP_DIR}/assets@/assets -s DISABLE_EXCEPTION_CATCHING=0")
 target_link_libraries(ibh_frontend.html PUBLIC -lpthread -lwebsocket.js)

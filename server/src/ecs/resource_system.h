@@ -16,25 +16,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #pragma once
 
-#include "../scene.h"
-#include <messages/company/get_company_listing_response.h>
+#include <entt/entity/registry.hpp>
+#include "components.h"
+#include "game_queue_messages/messages.h"
 
 namespace ibh {
-    class manage_companies_scene : public scene  {
+    class resource_system {
     public:
-        explicit manage_companies_scene(iscene_manager *manager);
-        ~manage_companies_scene() override = default;
+        resource_system(uint32_t every_n_ticks, moodycamel::ConcurrentQueue<outward_message> *outward_queue) :
+                _tick_count(0), _every_n_ticks(every_n_ticks), _outward_queue(outward_queue) {}
+        void do_tick(entt::registry &es);
 
-        void update(iscene_manager *manager, TimeDelta dt) override;
-        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
     private:
-        string _error;
-        bool _waiting_for_reply;
-        bool _waiting_for_companies;
-        string _selected_company;
-        vector<company> _companies;
+        uint32_t _tick_count;
+        uint32_t _every_n_ticks;
+        outward_queues _outward_queue;
     };
 }

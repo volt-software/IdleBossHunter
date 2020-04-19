@@ -24,6 +24,7 @@
 #include <repositories/companies_repository.h>
 #include <repositories/company_members_repository.h>
 #include <repositories/company_member_applications_repository.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 
@@ -55,7 +56,7 @@ namespace ibh {
                 return false;
             }
 
-            if(company_member->member_level == COMPANY_MEMBER) {
+            if(company_member->member_level == magic_enum::enum_integer(company_member_level::COMPANY_MEMBER)) {
                 auto new_err_msg = make_unique<reject_application_response>("Not an admin");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;

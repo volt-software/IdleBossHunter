@@ -31,6 +31,7 @@
 #include <websocket_thread.h>
 #include <ecs/components.h>
 #include "macros.h"
+#include <magic_enum.hpp>
 
 #ifdef TEST_CODE
 #include "../../../test/custom_server.h"
@@ -59,7 +60,7 @@ namespace ibh {
             return;
         }
 
-        if(company_member->member_level != COMPANY_SAGE && company_member->member_level != COMPANY_ADMIN) {
+        if(company_member->member_level != magic_enum::enum_integer(company_member_level::COMPANY_SAGE) && company_member->member_level != magic_enum::enum_integer(company_member_level::COMPANY_ADMIN)) {
             get_company_applications_response response{"Not a sage or admin of company", {}};
             auto response_msg = response.serialize();
             s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);

@@ -118,7 +118,10 @@ namespace ibh {
                                                      gear_slot_feet_id, gear_slot_ear_id };
 
     array<uint32_t const, 9> const company_stat_ids = {company_stat_tax_id, company_stat_str_bonus_id, company_stat_agi_bonus_id, company_stat_int_bonus_id,
-                                                    company_stat_vit_bonus_id, company_stat_spd_bonus_id, company_stat_gold_id, company_stat_xp_bonus_id};
+                                                       company_stat_vit_bonus_id, company_stat_spd_bonus_id, company_stat_gold_id, company_stat_xp_bonus_id};
+
+    array<uint32_t const, 11> const resource_ids = {resource_wood_id, resource_ore_id, resource_water_id, resource_plants_id, resource_clay_id, resource_gems_id,
+                                                    resource_paper_id, resource_ink_id, resource_metal_id, resource_bricks_id, resource_timber_id};
 
     ibh_flat_map<string, uint32_t> stat_name_to_id_mapper;
     ibh_flat_map<uint32_t, string> stat_id_to_name_mapper;

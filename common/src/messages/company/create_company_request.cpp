@@ -23,7 +23,7 @@
 using namespace ibh;
 using namespace rapidjson;
 
-create_company_request::create_company_request(string name) noexcept : name(move(name)) {
+create_company_request::create_company_request(string name, uint16_t company_type) noexcept : name(move(name)), company_type(company_type) {
 
 }
 
@@ -39,12 +39,15 @@ string create_company_request::serialize() const {
     writer.String(KEY_STRING("name"));
     writer.String(name.c_str(), name.size());
 
+    writer.String(KEY_STRING("company_type"));
+    writer.Uint64(company_type);
+
     writer.EndObject();
     return sb.GetString();
 }
 
 unique_ptr<create_company_request> create_company_request::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("name")) {
+    if (!d.HasMember("type") || !d.HasMember("name") || !d.HasMember("company_type")) {
         spdlog::warn("[create_company_request] deserialize failed");
         return nullptr;
     }
@@ -54,5 +57,5 @@ unique_ptr<create_company_request> create_company_request::deserialize(rapidjson
         return nullptr;
     }
 
-    return make_unique<create_company_request>(d["name"].GetString());
+    return make_unique<create_company_request>(d["name"].GetString(), d["company_type"].GetUint());
 }

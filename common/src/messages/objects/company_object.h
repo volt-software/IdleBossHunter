@@ -19,26 +19,23 @@
 #pragma once
 
 #include <string>
-#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/pointer.h>
 #include "messages/message.h"
 
 using namespace std;
 
 namespace ibh {
-    struct create_company_request : message {
-        create_company_request(string name, uint16_t company_type) noexcept;
+    struct stat_component;
 
-        ~create_company_request() noexcept override = default;
-
-        [[nodiscard]]
-        string serialize() const override;
-
-        [[nodiscard]]
-        static unique_ptr<create_company_request> deserialize(rapidjson::Document const &d);
-
+    struct company_object {
         string name;
-        uint16_t company_type;
+        vector<string> members;
+        vector<stat_component> bonuses;
 
-        static constexpr uint64_t type = generate_type<create_company_request>();
+        company_object(string name, vector<string> members, vector<stat_component> bonuses) noexcept : name(move(name)), members(move(members)), bonuses(move(bonuses)) {}
     };
+    
+    void write_company_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, company_object const &obj);
+    bool read_company_object_into_vector(rapidjson::Value const &value, vector<company_object> &objs);
 }

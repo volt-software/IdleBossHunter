@@ -67,7 +67,7 @@ void ibh::load_from_database(entt::registry &registry, const shared_ptr<database
         vector<item_component> items;
 
         for(auto &stat : character.stats) {
-            stats.insert(decltype(stats)::value_type{stat.stat_id, stat.value});
+            stats.emplace(stat.stat_id, stat.value);
         }
 
         for(auto &item : character.items) {

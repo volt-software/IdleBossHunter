@@ -24,6 +24,7 @@
 #include "messages/message.h"
 #include "item_object.h"
 #include "skill_object.h"
+#include "company_object.h"
 
 using namespace std;
 
@@ -33,6 +34,7 @@ namespace ibh {
         string name;
         string race;
         string baseclass;
+        string company;
         uint64_t level;
         uint32_t slot;
         uint64_t gold;
@@ -42,7 +44,7 @@ namespace ibh {
         vector<item_object> items;
         vector<skill_object> skills;
 
-        character_object(string name, string race, string baseclass, uint64_t level, uint32_t slot, uint64_t gold, uint64_t xp, uint64_t skill_points, vector<stat_component> stats, vector<item_object> items, vector<skill_object> skills) noexcept;
+        character_object(string name, string race, string baseclass, string company, uint64_t level, uint32_t slot, uint64_t gold, uint64_t xp, uint64_t skill_points, vector<stat_component> stats, vector<item_object> items, vector<skill_object> skills) noexcept;
     };
 
     void write_character_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, character_object const &obj);

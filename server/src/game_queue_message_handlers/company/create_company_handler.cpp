@@ -25,6 +25,7 @@
 #include <repositories/companies_repository.h>
 #include <repositories/company_stats_repository.h>
 #include <repositories/company_members_repository.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 
@@ -65,7 +66,7 @@ namespace ibh {
             company_members_repository<database_subtransaction> company_members_repo{};
             auto subtransaction = transaction->create_subtransaction();
 
-            db_company new_company{0, create_msg->company_name};
+            db_company new_company{0, create_msg->company_name, 0, create_msg->company_type};
             if(!company_repo.insert(new_company, subtransaction)) {
                 auto new_err_msg = make_unique<create_company_response>("Company name already exists");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
@@ -79,13 +80,11 @@ namespace ibh {
                 company_stats_repo.insert(stat, subtransaction);
             }
 
-            db_company_member company_admin{new_company.id, pc.id, COMPANY_ADMIN};
+            db_company_member company_admin{new_company.id, pc.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), 0};
             company_members_repo.insert(company_admin, subtransaction);
             subtransaction->commit();
 
-            auto company_entt = es.create();
-            es.assign<company_component>(company_entt, new_company.id, create_msg->company_name, ibh_flat_map<uint64_t, uint16_t>{{pc.id, COMPANY_ADMIN}}, company_stats);
-            pc.company_id = new_company.id;
+            es.assign<company_component>(entity, new_company.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), create_msg->company_name, company_stats);
 
             gold_it->second -= 10'000;
             auto new_err_msg = make_unique<create_company_response>("");
@@ -96,6 +95,8 @@ namespace ibh {
             return true;
         }
 
+        auto new_err_msg = make_unique<create_company_response>("unknown error");
+        outward_queue.enqueue(outward_message{create_msg->connection_id, move(new_err_msg)});
         spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, create_msg->connection_id);
 
         return false;

@@ -16,7 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <execution>
 #include <spdlog/spdlog.h>
+#include <magic_enum.hpp>
 #include <websocket_thread.h>
 #include <messages/user_access/character_select_response.h>
 #include <messages/battle/new_battle_response.h>
@@ -27,53 +29,38 @@
 #include "random_helper.h"
 #include "on_leaving_scope.h"
 #include "macros.h"
+#include <tbb/task_scheduler_init.h>
 
 using namespace std;
 using namespace ibh;
 
-#define GET_STAT(stats, var_name, stat_name) \
-    auto var_name = stats.find(stat_name); \
-    if(var_name == end(stats)) { \
-        spdlog::error("[{}] missing " #var_name " for pc {} battle {}", __FUNCTION__, pc.id, pc.battle->monster_name); \
-        throw std::runtime_error("missing " #var_name); \
-    } \
-    static_assert(true, "") // force usage of semicolon
-
-#define GET_STAT_DEFAULT(stats, var_name, stat_id, def) \
-    auto var_name = stats.find(stat_id); \
-    if(var_name == end(stats)) { \
-        stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat_id, def}); \
-        var_name = stats.find(stat_id); \
-    } \
-    static_assert(true, "") // force usage of semicolon
-
 [[nodiscard]]
 int64_t battle_turn(pc_component &pc, ibh_flat_map<uint32_t, int64_t> &attacker, ibh_flat_map<uint32_t, int64_t> &defender, bool &attacker_dead, bool &defender_dead, string const &attacker_name, string const &defender_name) {
-    GET_STAT(attacker, attacker_str, stat_str_id);
-    GET_STAT(attacker, attacker_agi, stat_agi_id);
-    GET_STAT(defender, defender_str, stat_str_id);
-    GET_STAT(defender, defender_agi, stat_agi_id);
-    GET_STAT(defender, defender_hp, stat_hp_id);
+    auto &attacker_str = get_stat(attacker, stat_str_id);
+    auto &attacker_agi = get_stat(attacker, stat_agi_id);
+    auto &defender_str = get_stat(defender, stat_str_id);
+    auto &defender_agi = get_stat(defender, stat_agi_id);
+    auto &defender_hp = get_stat(defender, stat_hp_id);
 
-    auto attacker_dmg = ibh::random.generate_single(attacker_str->second * 0.9, attacker_str->second*1.1);
-    auto defender_def = ibh::random.generate_single(defender_str->second * 0.9, defender_str->second*1.1);
+    auto attacker_dmg = ibh::random.generate_single(attacker_str * 0.9, attacker_str*1.1);
+    auto defender_def = ibh::random.generate_single(defender_str * 0.9, defender_str*1.1);
     int64_t dmg = round(max(attacker_dmg * attacker_dmg / (attacker_dmg + defender_def), 0.));
-    auto attacker_hit = ibh::random.generate_single(0L, attacker_agi->second);
-    auto defender_hit = ibh::random.generate_single(0L, defender_agi->second);
+    auto attacker_hit = ibh::random.generate_single(0L, attacker_agi);
+    auto defender_hit = ibh::random.generate_single(0L, defender_agi);
 
     if(dmg <= -922337203685477580L){
         spdlog::error("[{}] something went wrong?", __FUNCTION__);
     }
 
     if(attacker_hit >= defender_hit) {
-        defender_hp->second -= dmg;
-        spdlog::trace("[{}] {} attacked {} for {} dmg. {} has {} health left. {} {} {} {}", __FUNCTION__, attacker_name, defender_name, dmg, defender_name, defender_hp->second, attacker_dmg, defender_def, attacker_str->second, defender_str->second);
+        defender_hp -= dmg;
+        spdlog::trace("[{}] {} attacked {} for {} dmg. {} has {} health left. {} {} {} {}", __FUNCTION__, attacker_name, defender_name, dmg, defender_name, defender_hp, attacker_dmg, defender_def, attacker_str, defender_str);
     } else {
-        spdlog::trace("[{}] {} tried to attack {} but missed. {} has {} health left.", __FUNCTION__, attacker_name, defender_name, defender_name, defender_hp->second);
+        spdlog::trace("[{}] {} tried to attack {} but missed. {} has {} health left.", __FUNCTION__, attacker_name, defender_name, defender_name, defender_hp);
         dmg = -1;
     }
 
-    if(defender_hp->second <= 0) {
+    if(defender_hp <= 0) {
         spdlog::trace("[{}] {} died", __FUNCTION__, defender_name);
         defender_dead = true;
     }
@@ -82,21 +69,21 @@ int64_t battle_turn(pc_component &pc, ibh_flat_map<uint32_t, int64_t> &attacker,
 }
 
 void set_hp_mp(pc_component &pc, ibh_flat_map<uint32_t, int64_t> &stats) {
-    GET_STAT(stats, hp, stat_hp_id);
-    GET_STAT_DEFAULT(stats, max_hp, stat_max_hp_id, 1);
-    GET_STAT(stats, mp, stat_mp_id);
-    GET_STAT_DEFAULT(stats, max_mp, stat_max_mp_id, 1);
-    GET_STAT(stats, str, stat_str_id);
-    GET_STAT(stats, vit, stat_vit_id);
+    auto &hp = get_stat(stats, stat_hp_id);
+    auto &mp = get_stat(stats, stat_mp_id);
+    auto &str = get_stat(stats, stat_str_id);
+    auto &vit = get_stat(stats, stat_vit_id);
+    auto &max_hp = get_stat_or_initialize_default(stats, stat_max_hp_id, hp);
+    auto &max_mp = get_stat_or_initialize_default(stats, stat_max_mp_id, mp);
 
-    hp->second = str->second * 10 + vit->second * 2;
-    max_hp->second = hp->second;
-    mp->second = vit->second * 10;
-    max_mp->second = mp->second;
+    hp = str * 10 + vit * 2;
+    max_hp = hp;
+    mp = vit * 10;
+    max_mp = mp;
 }
 
-void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outward_queue) {
-    if(!pc.battle) {
+void simulate_battle(pc_component &pc, battle_component &bc, entt::registry &es, outward_queues &outward_queue) {
+    if(bc.done) {
         auto mob_view = es.view<monster_definition_component>();
         auto mob_special_view = es.view<monster_special_definition_component>();
 
@@ -109,6 +96,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
         auto level = ibh::random.generate_single(max(static_cast<int64_t>(pc.level)-2L, 0L), static_cast<int64_t>(pc.level)+2L);
         monster_definition_component &mob_def = es.get<monster_definition_component>(*(mob_view.begin() + definition));
         ibh_flat_map<uint32_t, int64_t> mob_stats;
+        mob_stats.reserve(stat_name_ids.size());
         string name = mob_def.name;
 
         for(auto& mob_stat_id : stat_name_ids) {
@@ -128,18 +116,19 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
             }
 
             value = ibh::random.generate_single(max(value*0.95, 0.), value*1.05);
-            mob_stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{mob_stat_id, static_cast<int64_t>(round(value))});
+            mob_stats.emplace(mob_stat_id, static_cast<int64_t>(round(value)));
         }
         if(special >= 0) {
             monster_special_definition_component &special_def = es.get<monster_special_definition_component>(*(mob_special_view.begin() + special));
             name += " " + special_def.name;
         }
-        pc.battle = make_optional<battle_component>(mob_def.name, level, move(mob_stats));
+        bc = battle_component(name, level, move(mob_stats));
 
         // mob setup
-        set_hp_mp(pc, pc.battle->monster_stats);
+        set_hp_mp(pc, bc.monster_stats);
 
         // pc setup
+        bc.total_player_stats.reserve(stat_name_ids.size());
         for(auto &stat_id : stat_name_ids) {
             auto stat = pc.stats.find(stat_id);
 
@@ -147,7 +136,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
                 continue;
             }
 
-            pc.battle->total_player_stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat_id, stat->second});
+            bc.total_player_stats.emplace(stat_id, stat->second);
         }
 
         for(auto &slot_id : slot_name_ids) {
@@ -158,37 +147,36 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
             }
 
             for(auto &stat : item->second.stats) {
-                GET_STAT(pc.battle->total_player_stats, stat_iter, stat.stat_id);
-                stat_iter->second += stat.value;
+                auto &pc_stat = get_stat(bc.total_player_stats, stat.stat_id);
+                pc_stat += stat.value;
             }
         }
-        set_hp_mp(pc, pc.battle->total_player_stats);
+        set_hp_mp(pc, bc.total_player_stats);
+        bc.done = false;
 
         if(pc.connection_id > 0) {
-            auto mob_hp = pc.battle->monster_stats.find(stat_hp_id);
-            auto mob_max_hp = pc.battle->monster_stats.find(stat_max_hp_id);
-            auto player_hp = pc.battle->total_player_stats.find(stat_hp_id);
-            auto player_max_hp = pc.battle->total_player_stats.find(stat_max_hp_id);
+            auto mob_hp = bc.monster_stats.find(stat_hp_id);
+            auto mob_max_hp = bc.monster_stats.find(stat_max_hp_id);
+            auto player_hp = bc.total_player_stats.find(stat_hp_id);
+            auto player_max_hp = bc.total_player_stats.find(stat_max_hp_id);
             auto new_battle_msg = make_unique<new_battle_response>(name, level, mob_hp->second, mob_max_hp->second, player_hp->second, player_max_hp->second);
-            outward_queue.enqueue(outward_message{pc.connection_id, move(new_battle_msg)});
+            outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(new_battle_msg)});
         }
     }
 
-    if(!pc.battle) {
+    if(bc.done) {
         spdlog::warn("[{}] Couldn't find appropriate monster to battle for pc {} level {}", __FUNCTION__, pc.id, pc.level);
         return;
     }
 
 #ifdef BATTLE_EXTREME_LOGGING
-        for(auto &mob_stat : pc.battle->monster_stats) {
+        for(auto &mob_stat : bc.monster_stats) {
             spdlog::info("[{}] available stat for monster: {} - {} - {}", __FUNCTION__, mob_stat.first, mob_stat.second.name, mob_stat.second.value);
         }
 #endif
 
-    GET_STAT(pc.battle->monster_stats, mob_spd_iter, stat_spd_id);
-    GET_STAT(pc.battle->total_player_stats, plyr_spd_iter, stat_spd_id);
-    int64_t mob_spd = mob_spd_iter->second;
-    int64_t plyr_spd = plyr_spd_iter->second;
+    auto mob_spd = get_stat(bc.monster_stats, stat_spd_id);
+    auto plyr_spd = get_stat(bc.total_player_stats, stat_spd_id);
     uint64_t player_turns = 0;
     uint64_t mob_turns = 0;
     uint64_t player_dmg_to_mob = 0;
@@ -203,7 +191,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
             mob_turns++;
             mob_spd -= plyr_spd;
 
-            auto dmg = battle_turn(pc, pc.battle->monster_stats, pc.battle->total_player_stats, mob_dead, plyr_dead, pc.battle->monster_name, pc.name);
+            auto dmg = battle_turn(pc, bc.monster_stats, bc.total_player_stats, mob_dead, plyr_dead, bc.monster_name, pc.name);
             if(dmg >= 0) {
                 mob_hits++;
                 mob_dmg_to_player += dmg;
@@ -216,7 +204,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
 
         if(!mob_dead && !plyr_dead) {
             player_turns++;
-            auto dmg = battle_turn(pc, pc.battle->total_player_stats, pc.battle->monster_stats, plyr_dead, mob_dead, pc.name, pc.battle->monster_name);
+            auto dmg = battle_turn(pc, bc.total_player_stats, bc.monster_stats, plyr_dead, mob_dead, pc.name, bc.monster_name);
             if(dmg >= 0) {
                 player_hits++;
                 player_dmg_to_mob += dmg;
@@ -227,7 +215,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
             player_turns++;
             plyr_spd -= mob_spd;
 
-            auto dmg = battle_turn(pc, pc.battle->total_player_stats, pc.battle->monster_stats, plyr_dead, mob_dead, pc.name, pc.battle->monster_name);
+            auto dmg = battle_turn(pc, bc.total_player_stats, bc.monster_stats, plyr_dead, mob_dead, pc.name, bc.monster_name);
             if(dmg >= 0) {
                 player_hits++;
                 player_dmg_to_mob += dmg;
@@ -240,7 +228,7 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
 
         if(!mob_dead && !plyr_dead) {
             mob_turns++;
-            auto dmg = battle_turn(pc, pc.battle->monster_stats, pc.battle->total_player_stats, mob_dead, plyr_dead, pc.battle->monster_name, pc.name);
+            auto dmg = battle_turn(pc, bc.monster_stats, bc.total_player_stats, mob_dead, plyr_dead, bc.monster_name, pc.name);
             if(dmg >= 0) {
                 mob_hits++;
                 mob_dmg_to_player += dmg;
@@ -249,18 +237,18 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
     }
 
     if(mob_dead) {
-        spdlog::trace("[{}] pc killed mob {}", __FUNCTION__, pc.name, pc.battle->monster_name);
-        GET_STAT(pc.battle->monster_stats, mob_xp, stat_xp_id);
-        GET_STAT(pc.battle->monster_stats, mob_gold, stat_gold_id);
-        GET_STAT(pc.stats, plyr_xp, stat_xp_id);
-        GET_STAT(pc.stats, plyr_gold, stat_gold_id);
-        plyr_xp->second += mob_xp->second;
-        plyr_gold->second += mob_gold->second;
+        spdlog::trace("[{}] pc {} killed mob {}", __FUNCTION__, pc.name, bc.monster_name);
+        auto &mob_xp = get_stat(bc.monster_stats, stat_xp_id);
+        auto &mob_gold = get_stat(bc.monster_stats, stat_gold_id);
+        auto &plyr_xp = get_stat(pc.stats, stat_xp_id);
+        auto &plyr_gold = get_stat(pc.stats, stat_gold_id);
+        plyr_xp += mob_xp;
+        plyr_gold += mob_gold;
 
-        auto level_calc = [](uint64_t level) { return 100+pow(level, 2); };
+        auto level_calc = [](uint64_t level) { return 50*pow(2, level); };
         auto level_threshold = level_calc(pc.level);
-        if(plyr_xp->second >= level_threshold) {
-            plyr_xp->second -= level_threshold;
+        if(plyr_xp >= level_threshold) {
+            plyr_xp -= level_threshold;
             pc.level++;
             ibh_flat_map<uint64_t, stat_component> stats;
 
@@ -274,14 +262,14 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
 
                 for(auto &extra_stat : race.level_stat_mods) {
                     auto stat_it = pc.stats.find(extra_stat.stat_id);
-                    
+
                     if(stat_it == end(pc.stats)) {
                         spdlog::error("[{}] missing stat {} for pc {} - {}", __FUNCTION__, extra_stat.stat_id, pc.name, pc.id);
                         continue;
                     }
                     stat_it->second += extra_stat.value;
                     if(pc.connection_id > 0) {
-                        stats.insert(decltype(stats)::value_type{extra_stat.stat_id, stat_component{extra_stat.stat_id, extra_stat.value}});
+                        stats.emplace(extra_stat.stat_id, stat_component{extra_stat.stat_id, extra_stat.value});
                     }
                 }
 
@@ -311,34 +299,34 @@ void simulate_battle(pc_component &pc, entt::registry &es, outward_queues &outwa
             }
             if(pc.connection_id > 0) {
                 auto level_up_msg = make_unique<level_up_response>(move(stats), level_calc(pc.level),
-                                                                   level_calc(pc.level) - plyr_xp->second);
-                outward_queue.enqueue(outward_message{pc.connection_id, move(level_up_msg)});
+                                                                   level_calc(pc.level) - plyr_xp);
+                outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(level_up_msg)});
             }
             spdlog::trace("[{}] pc {} level up", __FUNCTION__, pc.name);
         }
         if(pc.connection_id > 0) {
-            auto finished_msg = make_unique<battle_finished_response>(true, false, mob_xp->second, mob_gold->second);
-            outward_queue.enqueue(outward_message{pc.connection_id, move(finished_msg)});
+            auto finished_msg = make_unique<battle_finished_response>(true, false, mob_xp, mob_gold);
+            outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(finished_msg)});
         }
 
-        pc.battle.reset();
+        bc.done = true;
     } else if (plyr_dead) {
-        spdlog::trace("[{}] pc {} died against mob {}", __FUNCTION__, pc.name, pc.battle->monster_name);
+        spdlog::trace("[{}] pc {} died against mob {}", __FUNCTION__, pc.name, bc.monster_name);
         if(pc.connection_id > 0) {
             auto finished_msg = make_unique<battle_finished_response>(false, true, 0, 0);
-            outward_queue.enqueue(outward_message{pc.connection_id, move(finished_msg)});
+            outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(finished_msg)});
         }
-        pc.battle.reset();
+        bc.done = true;
     } else {
-        spdlog::trace("[{}] pc fought against mob {}", __FUNCTION__, pc.name, pc.battle->monster_name);
+        spdlog::trace("[{}] pc {} fought against mob {}", __FUNCTION__, pc.name, bc.monster_name);
         if(pc.connection_id > 0) {
             auto update_msg = make_unique<battle_update_response>(mob_turns, player_turns, mob_hits, player_hits, mob_dmg_to_player, player_dmg_to_mob);
-            outward_queue.enqueue(outward_message{pc.connection_id, move(update_msg)});
+            outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(update_msg)});
         }
     }
 }
 
-void ibh::battle_system::do_tick(entt::registry &es) {
+void battle_system::do_tick(entt::registry &es) {
     _tick_count++;
 
     if(_tick_count < _every_n_ticks) {
@@ -348,9 +336,10 @@ void ibh::battle_system::do_tick(entt::registry &es) {
     _tick_count = 0;
 
     MEASURE_TIME_OF_FUNCTION(info);
-    auto pc_view = es.view<pc_component>();
-    for(auto pc_entity : pc_view) {
-        pc_component &pc = pc_view.get<pc_component>(pc_entity);
-        simulate_battle(pc, es, _outward_queue);
-    }
+    auto pc_group = es.group<pc_component>(entt::get<battle_component>);
+    tbb::task_scheduler_init anonymous;
+    for_each(execution::par_unseq, begin(pc_group), end(pc_group), [&es, &outward_queue = _outward_queue, &pc_group](auto entity){
+        auto [pc, bc] = pc_group.template get<pc_component, battle_component>(entity);
+        simulate_battle(pc, bc, es, outward_queue);
+    });
 }

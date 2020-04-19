@@ -99,6 +99,7 @@ unique_ptr<login_response> login_response::deserialize(rapidjson::Document const
         return nullptr;
     }
 
+    online_users.reserve(online_users_array.Size());
     for(SizeType i = 0; i < online_users_array.Size(); i++) {
         if(!read_account_object_into_vector(online_users_array[i], online_users)) {
             spdlog::warn("[login_response] deserialize failed");
@@ -106,6 +107,7 @@ unique_ptr<login_response> login_response::deserialize(rapidjson::Document const
         }
     }
 
+    players.reserve(players_array.Size());
     for(SizeType i = 0; i < players_array.Size(); i++) {
         if(!read_character_object_into_vector(players_array[i], players)) {
             spdlog::warn("[login_response] deserialize failed");

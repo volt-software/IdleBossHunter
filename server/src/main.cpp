@@ -50,6 +50,7 @@
 #include "working_directory_manipulation.h"
 
 #include "ecs/battle_system.h"
+#include "ecs/resource_system.h"
 
 #include "websocket_thread.h"
 #include "discord/discord_thread.h"
@@ -130,6 +131,7 @@ int main() {
     moodycamel::ProducerToken game_loop_ptok(game_loop_queue);
     moodycamel::ConsumerToken game_loop_ctok(game_loop_queue);
     battle_system bs{config.battle_system_each_n_ticks, &outward_queue};
+    resource_system rs{config.resource_gathering_system_each_n_ticks, &outward_queue};
 
     if(quit.load(memory_order_acquire)) {
         spdlog::warn("[{}] quitting program", __FUNCTION__);
@@ -152,7 +154,7 @@ int main() {
     auto next_log_tick_times = chrono::system_clock::now() + chrono::seconds(1);
     uint32_t tick_counter = 0;
 
-    ibh_flat_map<uint32_t, function<bool(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &)>> game_queue_message_router;
+    ibh_flat_map<uint64_t, function<bool(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &)>> game_queue_message_router;
     game_queue_message_router.emplace(player_enter_message::_type, handle_player_enter_message);
     game_queue_message_router.emplace(player_leave_message::_type, handle_player_leave_message);
 
@@ -184,6 +186,7 @@ int main() {
         }
 
         bs.do_tick(es);
+        rs.do_tick(es);
 
         auto tick_end = chrono::system_clock::now();
         frame_times.push_back(chrono::duration_cast<chrono::microseconds>(tick_end - tick_start).count());

@@ -42,16 +42,42 @@ TEST_CASE("company members repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         REQUIRE(member_repo.insert(member, transaction) == true);
 
         auto member2 = member_repo.get(company.id, player.id, transaction);
         REQUIRE(member2->company_id == member.company_id);
         REQUIRE(member2->character_id == member.character_id);
         REQUIRE(member2->member_level == member.member_level);
+        REQUIRE(member2->wage == member.wage);
+    }
+
+    SECTION("company members updated correctly" ) {
+        auto transaction = db_pool->create_transaction();
+        db_user user{};
+        user_repo.insert_if_not_exists(user, transaction);
+        REQUIRE(user.id > 0);
+        db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
+        char_repo.insert(player, transaction);
+        REQUIRE(player.id > 0);
+        db_company company{0, "company", 0, 2};
+        company_repo.insert(company, transaction);
+        REQUIRE(company.id > 0);
+        db_company_member member{company.id, player.id, 1, 0};
+        REQUIRE(member_repo.insert(member, transaction) == true);
+
+        member.member_level = 2;
+        member.wage = 3;
+        member_repo.update(member, transaction);
+
+        auto member2 = member_repo.get(company.id, player.id, transaction);
+        REQUIRE(member2->company_id == member.company_id);
+        REQUIRE(member2->character_id == member.character_id);
+        REQUIRE(member2->member_level == member.member_level);
+        REQUIRE(member2->wage == member.wage);
     }
 
     SECTION("company members no double insertion" ) {
@@ -62,10 +88,10 @@ TEST_CASE("company members repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         REQUIRE(member_repo.insert(member, transaction) == true);
         REQUIRE(member_repo.insert(member, transaction) == false);
     }
@@ -78,10 +104,10 @@ TEST_CASE("company members repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         member_repo.insert(member, transaction);
 
         auto member2 = member_repo.get_by_character_id(player.id, transaction);
@@ -89,6 +115,7 @@ TEST_CASE("company members repository tests") {
         REQUIRE(member2->company_id == member.company_id);
         REQUIRE(member2->character_id == member.character_id);
         REQUIRE(member2->member_level == member.member_level);
+        REQUIRE(member2->wage == member.wage);
     }
 
     SECTION("remove company member" ) {
@@ -99,10 +126,10 @@ TEST_CASE("company members repository tests") {
         db_character player{0, user.id, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", vector<db_character_stat> {}, vector<db_item> {}};
         char_repo.insert(player, transaction);
         REQUIRE(player.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
+        db_company_member member{company.id, player.id, 1, 0};
         REQUIRE(member_repo.insert(member, transaction) == true);
         member_repo.remove(member, transaction);
 
@@ -121,11 +148,11 @@ TEST_CASE("company members repository tests") {
         char_repo.insert(player2, transaction);
         REQUIRE(player.id > 0);
         REQUIRE(player2.id > 0);
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         company_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
-        db_company_member member{company.id, player.id, 1};
-        db_company_member member2{company.id, player2.id, 2};
+        db_company_member member{company.id, player.id, 1, 0};
+        db_company_member member2{company.id, player2.id, 2, 0};
         member_repo.insert(member, transaction);
         member_repo.insert(member2, transaction);
 

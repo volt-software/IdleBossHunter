@@ -27,6 +27,8 @@
 #include <repositories/banned_users_repository.h>
 #include <repositories/characters_repository.h>
 #include <repositories/character_stats_repository.h>
+#include <repositories/company_members_repository.h>
+#include <repositories/companies_repository.h>
 #include <on_leaving_scope.h>
 #include <messages/user_access/login_response.h>
 #include <game_logic/censor_sensor.h>
@@ -55,6 +57,8 @@ namespace ibh {
         banned_users_repository<database_subtransaction> banned_user_repo{};
         characters_repository<database_subtransaction> character_repo{};
         character_stats_repository<database_subtransaction> stats_repo{};
+        company_members_repository<database_subtransaction> company_members_repo{};
+        companies_repository<database_subtransaction> companies_repo{};
 
         if(sensor.is_profane_ish(msg->username)) {
             SEND_ERROR("Usernames cannot contain profanities", "", "", true);
@@ -138,7 +142,17 @@ namespace ibh {
                 }
                 vector<item_object> items;
                 vector<skill_object> skills;
-                message_characters.emplace_back(character.name, character.race, character._class, character.level, character.slot, character.gold, character.xp, character.skill_points, move(stats), move(items), move(skills));
+
+                auto company_membership = company_members_repo.get_by_character_id(character.id, subtransaction);
+                string company_name;
+                if(company_membership) {
+                    auto company = companies_repo.get(company_membership->character_id, subtransaction);
+                    if(company) {
+                        company_name = company->name;
+                    }
+                }
+
+                message_characters.emplace_back(character.name, character.race, character._class, company_name, character.level, character.slot, character.gold, character.xp, character.skill_points, move(stats), move(items), move(skills));
             }
 
             vector<account_object> online_users;

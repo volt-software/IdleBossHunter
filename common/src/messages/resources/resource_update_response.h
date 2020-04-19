@@ -19,26 +19,31 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <optional>
 #include <rapidjson/document.h>
-#include "messages/message.h"
+#include <common_components.h>
+#include "../message.h"
 
 using namespace std;
 
 namespace ibh {
-    struct create_company_request : message {
-        create_company_request(string name, uint16_t company_type) noexcept;
+    struct resource_update_response : message {
+        resource_update_response(uint32_t resource_id, uint64_t resource, uint64_t resource_xp, uint64_t resource_level) noexcept;
 
-        ~create_company_request() noexcept override = default;
+        ~resource_update_response() noexcept override = default;
 
         [[nodiscard]]
         string serialize() const override;
 
         [[nodiscard]]
-        static unique_ptr<create_company_request> deserialize(rapidjson::Document const &d);
+        static unique_ptr<resource_update_response> deserialize(rapidjson::Document const &d);
 
-        string name;
-        uint16_t company_type;
+        uint32_t resource_id;
+        uint64_t resource;
+        uint64_t resource_xp;
+        uint64_t resource_level;
 
-        static constexpr uint64_t type = generate_type<create_company_request>();
+        static constexpr uint64_t type = generate_type<resource_update_response>();
     };
 }

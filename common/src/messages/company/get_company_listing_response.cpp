@@ -19,11 +19,13 @@
 #include "get_company_listing_response.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/writer.h>
+#include <messages/objects/company_object.h>
+#include <common_components.h>
 
 using namespace ibh;
 using namespace rapidjson;
 
-get_company_listing_response::get_company_listing_response(string error, vector<company> companies) noexcept : error(move(error)), companies(move(companies)) {
+get_company_listing_response::get_company_listing_response(string error, vector<company_object> companies) noexcept : error(move(error)), companies(move(companies)) {
 
 }
 
@@ -44,30 +46,7 @@ string get_company_listing_response::serialize() const {
     for(auto &company : companies) {
         writer.StartObject();
 
-        writer.String(KEY_STRING("name"));
-        writer.String(company.name.c_str(), company.name.size());
-
-        writer.String(KEY_STRING("members"));
-        writer.StartArray();
-        for(auto &member : company.members) {
-            writer.String(member.c_str(), member.size());
-        }
-        writer.EndArray();
-
-        writer.String(KEY_STRING("bonuses"));
-        writer.StartArray();
-        for(auto &bonus : company.bonuses) {
-            writer.StartObject();
-
-            writer.String(KEY_STRING("stat_id"));
-            writer.Uint64(bonus.stat_id);
-
-            writer.String(KEY_STRING("amount"));
-            writer.Uint64(bonus.amount);
-
-            writer.EndObject();
-        }
-        writer.EndArray();
+        write_company_object(writer, company);
 
         writer.EndObject();
     }
@@ -88,60 +67,18 @@ unique_ptr<get_company_listing_response> get_company_listing_response::deseriali
         return nullptr;
     }
 
-    vector<company> companies;
-    {
-        auto &company_array = d["companies"];
-        if(!company_array.IsArray()){
-            spdlog::warn("[get_company_listing_response] deserialize failed11");
+    vector<company_object> companies;
+    auto &companies_array = d["companies"];
+    if(!companies_array.IsArray()) {
+        spdlog::warn("[get_company_listing_response] deserialize failed");
+        return nullptr;
+    }
+
+    companies.reserve(companies_array.Size());
+    for(SizeType i = 0; i < companies_array.Size(); i++) {
+        if(!read_company_object_into_vector(companies_array[i], companies)) {
+            spdlog::warn("[get_company_listing_response] deserialize failed");
             return nullptr;
-        }
-
-        for (SizeType i = 0; i < company_array.Size(); i++) {
-            if (!company_array[i].IsObject() ||
-                !company_array[i].HasMember("name") ||
-                !company_array[i].HasMember("members") ||
-                !company_array[i].HasMember("bonuses")) {
-                spdlog::warn("[get_company_listing_response] deserialize failed12");
-                return nullptr;
-            }
-
-            vector<string> members;
-            {
-                auto &company_member_array = company_array[i]["members"];
-                if (!company_member_array.IsArray()) {
-                    spdlog::warn("[get_company_listing_response] deserialize failed13");
-                    return nullptr;
-                }
-
-                for (SizeType i2 = 0; i2 < company_member_array.Size(); i2++) {
-                    if (!company_member_array[i2].IsString()) {
-                        spdlog::warn("[get_company_listing_response] deserialize failed14");
-                        return nullptr;
-                    }
-                    members.emplace_back(company_member_array[i2].GetString());
-                }
-            }
-
-            vector<bonus> bonuses;
-            {
-                auto &bonus_array = company_array[i]["bonuses"];
-                if (!bonus_array.IsArray()) {
-                    spdlog::warn("[get_company_listing_response] deserialize failed13");
-                    return nullptr;
-                }
-
-                for (SizeType i2 = 0; i2 < bonus_array.Size(); i2++) {
-                    if (!bonus_array[i2].IsObject() ||
-                        !bonus_array[i2].HasMember("stat_id") ||
-                        !bonus_array[i2].HasMember("amount")) {
-                        spdlog::warn("[get_company_listing_response] deserialize failed14");
-                        return nullptr;
-                    }
-                    bonuses.emplace_back(bonus_array[i2]["stat_id"].GetUint64(), bonus_array[i2]["amount"].GetUint64());
-                }
-            }
-
-            companies.emplace_back(company_array[i]["name"].GetString(), move(members), move(bonuses));
         }
     }
 

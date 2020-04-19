@@ -29,7 +29,7 @@
 namespace ibh {
     class scene {
     public:
-        scene(uint64_t type) : _id(0), _type(type), _closed(false) {}
+        scene(uint64_t type) : _id(0), _type(type), _closed(false), _buttons_disabled(false) {}
         virtual ~scene() = default;
         scene(const scene &) = delete;
         scene(scene&&) noexcept = default;
@@ -48,9 +48,13 @@ namespace ibh {
 #endif
         }
 
+        void disable_buttons_when(bool disable);
+        void reenable_buttons();
+
         unsigned int _id;
         uint64_t _type;
         bool _closed;
+        bool _buttons_disabled;
     };
 
     void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr);

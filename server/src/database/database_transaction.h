@@ -21,15 +21,22 @@
 #include <memory>
 #include <string>
 #include <pqxx/pqxx>
+#include <type_traits>
 
 using namespace std;
 
 namespace ibh {
     template<typename T>
     concept DatabaseTransaction = requires(T a, string const& a2) {
+#if 0
+        { a.execute(a2) } -> same_as<pqxx::result>;
+        { a.escape(a2) } -> same_as<string>;
+        { a.commit() } -> same_as<void>;
+#else
         { a.execute(a2) } -> pqxx::result;
         { a.escape(a2) } -> string;
         { a.commit() } -> void;
+#endif
     };
 
     class database_pool;

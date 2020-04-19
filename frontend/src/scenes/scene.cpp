@@ -18,10 +18,14 @@
 
 #include "spdlog/spdlog.h"
 #include <SDL.h>
+#include <rendering/imgui/imgui.h>
+#include <rendering/imgui/imgui_internal.h>
+#include "scene.h"
 
 using namespace std;
+
 namespace ibh {
-    void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1 = nullptr, void *data2 = nullptr) {
+    void enqueue_sdl_event(uint32_t type, uint32_t code, void *data1, void *data2) {
         SDL_Event event{0};
         event.type = type;
         event.user.code = code;
@@ -30,6 +34,22 @@ namespace ibh {
         auto ret = SDL_PushEvent(&event);
         if (ret != 1) {
             spdlog::error("error pushing event {}", ret);
+        }
+    }
+
+    void scene::disable_buttons_when(bool disable) {
+        if(disable) {
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            _buttons_disabled = true;
+        }
+    }
+
+    void scene::reenable_buttons() {
+        if(_buttons_disabled) {
+            ImGui::PopItemFlag();
+            ImGui::PopStyleVar();
+            _buttons_disabled = false;
         }
     }
 }

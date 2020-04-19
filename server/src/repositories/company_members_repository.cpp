@@ -27,8 +27,8 @@ template class ibh::company_members_repository<database_subtransaction>;
 template<DatabaseTransaction transaction_T>
 bool company_members_repository<transaction_T>::insert(db_company_member const &member, unique_ptr<transaction_T> const &transaction) const {
     try {
-        transaction->execute(fmt::format("INSERT INTO company_members (company_id, character_id, member_level) VALUES ({}, {}, {})",
-                            member.company_id, member.character_id, member.member_level));
+        transaction->execute(fmt::format("INSERT INTO company_members (company_id, character_id, member_level, wage) VALUES ({}, {}, {}, {})",
+                            member.company_id, member.character_id, member.member_level, member.wage));
     } catch(pqxx::unique_violation const &e) {
         return false;
     }
@@ -39,7 +39,7 @@ bool company_members_repository<transaction_T>::insert(db_company_member const &
 
 template<DatabaseTransaction transaction_T>
 void company_members_repository<transaction_T>::update(db_company_member const &member, unique_ptr<transaction_T> const &transaction) const {
-    transaction->execute(fmt::format("UPDATE company_members SET member_level = {} WHERE company_id = {} AND character_id = {}", member.member_level, member.company_id, member.character_id));
+    transaction->execute(fmt::format("UPDATE company_members SET member_level = {}, wage = {} WHERE company_id = {} AND character_id = {}", member.member_level, member.wage, member.company_id, member.character_id));
 
     spdlog::trace("[{}] updated member {}-{}", __FUNCTION__, member.company_id, member.character_id);
 }
@@ -53,14 +53,14 @@ void company_members_repository<transaction_T>::remove(db_company_member const &
 
 template<DatabaseTransaction transaction_T>
 optional<db_company_member> company_members_repository<transaction_T>::get(uint64_t company_id, uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT m.company_id, m.character_id, m.member_level FROM company_members m WHERE m.company_id = {} AND m.character_id = {}" , company_id, character_id));
+    auto result = transaction->execute(fmt::format("SELECT m.company_id, m.character_id, m.member_level, m.wage FROM company_members m WHERE m.company_id = {} AND m.character_id = {}" , company_id, character_id));
 
     if(result.empty()) {
         spdlog::trace("[{}] found no member by company_id {} character_id {}", __FUNCTION__, company_id, character_id);
         return {};
     }
 
-    auto ret = make_optional<db_company_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), result[0][2].as(uint16_t{}));
+    auto ret = make_optional<db_company_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), result[0][2].as(uint16_t{}), result[0][3].as(uint64_t{}));
 
     spdlog::trace("[{}] found member by company_id {} character_id {}", __FUNCTION__, company_id, character_id);
 
@@ -69,7 +69,7 @@ optional<db_company_member> company_members_repository<transaction_T>::get(uint6
 
 template<DatabaseTransaction transaction_T>
 vector<db_company_member> company_members_repository<transaction_T>::get_by_company_id(uint64_t company_id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT m.company_id, m.character_id, m.member_level FROM company_members m WHERE m.company_id = {}", company_id));
+    auto result = transaction->execute(fmt::format("SELECT m.company_id, m.character_id, m.member_level, m.wage FROM company_members m WHERE m.company_id = {}", company_id));
 
     spdlog::trace("[{}] contains {} entries", __FUNCTION__, result.size());
 
@@ -77,7 +77,7 @@ vector<db_company_member> company_members_repository<transaction_T>::get_by_comp
     members.reserve(result.size());
 
     for(auto const & res : result) {
-        members.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), res[2].as(uint16_t{}));
+        members.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), res[2].as(uint16_t{}), res[3].as(uint16_t{}));
     }
 
     return members;
@@ -85,14 +85,14 @@ vector<db_company_member> company_members_repository<transaction_T>::get_by_comp
 
 template<DatabaseTransaction transaction_T>
 optional<db_company_member> company_members_repository<transaction_T>::get_by_character_id(uint64_t character_id, unique_ptr<transaction_T> const &transaction) const {
-    auto result = transaction->execute(fmt::format("SELECT m.company_id, m.character_id, m.member_level FROM company_members m WHERE m.character_id = {} LIMIT 1", character_id));
+    auto result = transaction->execute(fmt::format("SELECT m.company_id, m.character_id, m.member_level, m.wage FROM company_members m WHERE m.character_id = {} LIMIT 1", character_id));
 
     if(result.empty()) {
         spdlog::trace("[{}] found no member character_id {}", __FUNCTION__, character_id);
         return {};
     }
 
-    auto ret = make_optional<db_company_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), result[0][2].as(uint16_t{}));
+    auto ret = make_optional<db_company_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), result[0][2].as(uint16_t{}), result[0][3].as(uint64_t{}));
 
     spdlog::trace("[{}] found member character_id {}", __FUNCTION__, character_id);
 

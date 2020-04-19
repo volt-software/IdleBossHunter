@@ -168,10 +168,23 @@ namespace ibh {
     uint32_t constexpr company_stat_gold_id = 2008;
     uint32_t constexpr company_stat_xp_bonus_id = 2009;
 
+    uint32_t constexpr resource_wood_id = 3001;
+    uint32_t constexpr resource_ore_id = 3002;
+    uint32_t constexpr resource_water_id = 3003;
+    uint32_t constexpr resource_plants_id = 3004;
+    uint32_t constexpr resource_clay_id = 3005;
+    uint32_t constexpr resource_gems_id = 3006;
+    uint32_t constexpr resource_paper_id = 3007;
+    uint32_t constexpr resource_ink_id = 3008;
+    uint32_t constexpr resource_metal_id = 3009;
+    uint32_t constexpr resource_bricks_id = 3010;
+    uint32_t constexpr resource_timber_id = 3011;
+
 
     extern array<uint32_t const, 42> const stat_name_ids;
     extern array<uint32_t const, 12> const slot_name_ids;
     extern array<uint32_t const, 9> const company_stat_name_ids;
+    extern array<uint32_t const, 11> const resource_ids;
 
     extern ibh_flat_map<string, uint32_t> stat_name_to_id_mapper;
     extern ibh_flat_map<uint32_t, string> stat_id_to_name_mapper;
@@ -181,4 +194,59 @@ namespace ibh {
     extern ibh_flat_map<uint32_t, string> company_stat_id_to_name_mapper;
 
     void fill_mappers();
+
+    // constants
+    enum class company_member_level : uint16_t {
+        COMPANY_MEMBER = 1,
+        COMPANY_SAGE,
+        COMPANY_ADMIN
+    };
+
+    enum class selectable_actions : uint16_t {
+        COMBAT = 1,
+        WOOD_GATHERING,
+        ORE_GATHERING,
+        WATER_GATHERING,
+        PLANTS_GATHERING,
+        CLAY_GATHERING,
+        PAPER_CRAFTING,
+        INK_CRAFTING,
+        METAL_FORGING,
+        BRICK_FIRING,
+        GEM_CRAFTING,
+        WOOD_WORKING,
+        ITEM_CRAFTING,
+        WORKING,
+    };
+
+    enum class resource_types : uint16_t {
+        // basic
+        WOOD = 1,
+        ORE,
+        WATER,
+        PLANTS,
+        CLAY,
+        GEMS,
+
+
+        // compounds from basic
+        PAPER, // wood + water
+        INK, // water + plants
+        METAL, // ore + water
+        BRICKS, // water + clay
+        TIMBER, // wood
+    };
+
+    enum class item_types : uint16_t {
+        WEAPON = 1,
+        DUAL_HANDED_WEAPON = 1,
+        BODY,
+        LEGS,
+        BOOTS,
+        SHIELD,
+        CAPE,
+        RING,
+        NECKLACE,
+        POTION,
+    };
 }

@@ -32,7 +32,7 @@ TEST_CASE("company buildings repository tests") {
 
     SECTION("company building inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
 
@@ -48,7 +48,7 @@ TEST_CASE("company buildings repository tests") {
 
     SECTION( "update company building" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
 

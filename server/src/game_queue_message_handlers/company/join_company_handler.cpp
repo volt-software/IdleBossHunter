@@ -25,6 +25,7 @@
 #include <repositories/company_members_repository.h>
 #include <repositories/company_member_applications_repository.h>
 #include <game_queue_message_handlers/handler_helpers.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 
@@ -71,7 +72,7 @@ namespace ibh {
                 return false;
             }
 
-            db_company_member new_member{db_company->id, pc.id, COMPANY_MEMBER};
+            db_company_member new_member{db_company->id, pc.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
             if(!company_member_applications_repo.insert(new_member, subtransaction)) {
                 auto new_err_msg = make_unique<join_company_response>("Server error.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});

@@ -32,7 +32,7 @@ TEST_CASE("company stats repository tests") {
 
     SECTION("company stats inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
         db_company_stat stat{0, company.id, 121, 2};
@@ -48,7 +48,7 @@ TEST_CASE("company stats repository tests") {
 
     SECTION( "update stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
         db_company_stat stat{0, company.id, 122, 2};
@@ -67,7 +67,7 @@ TEST_CASE("company stats repository tests") {
 
     SECTION( "get one for company stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
         db_company_stat stat{0, company.id, 123, 2};
@@ -87,7 +87,7 @@ TEST_CASE("company stats repository tests") {
 
     SECTION( "get all for company stats" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
         db_company_stat stat{0, company.id, 125, 2};

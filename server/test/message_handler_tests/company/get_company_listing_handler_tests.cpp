@@ -22,6 +22,7 @@
 #include <messages/company/get_company_listing_request.h>
 #include <messages/company/get_company_listing_response.h>
 #include <repositories/companies_repository.h>
+#include <common_components.h>
 #include "../../custom_server.h"
 
 using namespace std;
@@ -43,7 +44,7 @@ TEST_CASE("get company listing handler tests") {
         d.Parse(&message[0], message.size());
 
         auto transaction = db_pool->create_transaction();
-        db_company new_company{0, "test"};
+        db_company new_company{0, "test", 0, 2};
         companies_repo.insert(new_company, transaction);
         REQUIRE(new_company.id > 0);
 
@@ -54,7 +55,7 @@ TEST_CASE("get company listing handler tests") {
         REQUIRE(new_msg);
         REQUIRE(new_msg->error.empty());
         REQUIRE(!new_msg->companies.empty());
-        auto inserted_company = find_if(begin(new_msg->companies), end(new_msg->companies), [company_name = new_company.name](company const &c){ return c.name == company_name; });
+        auto inserted_company = find_if(begin(new_msg->companies), end(new_msg->companies), [company_name = new_company.name](company_object const &c){ return c.name == company_name; });
         REQUIRE(inserted_company != end(new_msg->companies));
         REQUIRE(inserted_company->name == new_company.name);
     }

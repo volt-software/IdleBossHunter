@@ -54,7 +54,7 @@ optional<monster_definition_component> ibh::load_monsters(string const &file) {
                 spdlog::error("[{}] monster {} could not map stat {}", __FUNCTION__, name, stat);
                 continue;
             }
-            stats.insert(decltype(stats)::value_type{mapper_it->second, d["stats"][stat.c_str()].GetInt64()});
+            stats.emplace(mapper_it->second, d["stats"][stat.c_str()].GetInt64());
             spdlog::trace("[{}] monster {} found stat {}", __FUNCTION__, name, stat);
         } else {
             spdlog::trace("[{}] monster {} missing stat {}", __FUNCTION__, name, stat);

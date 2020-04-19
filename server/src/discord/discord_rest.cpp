@@ -7,7 +7,9 @@
 
 #include "discord_rest.h"
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wduplicated-branches"
+#pragma GCC diagnostic ignored "-Wnull-dereference"
 #include <websocketpp/common/memory.hpp>
 #include <websocketpp/http/response.hpp>
 #include <asio.hpp>

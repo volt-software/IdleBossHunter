@@ -56,6 +56,9 @@ optional<config> ibh::parse_env_file() {
     PARSE_MEMBER("CONNECTION_STRING", connection_string, GetString());
     PARSE_MEMBER("TICK_LENGTH", tick_length, GetUint());
     PARSE_MEMBER("BATTLE_SYSTEM_EACH_N_TICKS", battle_system_each_n_ticks, GetUint());
+    PARSE_MEMBER("NPC_SYSTEM_EACH_N_TICKS", npc_system_each_n_ticks, GetUint());
+    PARSE_MEMBER("RESOURCE_GATHERING_SYSTEM_EACH_N_TICKS", resource_gathering_system_each_n_ticks, GetUint());
+    PARSE_MEMBER("MACHINE_PRODUCTION_SYSTEM_EACH_N_TICKS", machine_production_system_each_n_ticks, GetUint());
     PARSE_MEMBER("LOG_TICK_TIMES", log_tick_times, GetBool());
     PARSE_MEMBER("CERTIFICATE_PASSWORD", certificate_password, GetString());
     PARSE_MEMBER("CERTIFICATE_FILE", certificate_file, GetString());

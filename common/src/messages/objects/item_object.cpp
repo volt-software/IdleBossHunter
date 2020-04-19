@@ -61,6 +61,7 @@ bool ibh::read_item_object_into_vector(rapidjson::Value const &value, vector<ite
     }
 
     vector<stat_component> stats;
+    stats.reserve(stats_array.Size());
     for(rapidjson::SizeType i = 0; i < stats_array.Size(); i++) {
         if(!stats_array[i].IsObject() || !stats_array[i].HasMember("name") || !stats_array[i].HasMember("value")) {
             return false;

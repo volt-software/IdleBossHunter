@@ -29,7 +29,6 @@
 #include "messages/update_response.h"
 #include "ibh_containers.h"
 #include <rendering/imgui/imgui.h>
-#include <rendering/imgui/imgui_internal.h>
 #include "spdlog/spdlog.h"
 #include <SDL.h>
 #include <algorithm>
@@ -67,10 +66,7 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             _show_create = true;
         }
 
-        if(_selected_play_slot < 0 || _waiting_for_reply) {
-            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
-        }
+        disable_buttons_when(_waiting_for_reply || _selected_play_slot < 0);
 
         ImGui::SameLine();
 
@@ -78,18 +74,12 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             _show_delete = true;
         }
 
-        bool pressed_this_frame = false;
         if (ImGui::Button("Play")) {
             send_message<play_character_request>(manager, static_cast<uint32_t>(_selected_play_slot));
             _waiting_for_reply = true;
-            pressed_this_frame = true;
         }
 
-        if (!pressed_this_frame && (_selected_play_slot < 0 || _waiting_for_reply))
-        {
-            ImGui::PopItemFlag();
-            ImGui::PopStyleVar();
-        }
+        reenable_buttons();
     }
     ImGui::End();
 
@@ -106,27 +96,18 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
                 }
             }
 
-            if(_waiting_for_reply) {
-                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
-            }
+            disable_buttons_when(_waiting_for_reply);
 
-            bool pressed_this_frame = false;
             if (ImGui::Button("Yes")) {
                 send_message<delete_character_request>(manager, static_cast<uint32_t>(_selected_play_slot));
                 _waiting_for_reply = true;
-                pressed_this_frame = true;
             }
 
             if (ImGui::Button("No")) {
                 _show_delete = false;
             }
 
-            if (!pressed_this_frame && _waiting_for_reply)
-            {
-                ImGui::PopItemFlag();
-                ImGui::PopStyleVar();
-            }
+            reenable_buttons();
         }
         ImGui::End();
     }
@@ -173,23 +154,14 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             ImGui::EndCombo();
         }
 
-        if(_selected_class.empty() || _selected_race.empty() || strlen(bufcharname) < 2 || _waiting_for_reply) {
-            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5F);
-        }
+        disable_buttons_when(_selected_class.empty() || _selected_race.empty() || strlen(bufcharname) < 2 || _waiting_for_reply);
 
-        bool pressed_this_frame = false;
         if (ImGui::Button("Create")) {
             _waiting_for_reply = true;
-            pressed_this_frame = true;
             send_message<create_character_request>(manager, _selected_slot, bufcharname, _selected_race, _selected_class);
         }
 
-        if (!pressed_this_frame && (_selected_class.empty() || _selected_race.empty() || strlen(bufcharname) < 2 || _waiting_for_reply))
-        {
-            ImGui::PopItemFlag();
-            ImGui::PopStyleVar();
-        }
+        reenable_buttons();
 
         if(!_selected_class.empty() && !_selected_race.empty()) {
             ibh_flat_map<uint64_t, int64_t> combined_stats;
@@ -289,6 +261,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
             }
 
             if(resp_msg->slot == static_cast<uint32_t>(_selected_play_slot)) {
+                manager->get_character() = *std::find_if(begin(_characters), end(_characters), [slot = _selected_play_slot](auto const &c){ return c.slot == static_cast<uint32_t>(slot); });
                 manager->add(make_unique<battle_scene>());
                 _waiting_for_reply = false;
                 _closed = true;

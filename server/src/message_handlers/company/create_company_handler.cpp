@@ -41,7 +41,7 @@ namespace ibh {
         MEASURE_TIME_OF_FUNCTION(trace);
         DESERIALIZE_WITH_PLAYING_CHECK(create_company_request);
 
-        q->enqueue(make_unique<create_company_message>(user_data->connection_id, msg->name));
+        q->enqueue(make_unique<create_company_message>(user_data->connection_id, msg->name, msg->company_type));
     }
 
     template void handle_create_company<server, websocketpp::connection_hdl>(server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction,

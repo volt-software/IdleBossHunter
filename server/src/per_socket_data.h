@@ -18,7 +18,9 @@
 
 #pragma once
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wduplicated-branches"
+#pragma GCC diagnostic ignored "-Wnull-dereference"
 #include <websocketpp/server.hpp>
 #include <websocketpp/client.hpp>
 #include <websocketpp/config/asio.hpp>

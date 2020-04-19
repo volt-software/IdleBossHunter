@@ -50,6 +50,7 @@ include_directories("${EXTERNAL_DIR}/entt/src")
 include_directories("${EXTERNAL_DIR}/pcg-cpp/include")
 include_directories("${EXTERNAL_DIR}/concurrentqueue")
 include_directories("${EXTERNAL_DIR}/cereal/include")
+include_directories("${EXTERNAL_DIR}/magic_enum/include")
 
 target_link_libraries(ibh_common_test PUBLIC ${PQXX_LIBRARY} -lpq)
 target_link_libraries(ibh_common_test PUBLIC -lpthread -lstdc++fs)

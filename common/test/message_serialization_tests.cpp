@@ -56,6 +56,7 @@
 #include <messages/company/reject_application_response.h>
 #include <messages/company/set_tax_request.h>
 #include <messages/company/set_tax_response.h>
+#include <messages/resources/resource_update_response.h>
 
 using namespace std;
 using namespace ibh;
@@ -96,8 +97,8 @@ TEST_CASE("message serialization tests") {
 
     SECTION("login response") {
         vector<character_object> players;
-        players.emplace_back("name", "race", "baseclass", 1, 9, 2, 5, 213, vector<stat_component>{}, vector<item_object>{}, vector<skill_object>{});
-        players.emplace_back("name2", "race2", "baseclass2", 3, 19, 4, 6, 343, vector<stat_component>{}, vector<item_object>{}, vector<skill_object>{});
+        players.emplace_back("name", "race", "baseclass", "company", 1, 9, 2, 5, 213, vector<stat_component>{}, vector<item_object>{}, vector<skill_object>{});
+        players.emplace_back("name2", "race2", "baseclass2", "company2", 3, 19, 4, 6, 343, vector<stat_component>{}, vector<item_object>{}, vector<skill_object>{});
         vector<account_object> users;
         users.emplace_back(false, true, false, 123, 456, "user1");
         users.emplace_back(true, false, true, 890, 342, "user2");
@@ -112,6 +113,7 @@ TEST_CASE("message serialization tests") {
             REQUIRE(msg.characters[i].name == msg2->characters[i].name);
             REQUIRE(msg.characters[i].race == msg2->characters[i].race);
             REQUIRE(msg.characters[i].baseclass == msg2->characters[i].baseclass);
+            REQUIRE(msg.characters[i].company == msg2->characters[i].company);
             REQUIRE(msg.characters[i].level == msg2->characters[i].level);
             REQUIRE(msg.characters[i].slot == msg2->characters[i].slot);
             REQUIRE(msg.characters[i].gold == msg2->characters[i].gold);
@@ -155,10 +157,11 @@ TEST_CASE("message serialization tests") {
     }
 
     SECTION("create character response") {
-        SERDE(create_character_response, character_object("name", "race", "baseclass", 1, 9, 2, 5, 213, vector<stat_component>{}, vector<item_object>{}, vector<skill_object>{}));
+        SERDE(create_character_response, character_object("name", "race", "baseclass", "company", 1, 9, 2, 5, 213, vector<stat_component>{}, vector<item_object>{}, vector<skill_object>{}));
         REQUIRE(msg.character.name == msg2->character.name);
         REQUIRE(msg.character.race == msg2->character.race);
         REQUIRE(msg.character.baseclass == msg2->character.baseclass);
+        REQUIRE(msg.character.company == msg2->character.company);
         REQUIRE(msg.character.level == msg2->character.level);
         REQUIRE(msg.character.slot == msg2->character.slot);
         REQUIRE(msg.character.gold == msg2->character.gold);
@@ -283,8 +286,8 @@ TEST_CASE("message serialization tests") {
 
     SECTION("level up response") {
         ibh_flat_map<uint64_t, stat_component> stats;
-        stats.insert(decltype(stats)::value_type{stat_hp_id, stat_component{stat_hp_id, 10}});
-        stats.insert(decltype(stats)::value_type{stat_mp_id, stat_component{stat_mp_id, 20}});
+        stats.emplace(stat_hp_id, stat_component{stat_hp_id, 10});
+        stats.emplace(stat_mp_id, stat_component{stat_mp_id, 20});
         SERDE(level_up_response, stats, 1, 2);
         REQUIRE(msg2->added_stats.size() == 2);
         auto as1 = msg2->added_stats.find(stat_hp_id);
@@ -338,8 +341,9 @@ TEST_CASE("message serialization tests") {
     }
 
     SECTION("create company request") {
-        SERDE(create_company_request, "company");
+        SERDE(create_company_request, "company", 2);
         REQUIRE(msg2->name == "company");
+        REQUIRE(msg2->company_type == 2);
     }
 
     SECTION("create company response") {
@@ -353,10 +357,10 @@ TEST_CASE("message serialization tests") {
     }
 
     SECTION("get company listing response") {
-        vector<company> companies;
-        vector<bonus> bonuses1;
+        vector<company_object> companies;
+        vector<stat_component> bonuses1;
         vector<string> members1;
-        vector<bonus> bonuses2;
+        vector<stat_component> bonuses2;
         vector<string> members2;
 
         bonuses1.emplace_back(123, 2);
@@ -378,18 +382,18 @@ TEST_CASE("message serialization tests") {
         REQUIRE(msg2->companies[0].members[1] == "m2");
         REQUIRE(msg2->companies[0].bonuses.size() == 2);
         REQUIRE(msg2->companies[0].bonuses[0].stat_id == 123);
-        REQUIRE(msg2->companies[0].bonuses[0].amount == 2);
+        REQUIRE(msg2->companies[0].bonuses[0].value == 2);
         REQUIRE(msg2->companies[0].bonuses[1].stat_id == 234);
-        REQUIRE(msg2->companies[0].bonuses[1].amount == 3);
+        REQUIRE(msg2->companies[0].bonuses[1].value == 3);
         REQUIRE(msg2->companies[1].name == "c2");
         REQUIRE(msg2->companies[1].members.size() == 2);
         REQUIRE(msg2->companies[1].members[0] == "m3");
         REQUIRE(msg2->companies[1].members[1] == "m4");
         REQUIRE(msg2->companies[1].bonuses.size() == 2);
         REQUIRE(msg2->companies[1].bonuses[0].stat_id == 345);
-        REQUIRE(msg2->companies[1].bonuses[0].amount == 4);
+        REQUIRE(msg2->companies[1].bonuses[0].value == 4);
         REQUIRE(msg2->companies[1].bonuses[1].stat_id == 456);
-        REQUIRE(msg2->companies[1].bonuses[1].amount == 5);
+        REQUIRE(msg2->companies[1].bonuses[1].value == 5);
     }
 
     SECTION("increase bonus request") {
@@ -440,6 +444,16 @@ TEST_CASE("message serialization tests") {
     SECTION("set tax response") {
         SERDE(set_tax_response, "error");
         REQUIRE(msg2->error == "error");
+    }
+
+    // resources
+
+    SECTION("resource update response") {
+        SERDE(resource_update_response, 1, 2, 3, 4);
+        REQUIRE(msg2->resource_id == 1);
+        REQUIRE(msg2->resource == 2);
+        REQUIRE(msg2->resource_xp == 3);
+        REQUIRE(msg2->resource_level == 4);
     }
 
     // misc

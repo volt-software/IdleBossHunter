@@ -45,6 +45,7 @@ void censor_sensor::add_dictionary(string const &profanity_dictionary_path) {
         throw runtime_error("deserialize failed");
     }
 
+    _word_tiers.reserve(d.MemberCount());
     for (auto iter = d.MemberBegin(); iter != d.MemberEnd(); ++iter){
         string word = iter->name.GetString();
         string_tolower(word);

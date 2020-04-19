@@ -52,7 +52,7 @@ optional<db_company_member> company_member_applications_repository<transaction_T
         return {};
     }
 
-    auto ret = make_optional<db_company_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), 0);
+    auto ret = make_optional<db_company_member>(result[0][0].as(uint64_t{}), result[0][1].as(uint64_t{}), 0, 0);
 
     spdlog::trace("[{}] found member by company_id {} character_id {}", __FUNCTION__, company_id, character_id);
 
@@ -69,7 +69,7 @@ vector<db_company_member> company_member_applications_repository<transaction_T>:
     members.reserve(result.size());
 
     for(auto const & res : result) {
-        members.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), 0);
+        members.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), 0, 0);
     }
 
     return members;
@@ -85,7 +85,7 @@ vector<db_company_member> company_member_applications_repository<transaction_T>:
     members.reserve(result.size());
 
     for(auto const & res : result) {
-        members.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), 0);
+        members.emplace_back(res[0].as(uint64_t{}), res[1].as(uint64_t{}), 0, 0);
     }
 
     return members;

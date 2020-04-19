@@ -20,7 +20,6 @@
 #include "chat_scene.h"
 #include "show_characters_scene.h"
 #include <rendering/imgui/imgui.h>
-#include <rendering/imgui/imgui_internal.h>
 #include "spdlog/spdlog.h"
 #include <SDL.h>
 #include <messages/user_access/login_request.h>
@@ -54,11 +53,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             register_fasttrack = ImGui::InputTextWithHint("email", "<email>", bufmail, 128, ImGuiInputTextFlags_EnterReturnsTrue);
         }
 
-        if (_waiting_for_reply)
-        {
-            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-        }
+        disable_buttons_when(_waiting_for_reply);
 
         if (ImGui::Button("Register") || register_fasttrack) {
             if(_show_register) {
@@ -82,11 +77,7 @@ void login_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             }
         }
 
-        if (_waiting_for_reply)
-        {
-            ImGui::PopItemFlag();
-            ImGui::PopStyleVar();
-        }
+        reenable_buttons();
     }
     ImGui::End();
 }

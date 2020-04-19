@@ -53,7 +53,7 @@ optional<monster_special_definition_component> ibh::load_monster_specials(string
                 spdlog::error("[{}] monster {} could not map stat {}", __FUNCTION__, name, stat);
                 continue;
             }
-            stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{mapper_it->second, d["multipliers"][stat.c_str()].GetInt64()});
+            stats.emplace(mapper_it->second, d["multipliers"][stat.c_str()].GetInt64());
         }
     }
 

@@ -19,7 +19,9 @@
 #include "main_menu_scene.h"
 #include "settings_menu_scene.h"
 #include "login_menu_scene.h"
-#include "manage_companies_scene.h"
+#include "scenes/gui_scenes/companies/companies_overview_scene.h"
+#include "scenes/gui_scenes/companies/manage_company_scene.h"
+#include "scenes/gui_scenes/companies/create_company_scene.h"
 #include "about_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
@@ -34,8 +36,18 @@ void main_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             manager->add(make_unique<login_menu_scene>());
         }
 
-        if(manager->get_logged_in() && ImGui::MenuItem("Companies")) {
-            manager->add(make_unique<manage_companies_scene>(manager));
+        if (manager->get_logged_in() && ImGui::BeginMenu("Companies")) {
+            if (ImGui::MenuItem("Overview")) {
+                manager->add(make_unique<companies_overview_scene>(manager));
+            }
+
+            if (!manager->get_character()->company.empty() && ImGui::MenuItem(fmt::format("Overview {}", manager->get_character()->company).c_str())) {
+                manager->add(make_unique<manage_company_scene>());
+            }
+
+            if (manager->get_character()->company.empty() && ImGui::MenuItem("Create")) {
+                manager->add(make_unique<create_company_scene>());
+            }
         }
 
         if (ImGui::MenuItem("Settings")) {

@@ -30,18 +30,20 @@ TEST_CASE("companies repository tests") {
 
     SECTION("company inserted correctly" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
 
         auto company2 = companies_repo.get(company.id, transaction);
         REQUIRE(company2->id == company.id);
         REQUIRE(company2->name == company.name);
+        REQUIRE(company2->no_of_shares == company.no_of_shares);
+        REQUIRE(company2->company_type == company.company_type);
     }
 
     SECTION( "update company" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
 
@@ -51,11 +53,13 @@ TEST_CASE("companies repository tests") {
         auto company2 = companies_repo.get(company.id, transaction);
         REQUIRE(company2->id == company.id);
         REQUIRE(company2->name == company.name);
+        REQUIRE(company2->no_of_shares == company.no_of_shares);
+        REQUIRE(company2->company_type == company.company_type);
     }
 
     SECTION( "remove company" ) {
         auto transaction = db_pool->create_transaction();
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
 
@@ -69,7 +73,7 @@ TEST_CASE("companies repository tests") {
         auto transaction = db_pool->create_transaction();
         auto companies_existing = companies_repo.get_all(transaction);
 
-        db_company company{0, "company"};
+        db_company company{0, "company", 0, 2};
         companies_repo.insert(company, transaction);
         REQUIRE(company.id > 0);
 

@@ -27,6 +27,7 @@
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
 #include <messages/company/reject_application_response.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 using namespace ibh;
@@ -53,14 +54,14 @@ TEST_CASE("reject application handler tests") {
         char_repo.insert(company_applicant, transaction);
         REQUIRE(company_applicant.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_ADMIN};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
-        db_company_member new_member{existing_company.id, company_applicant.id, 0};
+        db_company_member new_member{existing_company.id, company_applicant.id, 0, 0};
         REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
         auto entt = registry.create();
@@ -108,14 +109,14 @@ TEST_CASE("reject application handler tests") {
         char_repo.insert(company_applicant, transaction);
         REQUIRE(company_applicant.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_MEMBER};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
-        db_company_member new_member{existing_company.id, company_applicant.id, 0};
+        db_company_member new_member{existing_company.id, company_applicant.id, 0, 0};
         REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
         auto entt = registry.create();

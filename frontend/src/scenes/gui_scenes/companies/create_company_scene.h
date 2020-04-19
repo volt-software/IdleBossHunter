@@ -16,29 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <string>
-#include <rapidjson/document.h>
-#include "messages/message.h"
-
-using namespace std;
+#include "scenes/scene.h"
+#include <messages/company/get_company_listing_response.h>
 
 namespace ibh {
-    struct create_company_request : message {
-        create_company_request(string name, uint16_t company_type) noexcept;
+    class create_company_scene : public scene  {
+    public:
+        explicit create_company_scene();
+        ~create_company_scene() override = default;
 
-        ~create_company_request() noexcept override = default;
-
-        [[nodiscard]]
-        string serialize() const override;
-
-        [[nodiscard]]
-        static unique_ptr<create_company_request> deserialize(rapidjson::Document const &d);
-
-        string name;
-        uint16_t company_type;
-
-        static constexpr uint64_t type = generate_type<create_company_request>();
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
+    private:
+        string _error;
+        string _company_name;
+        bool _waiting_for_reply;
     };
 }

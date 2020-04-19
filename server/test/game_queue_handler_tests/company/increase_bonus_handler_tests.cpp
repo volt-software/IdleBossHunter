@@ -27,12 +27,13 @@
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
 #include <messages/company/increase_bonus_response.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 using namespace ibh;
 
 TEST_CASE("increase bonus handler tests") {
-    SECTION( "rejects application" ) {
+    SECTION( "increases bonus" ) {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
@@ -50,11 +51,11 @@ TEST_CASE("increase bonus handler tests") {
         char_repo.insert(company_admin, transaction);
         REQUIRE(company_admin.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_ADMIN};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
         db_company_stat existing_str_stat{0, existing_company.id, company_stat_str_bonus_id, 5};
@@ -70,15 +71,11 @@ TEST_CASE("increase bonus handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            pc.company_id = existing_company.id;
             registry.assign<pc_component>(entt, move(pc));
-        }
 
-        auto company_entt = registry.create();
-        {
-            company_component company{existing_company.id, existing_company.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
-            registry.assign<company_component>(company_entt, move(company));
+            company_component company{existing_company.id, existing_member.member_level, existing_company.name,
+                                      ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
+            registry.assign<company_component>(entt, move(company));
         }
 
         increase_bonus_message msg(1, company_stat_str_bonus_id);
@@ -92,9 +89,10 @@ TEST_CASE("increase bonus handler tests") {
         REQUIRE(retrieved_stat);
         REQUIRE(retrieved_stat->value == 6);
 
-        auto &company = registry.get<company_component>(company_entt);
+        auto &company = registry.get<company_component>(entt);
         REQUIRE(company.stats.find(msg.bonus_type) != end(company.stats));
-        REQUIRE(company.stats.find(msg.bonus_type)->second == retrieved_stat->value);
+        REQUIRE(company.stats.find(msg.bonus_type)->second == existing_str_stat.value + 1);
+        REQUIRE(retrieved_stat->value == existing_str_stat.value + 1);
         REQUIRE(company.stats.find(company_stat_gold_id) != end(company.stats));
         REQUIRE(company.stats.find(company_stat_gold_id)->second < existing_gold_stat.value);
     }
@@ -117,11 +115,11 @@ TEST_CASE("increase bonus handler tests") {
         char_repo.insert(company_admin, transaction);
         REQUIRE(company_admin.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_MEMBER};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
         db_company_stat existing_str_stat{0, existing_company.id, company_stat_str_bonus_id, 5};
@@ -137,15 +135,11 @@ TEST_CASE("increase bonus handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            pc.company_id = existing_company.id;
             registry.assign<pc_component>(entt, move(pc));
-        }
 
-        auto company_entt = registry.create();
-        {
-            company_component company{existing_company.id, existing_company.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
-            registry.assign<company_component>(company_entt, move(company));
+            company_component company{existing_company.id, existing_member.member_level, existing_company.name,
+                                      ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
+            registry.assign<company_component>(entt, move(company));
         }
 
         increase_bonus_message msg(1, company_stat_str_bonus_id);
@@ -159,9 +153,10 @@ TEST_CASE("increase bonus handler tests") {
         REQUIRE(retrieved_stat);
         REQUIRE(retrieved_stat->value == 5);
 
-        auto &company = registry.get<company_component>(company_entt);
+        auto &company = registry.get<company_component>(entt);
         REQUIRE(company.stats.find(msg.bonus_type) != end(company.stats));
-        REQUIRE(company.stats.find(msg.bonus_type)->second == retrieved_stat->value);
+        REQUIRE(company.stats.find(msg.bonus_type)->second == existing_str_stat.value);
+        REQUIRE(retrieved_stat->value == existing_str_stat.value);
         REQUIRE(company.stats.find(company_stat_gold_id) != end(company.stats));
         REQUIRE(company.stats.find(company_stat_gold_id)->second == existing_gold_stat.value);
     }
@@ -184,11 +179,11 @@ TEST_CASE("increase bonus handler tests") {
         char_repo.insert(company_admin, transaction);
         REQUIRE(company_admin.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_MEMBER};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
         db_company_stat existing_str_stat{0, existing_company.id, company_stat_str_bonus_id, 5};
@@ -204,15 +199,11 @@ TEST_CASE("increase bonus handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            pc.company_id = existing_company.id;
             registry.assign<pc_component>(entt, move(pc));
-        }
 
-        auto company_entt = registry.create();
-        {
-            company_component company{existing_company.id, existing_company.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
-            registry.assign<company_component>(company_entt, move(company));
+            company_component company{existing_company.id, existing_member.member_level, existing_company.name,
+                                      ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
+            registry.assign<company_component>(entt, move(company));
         }
 
         increase_bonus_message msg(1, company_stat_str_bonus_id);
@@ -226,9 +217,10 @@ TEST_CASE("increase bonus handler tests") {
         REQUIRE(retrieved_stat);
         REQUIRE(retrieved_stat->value == 5);
 
-        auto &company = registry.get<company_component>(company_entt);
+        auto &company = registry.get<company_component>(entt);
         REQUIRE(company.stats.find(msg.bonus_type) != end(company.stats));
-        REQUIRE(company.stats.find(msg.bonus_type)->second == retrieved_stat->value);
+        REQUIRE(company.stats.find(msg.bonus_type)->second == existing_str_stat.value);
+        REQUIRE(retrieved_stat->value == existing_str_stat.value);
         REQUIRE(company.stats.find(company_stat_gold_id) != end(company.stats));
         REQUIRE(company.stats.find(company_stat_gold_id)->second == existing_gold_stat.value);
     }

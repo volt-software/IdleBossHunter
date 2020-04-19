@@ -33,9 +33,9 @@ namespace ibh {
             return false;
         }
 
-        auto pc_view = registry.view<pc_component>();
-        for(auto entity : pc_view) {
-            auto &pc = pc_view.get(entity);
+        auto pc_bc_group = registry.view<pc_component>();
+        for(auto entity : pc_bc_group) {
+            auto &pc = pc_bc_group.get<pc_component>(entity);
 
             if(pc.id != enter_msg->character_id) {
                 continue;
@@ -44,12 +44,14 @@ namespace ibh {
             pc.connection_id = enter_msg->connection_id;
             spdlog::trace("[{}] found pc {} for connection id {}", __FUNCTION__, pc.name, pc.connection_id);
 
-            if(pc.battle) {
-                auto mob_hp = pc.battle->monster_stats.find(stat_hp_id);
-                auto mob_max_hp = pc.battle->monster_stats.find(stat_max_hp_id);
-                auto player_hp = pc.battle->total_player_stats.find(stat_hp_id);
-                auto player_max_hp = pc.battle->total_player_stats.find(stat_max_hp_id);
-                auto new_battle_msg = make_unique<new_battle_response>(pc.battle->monster_name, pc.battle->monster_level, mob_hp->second, mob_max_hp->second, player_hp->second, player_max_hp->second);
+            if(registry.has<battle_component>(entity)) {
+                auto &bc = registry.get<battle_component>(entity);
+                auto mob_hp = bc.monster_stats.find(stat_hp_id);
+                auto mob_max_hp = bc.monster_stats.find(stat_max_hp_id);
+                auto player_hp = bc.total_player_stats.find(stat_hp_id);
+                auto player_max_hp = bc.total_player_stats.find(stat_max_hp_id);
+                auto new_battle_msg = make_unique<new_battle_response>(bc.monster_name, bc.monster_level, mob_hp->second, mob_max_hp->second, player_hp->second,
+                                                                       player_max_hp->second);
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_battle_msg)});
             }
 

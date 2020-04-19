@@ -16,9 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "manage_companies_scene.h"
+#include "manage_company_scene.h"
 #include <rendering/imgui/imgui.h>
-#include <rendering/imgui/imgui_internal.h>
 #include "spdlog/spdlog.h"
 #include <messages/generic_error_response.h>
 #include <messages/company/get_company_listing_request.h>
@@ -31,11 +30,10 @@
 using namespace std;
 using namespace ibh;
 
-manage_companies_scene::manage_companies_scene(iscene_manager *manager) : scene(generate_type<manage_companies_scene>()), _error(), _waiting_for_reply(true), _waiting_for_companies(true), _selected_company(), _companies() {
-    send_message<get_company_listing_request>(manager);
+manage_company_scene::manage_company_scene() : scene(generate_type<manage_company_scene>()), _error(), _waiting_for_reply(true), _waiting_for_companies(true), _selected_company(), _companies() {
 }
 
-void manage_companies_scene::update(iscene_manager *manager, TimeDelta dt) {
+void manage_company_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(ImGui::Begin("Companies Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 
         if(!_error.empty()) {
@@ -69,12 +67,7 @@ void manage_companies_scene::update(iscene_manager *manager, TimeDelta dt) {
 
             ImGui::SameLine();
 
-            //TODO refactor this block into generic function in scene
-            if (_waiting_for_reply || _selected_company.empty())
-            {
-                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-            }
+            disable_buttons_when(_waiting_for_reply || _selected_company.empty());
 
             if (ImGui::Button("Join")) {
                 send_message<join_company_request>(manager, _selected_company);
@@ -86,11 +79,12 @@ void manage_companies_scene::update(iscene_manager *manager, TimeDelta dt) {
                 _waiting_for_reply = true;
             }
 
-            if (_waiting_for_reply || _selected_company.empty())
-            {
-                ImGui::PopItemFlag();
-                ImGui::PopStyleVar();
+            if (ImGui::Button("Create")) {
+                send_message<leave_company_request>(manager);
+                _waiting_for_reply = true;
             }
+
+            reenable_buttons();
 
             if (ImGui::Button("Done")) {
                 _closed = true;
@@ -100,7 +94,7 @@ void manage_companies_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void manage_companies_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
+void manage_company_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
     spdlog::trace("[{}] received message {}", __FUNCTION__, type);
     switch (type) {
         case get_company_listing_response::type: {

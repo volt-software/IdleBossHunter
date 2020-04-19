@@ -22,5 +22,23 @@ using namespace std;
 using namespace ibh;
 
 namespace ibh {
+    auto get_stat(decltype(pc_component::stats) &stats, decltype(pc_component::stats)::key_type stat_id) -> decltype(pc_component::stats)::mapped_type& {
+        auto stat = stats.find(stat_id);
+        if(stat == end(stats)) {
+            spdlog::error("[{}] missing {}", __FUNCTION__, stat_id);
+            throw std::runtime_error("missing stat");
+        }
 
+        return stat->second;
+    }
+
+    auto get_stat_or_initialize_default(decltype(pc_component::stats) &stats, decltype(pc_component::stats)::key_type stat_id, decltype(pc_component::stats)::mapped_type default_val) -> decltype(pc_component::stats)::mapped_type& {
+        auto stat = stats.find(stat_id);
+        if(stat == end(stats)) {
+            stats.emplace(stat_id, default_val);
+            stat = stats.find(stat_id);
+        }
+
+        return stat->second;
+    }
 }

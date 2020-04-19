@@ -49,6 +49,7 @@ namespace ibh {
         int get_socket() const override;
         void set_logged_in(bool logged_in) override;
         bool get_logged_in() const override;
+        optional<character_object>& get_character() override;
 
         // scene_system
         void init_main_menu();
@@ -62,6 +63,7 @@ namespace ibh {
         vector<unique_ptr<scene>> _scenes_to_add;
         unique_ptr<scene> _force_goto_scene;
         entt::registry &_es;
+        optional<character_object> _character;
 
         unsigned int _id_counter;
         bool _logged_in;

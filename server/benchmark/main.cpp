@@ -39,6 +39,7 @@
 #include <macros.h>
 #include <on_leaving_scope.h>
 #include <ecs/battle_system.h>
+#include <ecs/resource_system.h>
 
 using namespace std;
 using namespace ibh;
@@ -218,39 +219,82 @@ void bench_battle() {
 
     moodycamel::ConcurrentQueue<outward_message> q;
     entt::registry es;
+    const int entity_count = 10'000;
+    const int simulated_turns = 1'000;
 
-    for(int64_t i = 0; i < 1'000; i++) {
+    for(int64_t i = 0; i < entity_count; i++) {
         auto entt = es.create();
         decltype(monster_definition_component::stats) stats;
+        stats.reserve(stat_name_ids.size());
         for(auto &stat : stat_name_ids) {
-            stats.insert(decltype(monster_definition_component::stats)::value_type{stat, i+1});
+            stats.emplace(stat, i+1);
         }
         es.assign<monster_definition_component>(entt, to_string(i), stats);
     }
 
-    for(int64_t i = 0; i < 1'000; i++) {
+    for(int64_t i = 0; i < entity_count; i++) {
         auto entt = es.create();
         decltype(monster_special_definition_component::stats) stats;
+        stats.reserve(stat_name_ids.size());
         for(auto &stat : stat_name_ids) {
-            stats.insert(decltype(monster_special_definition_component::stats)::value_type{stat, i+1});
+            stats.emplace(stat, i+1);
         }
         es.assign<monster_special_definition_component>(entt, fmt::format("{}", i), stats, false);
     }
 
-    for(int64_t i = 0; i < 1'000; i++) {
+    for(int64_t i = 0; i < entity_count; i++) {
         auto entt = es.create();
         decltype(pc_component::stats) stats;
+        stats.reserve(stat_name_ids.size());
         for(auto &stat : stat_name_ids) {
-            stats.insert(decltype(pc_component::stats)::value_type{stat, i+1});
+            stats.emplace(stat, i+1);
         }
-        es.assign<pc_component>(entt, i, i,  "name", "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
+        es.assign<pc_component>(entt, i, i,  "pc"s + to_string(i), "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
+        es.assign<battle_component>(entt);
     }
 
     battle_system s{1, &q};
 
     {
         MEASURE_TIME_OF_FUNCTION(info);
-        for (int64_t i = 0; i < 1'000 && !quit; i++) {
+        for (int64_t i = 0; i < simulated_turns && !quit; i++) {
+            s.do_tick(es);
+        }
+    }
+}
+
+void bench_resource() {
+    if(quit) {
+        return;
+    }
+
+    moodycamel::ConcurrentQueue<outward_message> q;
+    entt::registry es;
+    const int entity_count = 10'000;
+    const int simulated_turns = 1'000;
+
+    for(int64_t i = 0; i < entity_count; i++) {
+        auto entt = es.create();
+        decltype(pc_component::stats) stats;
+        es.assign<pc_component>(entt, i, i,  "pc"s + to_string(i), "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
+        es.assign<wood_gathering_component>(entt);
+        es.assign<ore_gathering_component>(entt);
+        es.assign<water_gathering_component>(entt);
+        es.assign<plants_gathering_component>(entt);
+        es.assign<clay_gathering_component>(entt);
+        es.assign<gems_gathering_component>(entt);
+        es.assign<paper_gathering_component>(entt);
+        es.assign<ink_gathering_component>(entt);
+        es.assign<metal_gathering_component>(entt);
+        es.assign<bricks_gathering_component>(entt);
+        es.assign<timber_gathering_component>(entt);
+    }
+
+    resource_system s{1, &q};
+
+    {
+        MEASURE_TIME_OF_FUNCTION(info);
+        for (int64_t i = 0; i < simulated_turns && !quit; i++) {
             s.do_tick(es);
         }
     }
@@ -280,18 +324,20 @@ int main(int argc, char **argv) {
         spdlog::error("[{}] sodium init failure", __FUNCTION__);
         return 1;
     }
+    fill_mappers();
 
     entt::registry registry;
-    //load_assets(registry, quit);
+//    load_assets(registry, quit);
 
-    bench_censor_sensor();
-    bench_hashing();
-    bench_hash_verify();
-    bench_serialization();
-    bench_serialization_cereal();
-    bench_rapidjson_without_strlen();
-    bench_rapidjson_with_strlen();
-    bench_random_helper();
-    bench_pcg();
-    //bench_battle();
+//    bench_censor_sensor();
+//    bench_hashing();
+//    bench_hash_verify();
+//    bench_serialization();
+//    bench_serialization_cereal();
+//    bench_rapidjson_without_strlen();
+//    bench_rapidjson_with_strlen();
+//    bench_random_helper();
+//    bench_pcg();
+//    bench_battle();
+    bench_resource();
 }

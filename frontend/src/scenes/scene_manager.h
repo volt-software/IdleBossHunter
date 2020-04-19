@@ -20,6 +20,7 @@
 
 #include <config.h>
 #include <ecs/ecs.h>
+#include <messages/objects/character_object.h>
 
 namespace ibh {
     class scene;
@@ -36,5 +37,6 @@ namespace ibh {
         virtual int get_socket() const = 0;
         virtual void set_logged_in(bool logged_in) = 0;
         virtual bool get_logged_in() const = 0;
+        virtual optional<character_object>& get_character() = 0;
     };
 }

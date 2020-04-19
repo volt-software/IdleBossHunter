@@ -25,10 +25,12 @@
 #include <repositories/company_members_repository.h>
 #include <repositories/company_member_applications_repository.h>
 #include <game_queue_message_handlers/handler_helpers.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 
 namespace ibh {
+
     bool handle_accept_application(queue_message* msg, entt::registry& es, outward_queues& outward_queue, unique_ptr<database_transaction> const &transaction) {
         auto *accept_msg = dynamic_cast<accept_application_message*>(msg);
 
@@ -37,9 +39,9 @@ namespace ibh {
             return false;
         }
 
-        auto pc_view = es.view<pc_component>();
-        for(auto entity : pc_view) {
-            auto &pc = pc_view.get(entity);
+        auto pc_group = es.group<pc_component>(entt::get<company_component>);
+        for(auto entity : pc_group) {
+            auto [pc, cc] = pc_group.get<pc_component, company_component>(entity);
 
             if(pc.connection_id != accept_msg->connection_id) {
                 continue;
@@ -56,7 +58,7 @@ namespace ibh {
                 return false;
             }
 
-            if(company_member->member_level == COMPANY_MEMBER) {
+            if(company_member->member_level == magic_enum::enum_integer(company_member_level::COMPANY_MEMBER)) {
                 auto new_err_msg = make_unique<accept_application_response>("Not an admin");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
                 return false;
@@ -69,7 +71,7 @@ namespace ibh {
                 return false;
             }
 
-            company_application->member_level = COMPANY_MEMBER;
+            company_application->member_level = magic_enum::enum_integer(company_member_level::COMPANY_MEMBER);
             if(!company_members_repo.insert(*company_application, subtransaction)) {
                 auto new_err_msg = make_unique<accept_application_response>("Server error.");
                 outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
@@ -82,29 +84,18 @@ namespace ibh {
             auto new_err_msg = make_unique<accept_application_response>("");
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
 
-            auto company_view = es.view<company_component>();
-            for(auto company_entity : company_view) {
-                auto &company = company_view.get(company_entity);
-
-                if(company.id != company_member->company_id) {
-                    continue;
-                }
-
-                company.members.emplace(company_application->character_id, COMPANY_MEMBER);
-
-                auto accepted_player = get_player_entity(company_application->character_id, es);
-                if(accepted_player != nullptr) {
-                    send_message_to_all_company_members(company, pc.name, fmt::format("{} got accepted into the company!", accepted_player->name), "system-company", es, outward_queue);
-                } else {
-                    spdlog::error("[{}] Couldn't find recently accepted player {}", __FUNCTION__, company_application->character_id);
-                }
-
-                spdlog::trace("[{}] accepted applicant {} company {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, company_member->company_id, pc.name, pc.connection_id);
-
-                return true;
+            auto accepted_player = get_player_entity(company_application->character_id, es);
+            if(accepted_player.has_value()) {
+                es.assign<company_component>(*accepted_player, cc);
+                auto &pc =es.get<pc_component>(*accepted_player);
+                send_message_to_all_company_members(cc, pc.name, fmt::format("{} got accepted into the company!", pc.name), "system-company", es, outward_queue);
+            } else {
+                spdlog::error("[{}] Couldn't find recently accepted player {}", __FUNCTION__, company_application->character_id);
             }
 
-            spdlog::trace("[{}] could not find company id {} for player {}", __FUNCTION__, company_member->company_id, pc.id);
+            spdlog::trace("[{}] accepted applicant {} company {} by pc {} connection id {}", __FUNCTION__, accept_msg->applicant_id, company_member->company_id, pc.name, pc.connection_id);
+
+            return true;
         }
 
         spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, accept_msg->connection_id);

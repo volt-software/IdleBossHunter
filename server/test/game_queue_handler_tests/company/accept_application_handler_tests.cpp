@@ -27,6 +27,7 @@
 #include <repositories/characters_repository.h>
 #include <repositories/users_repository.h>
 #include <messages/company/accept_application_response.h>
+#include <magic_enum.hpp>
 
 using namespace std;
 using namespace ibh;
@@ -53,29 +54,34 @@ TEST_CASE("accept application handler tests") {
         char_repo.insert(company_applicant, transaction);
         REQUIRE(company_applicant.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_ADMIN};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
-        db_company_member new_member{existing_company.id, company_applicant.id, 0};
+        db_company_member new_member{existing_company.id, company_applicant.id, 0, 0};
         REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
-        auto entt = registry.create();
+        auto existing_entt = registry.create();
         {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.assign<pc_component>(existing_entt, move(pc));
+
+            company_component company{existing_company.id, existing_member.member_level, existing_company.name,
+                                      ibh_flat_map<uint32_t, int64_t>{}};
+            registry.assign<company_component>(existing_entt, move(company));
         }
 
-        auto company_entt = registry.create();
+        auto new_entt = registry.create();
         {
-            company_component company{existing_company.id, existing_company.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{}};
-            registry.assign<company_component>(company_entt, move(company));
+            pc_component pc{};
+            pc.id = company_admin.id+1;
+            pc.connection_id = 2;
+            registry.assign<pc_component>(new_entt, move(pc));
         }
 
         accept_application_message msg(1, company_applicant.id);
@@ -93,9 +99,18 @@ TEST_CASE("accept application handler tests") {
         auto member_it = find_if(begin(all_members), end(all_members), [&](const auto &m){ return m.character_id == company_applicant.id; });
         REQUIRE(member_it != end(all_members));
 
-        auto &company = registry.get<company_component>(company_entt);
-        REQUIRE(company.members.size() == 2);
-        REQUIRE(company.members.find(company_applicant.id) != end(company.members));
+        int company_count = 0;
+        bool applicant_found = false;
+        auto company_view = registry.view<pc_component, company_component>();
+        for(auto entity : company_view) {
+            auto [pc, cc] = company_view.get<pc_component, company_component>(entity);
+            company_count++;
+            if(pc.id == company_applicant.id) {
+                applicant_found = true;
+            }
+        }
+        REQUIRE(company_count == 2);
+        REQUIRE(applicant_found == true);
     }
 
     SECTION( "rejects attempt when missing admin rights" ) {
@@ -119,29 +134,34 @@ TEST_CASE("accept application handler tests") {
         char_repo.insert(company_applicant, transaction);
         REQUIRE(company_applicant.id > 0);
 
-        db_company existing_company{0, "test_company"};
+        db_company existing_company{0, "test_company", 0, 2};
         company_repo.insert(existing_company, transaction);
         REQUIRE(existing_company.id > 0);
 
-        db_company_member existing_member{existing_company.id, company_admin.id, COMPANY_MEMBER};
+        db_company_member existing_member{existing_company.id, company_admin.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_members_repo.insert(existing_member, transaction) == true);
 
-        db_company_member new_member{existing_company.id, company_applicant.id, 0};
+        db_company_member new_member{existing_company.id, company_applicant.id, 0, 0};
         REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
-        auto entt = registry.create();
+        auto existing_entt = registry.create();
         {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.assign<pc_component>(existing_entt, move(pc));
+
+            company_component company{existing_company.id, existing_member.member_level, existing_company.name,
+                                      ibh_flat_map<uint32_t, int64_t>{}};
+            registry.assign<company_component>(existing_entt, move(company));
         }
 
-        auto company_entt = registry.create();
+        auto new_entt = registry.create();
         {
-            company_component company{existing_company.id, existing_company.name, ibh_flat_map<uint64_t, uint16_t>{{existing_member.character_id, existing_member.member_level}},
-                                ibh_flat_map<uint32_t, int64_t>{}};
-            registry.assign<company_component>(company_entt, move(company));
+            pc_component pc{};
+            pc.id = company_admin.id+1;
+            pc.connection_id = 2;
+            registry.assign<pc_component>(new_entt, move(pc));
         }
 
         accept_application_message msg(1, company_applicant.id);
@@ -159,8 +179,17 @@ TEST_CASE("accept application handler tests") {
         auto member_it = find_if(begin(all_members), end(all_members), [&](const auto &m){ return m.character_id == company_applicant.id; });
         REQUIRE(member_it == end(all_members));
 
-        auto &company = registry.get<company_component>(company_entt);
-        REQUIRE(company.members.size() == 1);
-        REQUIRE(company.members.find(company_applicant.id) == end(company.members));
+        int company_count = 0;
+        bool applicant_found = false;
+        auto company_view = registry.view<pc_component, company_component>();
+        for(auto entity : company_view) {
+            auto [pc, cc] = company_view.get<pc_component, company_component>(entity);
+            company_count++;
+            if(pc.id == company_applicant.id) {
+                applicant_found = true;
+            }
+        }
+        REQUIRE(company_count == 1);
+        REQUIRE(applicant_found == false);
     }
 }

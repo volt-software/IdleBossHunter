@@ -36,9 +36,9 @@ namespace ibh {
             return false;
         }
 
-        auto pc_view = es.view<pc_component>();
-        for(auto entity : pc_view) {
-            auto &pc = pc_view.get(entity);
+        auto pc_group = es.group<pc_component>(entt::get<company_component>);
+        for(auto entity : pc_group) {
+            auto [pc, cc] = pc_group.get<pc_component, company_component>(entity);
 
             if(pc.connection_id != leave_msg->connection_id) {
                 continue;
@@ -61,22 +61,15 @@ namespace ibh {
             outward_queue.enqueue(outward_message{pc.connection_id, move(new_err_msg)});
             subtransaction->commit();
 
-            auto company_view = es.view<company_component>();
-            for(auto company_entity : company_view) {
-                auto &company = company_view.get(company_entity);
-
-                if (company.id != pc.company_id) {
-                    continue;
-                }
-
-                company.members.erase(pc.id);
-            }
+            es.remove<company_component>(entity);
 
             spdlog::trace("[{}] left company {} for pc {} for connection id {}", __FUNCTION__, company_member->company_id, pc.name, pc.connection_id);
 
             return true;
         }
 
+        auto new_err_msg = make_unique<leave_company_response>("Not a member of a company");
+        outward_queue.enqueue(outward_message{leave_msg->connection_id, move(new_err_msg)});
         spdlog::trace("[{}] could not find conn id {}", __FUNCTION__, leave_msg->connection_id);
 
         return false;

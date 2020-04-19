@@ -34,7 +34,7 @@ TEST_CASE("create company handler tests") {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        create_company_message msg(1, "company_name");
+        create_company_message msg(1, "company_name", 2);
         companies_repository<database_transaction> company_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
@@ -53,7 +53,7 @@ TEST_CASE("create company handler tests") {
             pc_component pc{};
             pc.id = player.id;
             pc.connection_id = 1;
-            pc.stats.insert({stat_gold_id, 10'001});
+            pc.stats.emplace(stat_gold_id, 10'001);
             registry.assign<pc_component>(entt, move(pc));
         }
 
@@ -74,7 +74,7 @@ TEST_CASE("create company handler tests") {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        create_company_message msg(1, "company_name");
+        create_company_message msg(1, "company_name", 2);
         companies_repository<database_transaction> company_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
@@ -93,7 +93,7 @@ TEST_CASE("create company handler tests") {
             pc_component pc{};
             pc.id = player.id;
             pc.connection_id = 1;
-            pc.stats.insert({stat_gold_id, 9'999});
+            pc.stats.emplace(stat_gold_id, 9'999);
             registry.assign<pc_component>(entt, move(pc));
         }
 
@@ -114,7 +114,7 @@ TEST_CASE("create company handler tests") {
         entt::registry registry;
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);
-        create_company_message msg(1, "company_name_exists");
+        create_company_message msg(1, "company_name_exists", 2);
         companies_repository<database_transaction> company_repo{};
         characters_repository<database_transaction> char_repo{};
         users_repository<database_transaction> user_repo{};
@@ -136,7 +136,7 @@ TEST_CASE("create company handler tests") {
             pc_component pc{};
             pc.id = player.id;
             pc.connection_id = 1;
-            pc.stats.insert({stat_gold_id, 10'001});
+            pc.stats.emplace(stat_gold_id, 10'001);
             registry.assign<pc_component>(entt, move(pc));
         }
 

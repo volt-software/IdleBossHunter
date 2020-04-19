@@ -18,8 +18,8 @@
 
 #include "character_object.h"
 
-ibh::character_object::character_object(string name, string race, string baseclass, uint64_t level, uint32_t slot, uint64_t gold, uint64_t xp, uint64_t skill_points, vector<stat_component> stats, vector<item_object> items, vector<skill_object> skills) noexcept :
-name(move(name)), race(move(race)), baseclass(move(baseclass)), level(level), slot(slot), gold(gold), xp(xp), skill_points(skill_points), stats(move(stats)), items(move(items)), skills(move(skills)) {}
+ibh::character_object::character_object(string name, string race, string baseclass, string company, uint64_t level, uint32_t slot, uint64_t gold, uint64_t xp, uint64_t skill_points, vector<stat_component> stats, vector<item_object> items, vector<skill_object> skills) noexcept :
+name(move(name)), race(move(race)), baseclass(move(baseclass)), company(move(company)), level(level), slot(slot), gold(gold), xp(xp), skill_points(skill_points), stats(move(stats)), items(move(items)), skills(move(skills)) {}
 
 void ibh::write_character_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, character_object const &obj) {
     writer.String(KEY_STRING("name"));
@@ -30,6 +30,9 @@ void ibh::write_character_object(rapidjson::Writer<rapidjson::StringBuffer> &wri
 
     writer.String(KEY_STRING("baseclass"));
     writer.String(obj.baseclass.c_str(), obj.baseclass.size());
+
+    writer.String(KEY_STRING("company"));
+    writer.String(obj.company.c_str(), obj.company.size());
 
     writer.String(KEY_STRING("level"));
     writer.Uint64(obj.level);
@@ -81,6 +84,7 @@ void ibh::write_character_object(rapidjson::Writer<rapidjson::StringBuffer> &wri
 bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vector<character_object> &objs) {
     if(!value.IsObject() || !value.HasMember("name") ||
        !value.HasMember("race") || !value.HasMember("baseclass") ||
+       !value.HasMember("company") ||
        !value.HasMember("level") || !value.HasMember("gold") ||
        !value.HasMember("slot") || !value.HasMember("stats") ||
        !value.HasMember("xp") || !value.HasMember("skill_points") ||
@@ -104,6 +108,7 @@ bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vecto
     }
 
     vector<stat_component> stats;
+    stats.reserve(stats_array.Size());
     for(rapidjson::SizeType i = 0; i < stats_array.Size(); i++) {
         if(!stats_array[i].IsObject() || !stats_array[i].HasMember("name") || !stats_array[i].HasMember("value")) {
             return false;
@@ -113,6 +118,7 @@ bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vecto
     }
 
     vector<item_object> items;
+    items.reserve(items_array.Size());
     for(rapidjson::SizeType i = 0; i < items_array.Size(); i++) {
         if(!read_item_object_into_vector(items_array[i], items)) {
             return false;
@@ -120,13 +126,14 @@ bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vecto
     }
 
     vector<skill_object> skills;
+    skills.reserve(skills_array.Size());
     for(rapidjson::SizeType i = 0; i < skills_array.Size(); i++) {
         if(!read_skill_object_into_vector(skills_array[i], skills)) {
             return false;
         }
     }
 
-    objs.emplace_back(value["name"].GetString(), value["race"].GetString(), value["baseclass"].GetString(),
+    objs.emplace_back(value["name"].GetString(), value["race"].GetString(), value["baseclass"].GetString(), value["company"].GetString(),
                       value["level"].GetUint64(), value["slot"].GetUint(), value["gold"].GetUint64(), value["xp"].GetUint64(), value["skill_points"].GetUint64(), move(stats), move(items), move(skills));
     return true;
 }

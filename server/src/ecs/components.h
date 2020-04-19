@@ -23,8 +23,10 @@
 #include <array>
 #include <vector>
 #include <optional>
+#include <type_traits>
 #include <ibh_containers.h>
 #include <entt/entity/registry.hpp>
+#include <spdlog/spdlog.h>
 #include "common_components.h"
 
 using namespace std;
@@ -128,18 +130,20 @@ namespace ibh {
 
     struct company_component {
         uint64_t id;
+        uint16_t member_level;
         string name;
-        ibh_flat_map<uint64_t, uint16_t> members;
         ibh_flat_map<uint32_t, int64_t> stats;
     };
 
     struct battle_component {
+        bool done;
         string monster_name;
         uint32_t monster_level;
         ibh_flat_map<uint32_t, int64_t> monster_stats;
         ibh_flat_map<uint32_t, int64_t> total_player_stats;
 
-        battle_component(string monster_name, uint32_t monster_level, ibh_flat_map<uint32_t, int64_t> monster_stats) : monster_name(move(monster_name)), monster_level(monster_level), monster_stats(move(monster_stats)) {}
+        battle_component() : done(true), monster_name(), monster_level(), monster_stats(), total_player_stats() {}
+        battle_component(string monster_name, uint32_t monster_level, ibh_flat_map<uint32_t, int64_t> monster_stats) : done(false), monster_name(move(monster_name)), monster_level(monster_level), monster_stats(move(monster_stats)) {}
     };
 
     struct pc_component {
@@ -153,9 +157,6 @@ namespace ibh {
 
         uint64_t level;
         uint64_t skill_points;
-        uint64_t company_id;
-
-        optional<battle_component> battle;
 
         ibh_flat_map<uint32_t, int64_t> stats;
         ibh_flat_map<uint32_t, item_component> equipped_items;
@@ -163,10 +164,10 @@ namespace ibh {
         ibh_flat_map<string, skill_component> skills;
 
         pc_component() : id(), connection_id(), name(), race(), dir(), _class(), spawn_message(),
-                          level(), skill_points(), company_id(), stats(), equipped_items(), inventory(), skills() {}
+                          level(), skill_points(), stats(), equipped_items(), inventory(), skills() {}
         pc_component(uint64_t id, uint64_t connection_id, string name, string race, string dir, string _class, string spawn_message, uint64_t level, uint64_t skill_points, ibh_flat_map<uint32_t, int64_t> stats, ibh_flat_map<uint32_t, item_component> equipped_items, vector<item_component> inventory, ibh_flat_map<string, skill_component> skills)
         : id(id), connection_id(connection_id), name(move(name)), race(move(race)), dir(move(dir)), _class(move(_class)), spawn_message(move(spawn_message)),
-                          level(level), skill_points(skill_points), company_id(), stats(move(stats)), equipped_items(move(equipped_items)), inventory(move(inventory)), skills(move(skills)) {}
+                          level(level), skill_points(skill_points), stats(move(stats)), equipped_items(move(equipped_items)), inventory(move(inventory)), skills(move(skills)) {}
     };
 
     struct user_component {
@@ -182,14 +183,26 @@ namespace ibh {
         vector<pc_component> characters;
     };
 
-    // helper functions
+    struct wood_gathering_component {};
+    struct ore_gathering_component {};
+    struct water_gathering_component {};
+    struct plants_gathering_component {};
+    struct clay_gathering_component {};
+    struct gems_gathering_component {};
+    struct paper_gathering_component {};
+    struct ink_gathering_component {};
+    struct metal_gathering_component {};
+    struct bricks_gathering_component {};
+    struct timber_gathering_component {};
 
+    // helper functions
+    [[nodiscard]]
+    auto get_stat(decltype(pc_component::stats) &stats, decltype(pc_component::stats)::key_type stat_id) -> decltype(pc_component::stats)::mapped_type&;
+
+    auto get_stat_or_initialize_default(decltype(pc_component::stats) &stats, decltype(pc_component::stats)::key_type stat_id, decltype(pc_component::stats)::mapped_type default_val) -> decltype(pc_component::stats)::mapped_type&;
 
     // constants
 
     // company member levels
-    constexpr uint32_t COMPANY_ADMIN = 3;
-    constexpr uint32_t COMPANY_SAGE = 2;
-    constexpr uint32_t COMPANY_MEMBER = 1;
 
 }

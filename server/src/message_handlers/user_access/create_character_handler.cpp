@@ -153,7 +153,7 @@ namespace ibh {
         subtransaction->commit();
 
 
-        create_character_response response{character_object{new_player.name, new_player.race, new_player._class,
+        create_character_response response{character_object{new_player.name, new_player.race, new_player._class, "",
                                                             new_player.level, new_player.slot, new_player.gold, new_player.xp, new_player.skill_points, move(player_stats), {}, {}}};
         auto response_msg = response.serialize();
         s->send(user_data->ws, response_msg, websocketpp::frame::opcode::value::TEXT);

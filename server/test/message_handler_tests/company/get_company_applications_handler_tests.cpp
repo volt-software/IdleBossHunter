@@ -28,6 +28,7 @@
 #include <repositories/characters_repository.h>
 #include <ecs/components.h>
 #include "../../custom_server.h"
+#include <magic_enum.hpp>
 
 using namespace std;
 using namespace ibh;
@@ -52,7 +53,7 @@ TEST_CASE("get company applications handler tests") {
         d.Parse(&message[0], message.size());
 
         auto transaction = db_pool->create_transaction();
-        db_company new_company{0, "test"};
+        db_company new_company{0, "test", 0, 2};
         companies_repo.insert(new_company, transaction);
         REQUIRE(new_company.id > 0);
         db_user new_user{};
@@ -66,9 +67,9 @@ TEST_CASE("get company applications handler tests") {
         requesting_char.name = "requesting_char_name";
         chars_repo.insert(requesting_char, transaction);
         REQUIRE(requesting_char.id > 0);
-        db_company_member requesting_member{new_company.id, requesting_char.id, COMPANY_SAGE};
+        db_company_member requesting_member{new_company.id, requesting_char.id, magic_enum::enum_integer(company_member_level::COMPANY_SAGE), 0};
         REQUIRE(company_members_repo.insert(requesting_member, transaction) == true);
-        db_company_member new_member{new_company.id, new_char.id, COMPANY_MEMBER};
+        db_company_member new_member{new_company.id, new_char.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
         user_data.playing_character_slot = 0;
@@ -105,7 +106,7 @@ TEST_CASE("get company applications handler tests") {
         d.Parse(&message[0], message.size());
 
         auto transaction = db_pool->create_transaction();
-        db_company new_company{0, "test"};
+        db_company new_company{0, "test", 0, 2};
         companies_repo.insert(new_company, transaction);
         REQUIRE(new_company.id > 0);
         db_user new_user{};
@@ -119,9 +120,9 @@ TEST_CASE("get company applications handler tests") {
         requesting_char.name = "requesting_char_name";
         chars_repo.insert(requesting_char, transaction);
         REQUIRE(requesting_char.id > 0);
-        db_company_member requesting_member{new_company.id, requesting_char.id, COMPANY_MEMBER};
+        db_company_member requesting_member{new_company.id, requesting_char.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_members_repo.insert(requesting_member, transaction) == true);
-        db_company_member new_member{new_company.id, new_char.id, COMPANY_MEMBER};
+        db_company_member new_member{new_company.id, new_char.id, magic_enum::enum_integer(company_member_level::COMPANY_MEMBER), 0};
         REQUIRE(company_applications_repo.insert(new_member, transaction) == true);
 
         user_data.playing_character_slot = 0;

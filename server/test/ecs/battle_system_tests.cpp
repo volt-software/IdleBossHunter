@@ -29,10 +29,10 @@ void simulate_battle(pc_component &pc, entt::registry &es, ibh::outward_queues *
 TEST_CASE("set hp/mp test") {
     pc_component pc{};
     ibh_flat_map<uint32_t, int64_t> stats;
-    stats.insert(ibh_flat_map<uint32_t , int64_t>::value_type{stat_hp_id, 10});
-    stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat_mp_id, 10});
-    stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat_str_id, 10});
-    stats.insert(ibh_flat_map<uint32_t, int64_t>::value_type{stat_vit_id, 10});
+    stats.emplace(stat_hp_id, 10);
+    stats.emplace(stat_mp_id, 10);
+    stats.emplace(stat_str_id, 10);
+    stats.emplace(stat_vit_id, 10);
     set_hp_mp(pc, stats);
     auto hp = stats.find(stat_hp_id);
     auto max_hp = stats.find(stat_max_hp_id);

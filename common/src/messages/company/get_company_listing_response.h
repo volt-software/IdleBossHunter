@@ -21,26 +21,14 @@
 #include <string>
 #include <rapidjson/document.h>
 #include "messages/message.h"
+#include <messages/objects//company_object.h>
 
 using namespace std;
 
 namespace ibh {
-    struct bonus {
-        uint64_t stat_id;
-        uint64_t amount;
-
-        bonus(uint64_t stat_id, uint64_t amount) noexcept : stat_id(stat_id), amount(amount) {}
-    };
-    struct company {
-        string name;
-        vector<string> members;
-        vector<bonus> bonuses;
-
-        company(string name, vector<string> members, vector<bonus> bonuses) noexcept : name(move(name)), members(move(members)), bonuses(move(bonuses)) {}
-    };
 
     struct get_company_listing_response : message {
-        explicit get_company_listing_response(string error, vector<company> companies) noexcept;
+        explicit get_company_listing_response(string error, vector<company_object> companies) noexcept;
 
         ~get_company_listing_response() noexcept override = default;
 
@@ -51,7 +39,7 @@ namespace ibh {
         static unique_ptr<get_company_listing_response> deserialize(rapidjson::Document const &d);
 
         string error;
-        vector<company> companies;
+        vector<company_object> companies;
 
         static constexpr uint64_t type = generate_type<get_company_listing_response>();
     };
