@@ -157,14 +157,12 @@ context_ptr on_tls_init(ibh::config const &config, websocketpp::connection_hdl h
                          asio::ssl::context::no_tlsv1 |
                          asio::ssl::context::no_tlsv1_1 |
                          asio::ssl::context::single_dh_use);
-        //ctx->set_password_callback(bind(&get_password, config, ::_1, ::_2));
+#ifdef __EMSCRIPTEN__
+        ctx->set_verify_mode(asio::ssl::verify_peer);
+#else
         ctx->set_verify_mode(asio::ssl::verify_none);
-//
-//        std::string ciphers = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK";;
-//
-//        if (SSL_CTX_set_cipher_list(ctx->native_handle(), ciphers.c_str()) != 1) {
-//            spdlog::error("[{}] error setting cipher list", __FUNCTION__);
-//        }
+#endif
+
     } catch (std::exception &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
     }
@@ -181,7 +179,7 @@ void on_open(ibh::client *c, entt::entity entt, entt::registry *es, ibh::scene_s
         }
 
         auto &socket = ss->get_socket();
-        socket.hdl = hdl;
+        socket.hdl = move(hdl);
         ss->set_connected(true);
     } catch (exception const &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());

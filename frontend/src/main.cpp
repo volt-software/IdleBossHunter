@@ -121,8 +121,10 @@ void close(atomic<bool> &quit) noexcept
     SDL_DestroyWindow(window);
     window = nullptr;
 
-    IMG_Quit();
+    Mix_CloseAudio();
 
+    IMG_Quit();
+    Mix_Quit();
     SDL_Quit();
     quit = true;
 }
@@ -184,11 +186,6 @@ int main(int argc, char* argv[]) {
     scene_system ss(&config, es);
 
     init_sdl(config);
-#ifdef __EMSCRIPTEN__
-    init_net(config, es, ss);
-#else
-    auto net_thread = init_net(config, es, ss);
-#endif
     init_sdl_image();
     init_sdl_mixer(config);
 
@@ -228,6 +225,12 @@ int main(int argc, char* argv[]) {
     rendering_system rs(&config, window, context);
     ss.init_connection_screen();
     bool previousCapture = false;
+
+#ifdef __EMSCRIPTEN__
+    init_net(config, es, ss);
+#else
+    auto net_thread = init_net(config, es, ss);
+#endif
 
     loop = [&] {
         try {
@@ -285,6 +288,11 @@ int main(int argc, char* argv[]) {
                             spdlog::info("Resize to {}x{}", config.screen_width, config.screen_height);
                             projection = glm::ortho(0.0F, (float) config.screen_width, (float) config.screen_height,
                                                     0.0F, -1.0F, 1.0F);
+#ifndef __EMSCRIPTEN__
+                            glViewport(0, 0, config.screen_width, config.screen_height);
+                            glMatrixMode(GL_PROJECTION);
+                            gluOrtho2D(0, config.screen_height, config.screen_width, 0);
+#endif
                         }
                         break;
                     }
@@ -351,9 +359,10 @@ int main(int argc, char* argv[]) {
                 Mix_PlayMusic(mus2, -1);
             }
 
+            auto prev = bench_timer.get_ticks();
             bench_timer.start();
-            rs.update(es, 1);
-            ss.update(es, 1);
+            rs.update(es, prev);
+            ss.update(es, prev);
             rs.end_rendering();
 
             if (config.log_fps) {

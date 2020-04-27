@@ -22,4 +22,4 @@
 
 void print_shader_log(GLuint const shader) noexcept;
 void print_program_log(GLuint const program) noexcept;
-std::optional<GLuint> const load_shader_from_file(std::string const & path, GLenum const shaderType) noexcept;
+[[nodiscard]] std::optional<GLuint> const load_shader_from_file(std::string const & path, GLenum const shaderType) noexcept;

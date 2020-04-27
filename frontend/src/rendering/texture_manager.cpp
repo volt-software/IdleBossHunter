@@ -83,7 +83,7 @@ texture ibh::create_texture_from_image(string const & image) {
     spdlog::info("[{}] size {}x{}", __FUNCTION__, surface->w, surface->h);
 
     uint32_t alignment = 8;
-    spdlog::info("[{}] surface->pitch {}x{}", __FUNCTION__, surface->pitch);
+    spdlog::info("[{}] surface->pitch {}", __FUNCTION__, surface->pitch);
     while (surface->pitch % alignment) { // x%1==0 for any x
         alignment >>= 1;
     }

@@ -45,11 +45,11 @@ namespace ibh {
 
         void render() const noexcept;
         void set_projection(glm::mat4 &projection) noexcept;
-        uint32_t add_data_object(sprite *sprite);
-        bool update_data_object(sprite *sprite);
+        [[nodiscard]] uint32_t add_data_object(sprite *sprite);
+        void update_data_object(sprite *sprite);
         void remove_data_object(sprite *sprite);
-        uint32_t texture_width() const noexcept;
-        uint32_t texture_height() const noexcept;
+        [[nodiscard]] uint32_t texture_width() const noexcept;
+        [[nodiscard]] uint32_t texture_height() const noexcept;
 
     private:
         std::string const _image;

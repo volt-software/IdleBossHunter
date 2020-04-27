@@ -16,10 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <entt/entity/registry.hpp>
+#include "../scene.h"
+#include <memory>
 
 namespace ibh {
-    using TimeDelta = uint64_t;
+    class texture_atlas;
+    class sprite;
+
+    class background_scene : public scene  {
+    public:
+        background_scene();
+        ~background_scene() override;
+
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
+
+    private:
+        std::vector<std::shared_ptr<texture_atlas>> _atlasses;
+        std::vector<std::unique_ptr<sprite>> _sprites;
+        uint32_t _microseconds_between_switch;
+        uint32_t _microsecond_count;
+        uint32_t _bg_to_render;
+    };
 }

@@ -39,8 +39,8 @@ namespace ibh {
 
         ~sprite() noexcept;
         void set_position(glm::vec4 &position) noexcept;
-        glm::vec4 get_position() noexcept;
-        std::array<GLfloat, 24> get_vertex_data();
+        [[nodiscard]] glm::vec4 get_position() noexcept;
+        [[nodiscard]] std::array<GLfloat, 24> get_vertex_data();
 
         uint32_t _vertex_data_position;
     private:

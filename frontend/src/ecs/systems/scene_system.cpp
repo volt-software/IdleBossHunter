@@ -21,6 +21,7 @@
 #include <scenes/gui_scenes/alpha_window_scene.h>
 #include <scenes/gui_scenes/main_menu_scene.h>
 #include <scenes/gui_scenes/connecting_scene.h>
+#include <scenes/gui_scenes/background_scene.h>
 #include <messages/chat/message_response.h>
 #include <messages/user_access/login_response.h>
 #include <messages/user_access/character_select_response.h>
@@ -114,14 +115,24 @@ config * scene_system::get_config() {
 }
 
 void scene_system::init_connection_screen() {
-    auto connecting_menu = make_unique<connecting_scene>();
-    connecting_menu->_id = _id_counter++;
-    spdlog::info("connecting menu id {}", connecting_menu->_id);
-    _scenes.push_back(move(connecting_menu));
+    auto background = make_unique<background_scene>();
+    background->_id = _id_counter++;
+    spdlog::info("background id {}", background->_id);
+    _scenes.push_back(move(background));
+    auto connecting = make_unique<connecting_scene>();
+    connecting->_id = _id_counter++;
+    spdlog::info("connecting id {}", connecting->_id);
+    _scenes.push_back(move(connecting));
 }
 
 void scene_system::init_main_menu() {
-    _scenes[0]->_closed = true;
+    scoped_lock sg(_m);
+    for(auto const &scene : _scenes) {
+        if(scene->_id == 0) {
+            continue;
+        }
+        _scenes_to_erase.emplace_back(scene->_id);
+    }
     auto main_menu = make_unique<main_menu_scene>();
     main_menu->_id = _id_counter++;
     spdlog::info("main menu id {}", main_menu->_id);

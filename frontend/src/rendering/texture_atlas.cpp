@@ -150,7 +150,7 @@ uint32_t ibh::texture_atlas::add_data_object(sprite *sprite) {
     return i;
 }
 
-bool ibh::texture_atlas::update_data_object(sprite *sprite) {
+void ibh::texture_atlas::update_data_object(sprite *sprite) {
     if(sprite->_vertex_data_position > _capacity) {
         spdlog::error("[texture_atlas] update_data_object position out of bounds, got {} expected less than {}", sprite->_vertex_data_position, _capacity);
         throw runtime_error("[texture_atlas] update_data_object position out of bounds");
@@ -159,8 +159,6 @@ bool ibh::texture_atlas::update_data_object(sprite *sprite) {
     glBindBuffer(GL_ARRAY_BUFFER, _buffer_object);
     glBufferSubData(GL_ARRAY_BUFFER, sprite->_vertex_data_position * 24 * sizeof(uint32_t), 24 * sizeof(uint32_t), sprite->get_vertex_data().data());
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    return true;
 }
 
 void ibh::texture_atlas::remove_data_object(sprite *sprite) {
