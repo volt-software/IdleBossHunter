@@ -41,6 +41,7 @@
 #include <game_queue_message_handlers/company/reject_application_handler.h>
 #include <game_queue_message_handlers/company/set_tax_handler.h>
 #include <range/v3/all.hpp>
+#include <tbb/task_scheduler_init.h>
 #include <asset_loading/load_character_select.h>
 
 #include "config.h"
@@ -64,6 +65,21 @@ atomic<bool> quit{false};
 void on_sigint([[maybe_unused]] int sig) {
     quit.store(true, memory_order_release);
     spdlog::info("received sigint");
+}
+
+void setup_es_groups(entt::registry &es) {
+    es.group<battle_component>(entt::get<pc_component>);
+    es.group<wood_gathering_component>(entt::get<pc_component>);
+    es.group<ore_gathering_component>(entt::get<pc_component>);
+    es.group<water_gathering_component>(entt::get<pc_component>);
+    es.group<plants_gathering_component>(entt::get<pc_component>);
+    es.group<clay_gathering_component>(entt::get<pc_component>);
+    es.group<gems_gathering_component>(entt::get<pc_component>);
+    es.group<paper_gathering_component>(entt::get<pc_component>);
+    es.group<ink_gathering_component>(entt::get<pc_component>);
+    es.group<metal_gathering_component>(entt::get<pc_component>);
+    es.group<bricks_gathering_component>(entt::get<pc_component>);
+    es.group<timber_gathering_component>(entt::get<pc_component>);
 }
 
 int main() {
@@ -105,6 +121,7 @@ int main() {
     client_handle c_handle{};
 
     entt::registry es;
+    setup_es_groups(es);
 
     load_assets(es, quit);
     load_from_database(es, pool, quit);
@@ -166,6 +183,8 @@ int main() {
     game_queue_message_router.emplace(leave_company_message::_type, handle_leave_company);
     game_queue_message_router.emplace(reject_application_message::_type, handle_reject_application);
     game_queue_message_router.emplace(set_tax_message::_type, handle_set_tax);
+
+    tbb::task_scheduler_init anonymous;
 
     while (!quit.load(memory_order_acquire)) {
         auto now = chrono::system_clock::now();

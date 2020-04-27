@@ -21,6 +21,7 @@
 #include "../ecs/ecs.h"
 #include "scene_manager.h"
 #include <messages/message.h>
+#include <ecs/components.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/websocket.h>
@@ -29,7 +30,7 @@
 namespace ibh {
     class scene {
     public:
-        scene(uint64_t type) : _id(0), _type(type), _closed(false), _buttons_disabled(false) {}
+        explicit scene(uint64_t type) : _id(0), _type(type), _closed(false), _buttons_disabled(false) {}
         virtual ~scene() = default;
         scene(const scene &) = delete;
         scene(scene&&) noexcept = default;
@@ -44,7 +45,10 @@ namespace ibh {
         {
             TemplateClass req{std::forward<Args>(args)...};
 #ifdef __EMSCRIPTEN__
-            emscripten_websocket_send_utf8_text(manager->get_socket(), req.serialize().c_str());
+            emscripten_websocket_send_utf8_text(manager->get_socket().socket, req.serialize().c_str());
+#else
+            auto &socket = manager->get_socket();
+            socket.socket->send(socket.hdl, req.serialize(), websocketpp::frame::opcode::value::TEXT);
 #endif
         }
 

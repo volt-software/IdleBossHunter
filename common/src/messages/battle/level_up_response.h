@@ -29,8 +29,6 @@
 using namespace std;
 
 namespace ibh {
-    struct character_component;
-
     struct level_up_response : message {
         level_up_response(ibh_flat_map<uint64_t, stat_component> added_stats, uint64_t new_xp_goal, uint64_t current_xp) noexcept;
 

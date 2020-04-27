@@ -21,6 +21,10 @@
 #include <string>
 #include <vector>
 
+#ifndef __EMSCRIPTEN__
+#include <networking.h>
+#endif
+
 namespace ibh {
     class texture_atlas;
     class sprite;
@@ -36,7 +40,7 @@ namespace ibh {
     };
 
     struct character_component {
-        character_component(uint64_t map_id) : map_id(map_id) {}
+        character_component(uint64_t map_id) noexcept : map_id(map_id) {}
 
         uint64_t map_id;
     };
@@ -101,8 +105,16 @@ namespace ibh {
     };
 
     struct socket_component {
+
+#ifdef __EMSCRIPTEN__
         explicit socket_component(int socket) : socket(socket) {}
         int socket;
+#else
+        explicit socket_component(bool running, websocketpp::connection_hdl hdl, client *socket) : running(running), hdl(move(hdl)), socket(socket) {}
+        bool running;
+        websocketpp::connection_hdl hdl;
+        client *socket;
+#endif
     };
 
     struct sprite_component {

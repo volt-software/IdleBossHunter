@@ -44,7 +44,7 @@ void ibh::load_assets(entt::registry &registry, atomic<bool> const &quit) {
         }
 
         auto new_entity = registry.create();
-        registry.assign<monster_definition_component>(new_entity, move(monster.value()));
+        registry.emplace<monster_definition_component>(new_entity, move(monster.value()));
 
         monster_count++;
     }
@@ -63,7 +63,7 @@ void ibh::load_assets(entt::registry &registry, atomic<bool> const &quit) {
         }
 
         auto new_entity = registry.create();
-        registry.assign<monster_special_definition_component>(new_entity, move(special.value()));
+        registry.emplace<monster_special_definition_component>(new_entity, move(special.value()));
 
         monster_specials_count++;
     }

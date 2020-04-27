@@ -28,15 +28,9 @@
 #include <message_handlers/user_access/character_select_handler.h>
 #include <message_handlers/chat/public_chat_handler.h>
 #include <message_handlers/moderator/set_motd_handler.h>
-#include <message_handlers/company/set_tax_handler.h>
-#include <message_handlers/company/join_company_handler.h>
-#include <message_handlers/company/increase_bonus_handler.h>
 #include <message_handlers/company/get_company_listing_handler.h>
-#include <message_handlers/company/create_company_handler.h>
-#include <message_handlers/company/accept_application_handler.h>
-#include <message_handlers/company/reject_application_handler.h>
-#include <message_handlers/company/leave_company_handler.h>
 #include <message_handlers/company/get_company_applications_handler.h>
+#include <message_handlers/playing_passthrough_handler.h>
 #include <messages/user_access/login_request.h>
 #include <messages/user_access/register_request.h>
 #include <messages/user_access/play_character_request.h>
@@ -55,6 +49,7 @@
 #include <messages/company/reject_application_request.h>
 #include <messages/company/leave_company_request.h>
 #include <messages/company/get_company_applications_request.h>
+#include <messages/resources/set_action_request.h>
 #include <message_handlers/handler_macros.h>
 #include <messages/user_access/user_left_game_response.h>
 #include "per_socket_data.h"
@@ -91,7 +86,7 @@ namespace ibh {
 //    return true;
 //}
 
-    context_ptr on_tls_init(config &config, websocketpp::connection_hdl hdl) {
+    context_ptr on_tls_init(config const &config, websocketpp::connection_hdl hdl) {
         namespace asio = websocketpp::lib::asio;
 
         context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::tlsv12);
@@ -278,15 +273,18 @@ namespace ibh {
         message_router.emplace(set_motd_request::type, handle_set_motd<server, websocketpp::connection_hdl>);
 
         // companies
-        message_router.emplace(set_tax_request::type, handle_set_tax<server, websocketpp::connection_hdl>);
-        message_router.emplace(join_company_request::type, handle_join_company<server, websocketpp::connection_hdl>);
-        message_router.emplace(increase_bonus_request::type, handle_increase_bonus<server, websocketpp::connection_hdl>);
-        message_router.emplace(get_company_listing_request::type, handle_get_company_listing<server, websocketpp::connection_hdl>);
-        message_router.emplace(create_company_request::type, handle_create_company<server, websocketpp::connection_hdl>);
-        message_router.emplace(accept_application_request::type, handle_accept_application<server, websocketpp::connection_hdl>);
-        message_router.emplace(reject_application_request::type, handle_reject_application<server, websocketpp::connection_hdl>);
-        message_router.emplace(leave_company_request::type, handle_leave_company<server, websocketpp::connection_hdl>);
+        message_router.emplace(accept_application_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, accept_application_request>);
+        message_router.emplace(create_company_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, create_company_request>);
         message_router.emplace(get_company_applications_request::type, handle_get_company_applications<server, websocketpp::connection_hdl>);
+        message_router.emplace(get_company_listing_request::type, handle_get_company_listing<server, websocketpp::connection_hdl>);
+        message_router.emplace(increase_bonus_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, increase_bonus_request>);
+        message_router.emplace(join_company_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, join_company_request>);
+        message_router.emplace(leave_company_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, leave_company_request>);
+        message_router.emplace(reject_application_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, reject_application_request>);
+        message_router.emplace(set_tax_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, set_tax_request>);
+
+        // resources
+        message_router.emplace(set_action_request::type, playing_passthrough_handler<server, websocketpp::connection_hdl, set_action_request>);
     }
 
     thread run_websocket(config const &config, shared_ptr<database_pool> pool, server_handle &s_handle, atomic<bool> &quit) {

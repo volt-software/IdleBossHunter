@@ -26,7 +26,6 @@
 using namespace std;
 
 namespace ibh {
-
     struct increase_bonus_request : message {
         explicit increase_bonus_request(uint32_t bonus_type) noexcept;
 

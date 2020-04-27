@@ -128,6 +128,15 @@ namespace ibh {
         set_tax_message& operator=(set_tax_message&&) noexcept = default;
     };
 
+    // resources
+
+    struct set_action_message : queue_message {
+        uint32_t action_id;
+        static constexpr uint64_t _type = generate_type<set_action_message>();
+
+        explicit set_action_message(uint64_t connection_id, uint32_t action_id) noexcept;
+    };
+
     // uac
 
     struct player_enter_message : queue_message {

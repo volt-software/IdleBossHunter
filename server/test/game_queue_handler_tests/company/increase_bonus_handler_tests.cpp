@@ -71,11 +71,11 @@ TEST_CASE("increase bonus handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
 
             company_component company{existing_company.id, existing_member.member_level, existing_company.name,
                                       ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
-            registry.assign<company_component>(entt, move(company));
+            registry.emplace<company_component>(entt, move(company));
         }
 
         increase_bonus_message msg(1, company_stat_str_bonus_id);
@@ -135,11 +135,11 @@ TEST_CASE("increase bonus handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
 
             company_component company{existing_company.id, existing_member.member_level, existing_company.name,
                                       ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
-            registry.assign<company_component>(entt, move(company));
+            registry.emplace<company_component>(entt, move(company));
         }
 
         increase_bonus_message msg(1, company_stat_str_bonus_id);
@@ -199,11 +199,11 @@ TEST_CASE("increase bonus handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
 
             company_component company{existing_company.id, existing_member.member_level, existing_company.name,
                                       ibh_flat_map<uint32_t, int64_t>{{existing_str_stat.stat_id, existing_str_stat.value}, {existing_gold_stat.stat_id, existing_gold_stat.value}}};
-            registry.assign<company_component>(entt, move(company));
+            registry.emplace<company_component>(entt, move(company));
         }
 
         increase_bonus_message msg(1, company_stat_str_bonus_id);

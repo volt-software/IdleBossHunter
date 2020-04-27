@@ -19,7 +19,6 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
-#include "components.h"
 
 namespace ibh {
     using TimeDelta = uint32_t;

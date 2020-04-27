@@ -31,6 +31,10 @@ namespace ibh {
         string name;
 
         member(uint64_t id, uint64_t level, string name) noexcept : id(id), level(level), name(move(name)) {}
+        member(member&&) noexcept = default;
+        member(const member&) noexcept = default;
+        member& operator=(member&&) noexcept = default;
+        member& operator=(const member&) noexcept = default;
     };
 
     struct get_company_applications_response : message {

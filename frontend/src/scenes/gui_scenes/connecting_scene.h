@@ -16,18 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
-#include <game_queue_messages/messages.h>
-
-using namespace std;
+#include "../scene.h"
 
 namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_leave_company(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
-                                   queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    class connecting_scene : public scene  {
+    public:
+        connecting_scene() : scene(generate_type<connecting_scene>()) {}
+        ~connecting_scene() override = default;
+
+        void update(iscene_manager *manager, TimeDelta dt) override;
+        void handle_message(iscene_manager *manager, uint64_t type, message const* msg) override;
+    };
 }

@@ -16,27 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define CATCH_CONFIG_RUNNER
-
-#include <catch2/catch.hpp>
-#include <spdlog/spdlog.h>
-#include <working_directory_manipulation.h>
-#include <common_components.h>
-#include "on_leaving_scope.h"
-#include "macros.h"
+#include "connecting_scene.h"
+#include <rendering/imgui/imgui.h>
+#include "spdlog/spdlog.h"
 
 using namespace std;
 using namespace ibh;
 
-int main(int argc, char **argv) {
-    set_cwd(get_selfpath());
-    locale::global(locale("en_US.UTF-8"));
-    spdlog::set_level(spdlog::level::trace);
-    fill_mappers();
+void connecting_scene::update(iscene_manager *manager, TimeDelta dt) {
+    if(ImGui::Begin("Connecting...", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Connecting to server, please wait... %c", "|/-\\"[(int)(ImGui::GetTime() / 0.05f) & 3]);
+    }
+    ImGui::End();
+}
 
-    MEASURE_TIME_OF_FUNCTION(info);
-    int result = Catch::Session().run( argc, argv );
-    // global clean-up...
+void connecting_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
 
-    return ( result < 0xff ? result : 0xff );
 }

@@ -62,11 +62,11 @@ TEST_CASE("leave company handler tests") {
             pc_component pc{};
             pc.id = company_applicant.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
 
             company_component company{existing_company.id, existing_member.member_level, existing_company.name,
                                       ibh_flat_map<uint32_t, int64_t>{}};
-            registry.assign<company_component>(entt, move(company));
+            registry.emplace<company_component>(entt, move(company));
         }
 
         leave_company_message msg(1);
@@ -117,7 +117,7 @@ TEST_CASE("leave company handler tests") {
             pc_component pc{};
             pc.id = company_applicant.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         leave_company_message msg(1);

@@ -86,9 +86,11 @@ namespace ibh {
 
             auto accepted_player = get_player_entity(company_application->character_id, es);
             if(accepted_player.has_value()) {
-                es.assign<company_component>(*accepted_player, cc);
+                es.emplace<company_component>(*accepted_player, cc);
+                // can't use cc anymore as group has re-allocated underlying storage
+                auto cc2 = pc_group.get<company_component>(entity);
                 auto &pc =es.get<pc_component>(*accepted_player);
-                send_message_to_all_company_members(cc, pc.name, fmt::format("{} got accepted into the company!", pc.name), "system-company", es, outward_queue);
+                send_message_to_all_company_members(cc2, pc.name, fmt::format("{} got accepted into the company!", pc.name), "system-company", es, outward_queue);
             } else {
                 spdlog::error("[{}] Couldn't find recently accepted player {}", __FUNCTION__, company_application->character_id);
             }

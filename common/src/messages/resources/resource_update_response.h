@@ -28,8 +28,21 @@
 using namespace std;
 
 namespace ibh {
+    struct resource {
+        uint32_t resource_id;
+        uint64_t resource_amt;
+        uint64_t resource_xp;
+        uint64_t resource_level;
+
+        resource(uint32_t resource_id, uint64_t resource_amt, uint64_t resource_xp, uint64_t resource_level) noexcept : resource_id(resource_id),  resource_amt(resource_amt),  resource_xp(resource_xp),  resource_level(resource_level){}
+        resource(resource&&) noexcept = default;
+        resource(const resource&) noexcept = default;
+        resource& operator=(resource&&) noexcept = default;
+        resource& operator=(const resource&) noexcept = default;
+    };
+
     struct resource_update_response : message {
-        resource_update_response(uint32_t resource_id, uint64_t resource, uint64_t resource_xp, uint64_t resource_level) noexcept;
+        explicit resource_update_response(vector<resource> resources) noexcept;
 
         ~resource_update_response() noexcept override = default;
 
@@ -39,10 +52,7 @@ namespace ibh {
         [[nodiscard]]
         static unique_ptr<resource_update_response> deserialize(rapidjson::Document const &d);
 
-        uint32_t resource_id;
-        uint64_t resource;
-        uint64_t resource_xp;
-        uint64_t resource_level;
+        vector<resource> resources;
 
         static constexpr uint64_t type = generate_type<resource_update_response>();
     };

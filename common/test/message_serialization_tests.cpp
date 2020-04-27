@@ -57,6 +57,8 @@
 #include <messages/company/set_tax_request.h>
 #include <messages/company/set_tax_response.h>
 #include <messages/resources/resource_update_response.h>
+#include <messages/resources/set_action_request.h>
+#include <messages/resources/set_action_response.h>
 
 using namespace std;
 using namespace ibh;
@@ -449,11 +451,21 @@ TEST_CASE("message serialization tests") {
     // resources
 
     SECTION("resource update response") {
-        SERDE(resource_update_response, 1, 2, 3, 4);
+        SERDE(resource_update_response, vector<resource>{{1, 2, 3, 4}});
+        REQUIRE(msg2->resources[0].resource_id == 1);
+        REQUIRE(msg2->resources[0].resource_amt == 2);
+        REQUIRE(msg2->resources[0].resource_xp == 3);
+        REQUIRE(msg2->resources[0].resource_level == 4);
+    }
+
+    SECTION("set action request") {
+        SERDE(set_action_request, 1);
         REQUIRE(msg2->resource_id == 1);
-        REQUIRE(msg2->resource == 2);
-        REQUIRE(msg2->resource_xp == 3);
-        REQUIRE(msg2->resource_level == 4);
+    }
+
+    SECTION("set action response") {
+        SERDE(set_action_response, "test");
+        REQUIRE(msg2->error == "test");
     }
 
     // misc

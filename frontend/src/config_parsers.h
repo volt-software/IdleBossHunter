@@ -16,27 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define CATCH_CONFIG_RUNNER
+#pragma once
 
-#include <catch2/catch.hpp>
-#include <spdlog/spdlog.h>
-#include <working_directory_manipulation.h>
-#include <common_components.h>
-#include "on_leaving_scope.h"
-#include "macros.h"
+#ifndef __EMSCRIPTEN__
+
+#include <optional>
+#include "config.h"
 
 using namespace std;
-using namespace ibh;
 
-int main(int argc, char **argv) {
-    set_cwd(get_selfpath());
-    locale::global(locale("en_US.UTF-8"));
-    spdlog::set_level(spdlog::level::trace);
-    fill_mappers();
-
-    MEASURE_TIME_OF_FUNCTION(info);
-    int result = Catch::Session().run( argc, argv );
-    // global clean-up...
-
-    return ( result < 0xff ? result : 0xff );
+namespace ibh {
+    optional<config> parse_env_file();
 }
+
+#endif

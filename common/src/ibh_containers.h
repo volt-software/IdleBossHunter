@@ -18,7 +18,15 @@
 
 #pragma once
 
+
+// stable map guarantees a map that doesn't invalidate iterators on assign/remove
+//#define USE_STABLE_MAP
+
+#ifdef USE_STABLE_MAP
+#include <unordered_map>
+#else
 #include <robin_hood.h>
+#endif
 
 #ifdef USE_WYHASH
 #include <wyhash.h>
@@ -240,8 +248,55 @@ namespace ibh {
         }
     };
 
+#ifdef USE_STABLE_MAP
+
+    // stolen from https://gist.github.com/facontidavide/95f20c28df8ec91729f9d8ab01e7d2df
+    // unordered_map has lower performance but at least invalidates iterators less...
+    template <typename T, typename Hash, typename Pred>
+    class StringMap: public unordered_map<string, T, Hash, Pred>
+    {
+    public:
+        typename unordered_map<string,T, Hash, Pred>::iterator find(const string_view& v )
+        {
+            tmp_.reserve(v.size());
+            tmp_.assign(v.data(), v.size());
+            return unordered_map<string, T, Hash, Pred>::find(tmp_);
+        }
+
+        typename unordered_map<string,T, Hash, Pred>::iterator find(const string& v )
+        {
+            return unordered_map<string, T, Hash, Pred>::find(v);
+        }
+
+        typename unordered_map<string,T, Hash, Pred>::iterator find(const char* v )
+        {
+            tmp_.assign(v);
+            return unordered_map<string, T, Hash, Pred>::find(v);
+        }
+
+    private:
+        thread_local static string tmp_;
+    };
+
+    template <typename T, typename Hash, typename Pred> thread_local string StringMap<T, Hash, Pred>::tmp_ = {};
+
+    template <typename Key, typename T>
+    struct ibh_flat_map_type {
+        typedef unordered_map<Key, T, custom_hash<Key>, custom_equalto<Key>> type;
+    };
+
+    template <typename T>
+    struct ibh_flat_map_type<string, T> {
+        typedef StringMap<T, custom_hash<string>, custom_equalto<string>> type;
+    };
+
+    template <typename Key, typename T>
+    using ibh_flat_map = typename ibh_flat_map_type<Key, T>::type;
+#else
     template <typename Key, typename T>
     using ibh_flat_map = robin_hood::unordered_flat_map<Key, T, custom_hash<Key>, custom_equalto<Key>>;
+#endif
+
     template <typename Key>
     using ibh_unordered_set = unordered_set<Key, custom_hash<Key>, custom_equalto<Key>, allocator<Key>>;
 }

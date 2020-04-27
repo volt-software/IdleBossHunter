@@ -16,18 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
-#include <game_queue_messages/messages.h>
+#include "resource_overview_scene.h"
+#include <rendering/imgui/imgui.h>
+#include "spdlog/spdlog.h"
 
 using namespace std;
+using namespace ibh;
 
-namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_increase_bonus(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
-                               queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+void resource_overview_scene::update(iscene_manager *manager, TimeDelta dt) {
+    if(ImGui::Begin("Resource Overview")) {
+
+    }
+    ImGui::End();
+}
+
+void resource_overview_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
+
 }

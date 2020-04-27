@@ -18,16 +18,30 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+#include <optional>
 #include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
-#include <game_queue_messages/messages.h>
+#include <common_components.h>
+#include "../message.h"
 
 using namespace std;
 
 namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_create_company(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
-                            queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    struct set_action_response : message {
+        explicit set_action_response(string error) noexcept;
+
+        ~set_action_response() noexcept override = default;
+
+        [[nodiscard]]
+        string serialize() const override;
+
+        [[nodiscard]]
+        static unique_ptr<set_action_response> deserialize(rapidjson::Document const &d);
+
+
+        string error;
+
+        static constexpr uint64_t type = generate_type<set_action_response>();
+    };
 }

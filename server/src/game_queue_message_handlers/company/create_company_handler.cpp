@@ -84,7 +84,7 @@ namespace ibh {
             company_members_repo.insert(company_admin, subtransaction);
             subtransaction->commit();
 
-            es.assign<company_component>(entity, new_company.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), create_msg->company_name, company_stats);
+            es.emplace<company_component>(entity, new_company.id, magic_enum::enum_integer(company_member_level::COMPANY_ADMIN), create_msg->company_name, company_stats);
 
             gold_it->second -= 10'000;
             auto new_err_msg = make_unique<create_company_response>("");

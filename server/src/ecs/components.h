@@ -188,12 +188,14 @@ namespace ibh {
     struct water_gathering_component {};
     struct plants_gathering_component {};
     struct clay_gathering_component {};
-    struct gems_gathering_component {};
     struct paper_gathering_component {};
     struct ink_gathering_component {};
     struct metal_gathering_component {};
     struct bricks_gathering_component {};
+    struct gems_gathering_component {};
     struct timber_gathering_component {};
+    struct item_gathering_component {};
+    struct working_component {};
 
     // helper functions
     [[nodiscard]]

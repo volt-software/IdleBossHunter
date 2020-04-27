@@ -54,7 +54,7 @@ TEST_CASE("create company handler tests") {
             pc.id = player.id;
             pc.connection_id = 1;
             pc.stats.emplace(stat_gold_id, 10'001);
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         auto ret = handle_create_company(&msg, registry, q, transaction);
@@ -94,7 +94,7 @@ TEST_CASE("create company handler tests") {
             pc.id = player.id;
             pc.connection_id = 1;
             pc.stats.emplace(stat_gold_id, 9'999);
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         auto ret = handle_create_company(&msg, registry, q, transaction);
@@ -137,7 +137,7 @@ TEST_CASE("create company handler tests") {
             pc.id = player.id;
             pc.connection_id = 1;
             pc.stats.emplace(stat_gold_id, 10'001);
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         auto ret = handle_create_company(&msg, registry, q, transaction);

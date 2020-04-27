@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <execution>
 #include <spdlog/spdlog.h>
 #include <magic_enum.hpp>
 #include <websocket_thread.h>
@@ -23,39 +24,52 @@
 #include "random_helper.h"
 #include "on_leaving_scope.h"
 #include "macros.h"
+#include <messages/resources/resource_update_response.h>
 
 using namespace std;
 using namespace ibh;
 
-void simulate_resource(uint32_t resource_id, pc_component &pc, entt::registry &es, outward_queues &outward_queue) {
-    auto resource = pc.stats.find(resource_id);
-    auto resource_xp = pc.stats.find(resource_id + 300u);
+void simulate_resource(uint32_t resource_id, pc_component &pc, outward_queues &outward_queue) {
     auto resource_level = pc.stats.find(resource_id + 600u);
-
-    if(resource == end(pc.stats)) {
-        pc.stats.emplace(resource_id, 1);
-    } else {
-        resource->second++;
+    if(resource_level == end(pc.stats)) {
+        pc.stats.emplace(resource_id + 600u, 1);
+        resource_level = pc.stats.find(resource_id + 600u);
     }
 
+    auto resource_amt = pc.stats.find(resource_id);
+    if(resource_amt == end(pc.stats)) {
+        pc.stats.emplace(resource_id, 1);
+        resource_amt = pc.stats.find(resource_id);
+    } else {
+        resource_amt->second++;
+    }
+
+    auto resource_xp = pc.stats.find(resource_id + 300u);
     if(resource_xp == end(pc.stats)) {
         pc.stats.emplace(resource_id + 300u, 1);
+        resource_xp = pc.stats.find(resource_id + 300u);
     } else {
         resource_xp->second++;
-
-        if(resource_level == end(pc.stats)) {
-            pc.stats.emplace(resource_id + 600u, 1);
-            resource_level = pc.stats.find(resource_id + 600u);
-        }
 
         auto xp_threshold = 50*pow(2, resource_level->second);
         if(resource_xp->second > xp_threshold) {
             resource_xp->second -= xp_threshold;
             resource_level->second++;
         }
-        auto update_msg = make_unique<battle_update_response>(mob_turns, player_turns, mob_hits, player_hits, mob_dmg_to_player, player_dmg_to_mob);
-        outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(update_msg)});
     }
+
+    auto update_msg = make_unique<resource_update_response>(vector<resource>{
+        {resource_id, static_cast<uint64_t>(resource_amt->second), static_cast<uint64_t>(resource_xp->second), static_cast<uint64_t>(resource_level->second)}
+    });
+    outward_queue.enqueue_tokenless(outward_message{pc.connection_id, move(update_msg)});
+}
+template <typename T>
+void tick_for(entt::registry &es, uint32_t resource_id, queue_abstraction<outward_message> &outward_queue) {
+    auto pc_group = es.group<T>(entt::get<pc_component>);
+    for_each(execution::par_unseq, begin(pc_group), end(pc_group), [resource_id, &outward_queue, &pc_group](auto entity){
+        auto &pc = pc_group.template get<pc_component>(entity);
+        simulate_resource(resource_id, pc, outward_queue);
+    });
 }
 
 void ibh::resource_system::do_tick(entt::registry &es) {
@@ -68,91 +82,15 @@ void ibh::resource_system::do_tick(entt::registry &es) {
     _tick_count = 0;
 
     MEASURE_TIME_OF_FUNCTION(info);
-    {
-        auto pc_group = es.group<pc_component>(entt::get<wood_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_wood_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<ore_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_ore_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<water_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_water_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<plants_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_plants_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<clay_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_clay_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<gems_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_gems_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<paper_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_paper_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<ink_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_ink_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<metal_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_metal_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<bricks_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_bricks_id, pc, es, _outward_queue);
-        }
-    }
-
-    {
-        auto pc_group = es.group<pc_component>(entt::get<timber_gathering_component>);
-        for (auto pc_entity : pc_group) {
-            pc_component &pc = pc_group.get<pc_component>(pc_entity);
-            simulate_resource(resource_timber_id, pc, es, _outward_queue);
-        }
-    }
+    tick_for<wood_gathering_component>(es, resource_wood_id, _outward_queue);
+    tick_for<ore_gathering_component>(es, resource_ore_id, _outward_queue);
+    tick_for<water_gathering_component>(es, resource_water_id, _outward_queue);
+    tick_for<plants_gathering_component>(es, resource_plants_id, _outward_queue);
+    tick_for<clay_gathering_component>(es, resource_clay_id, _outward_queue);
+    tick_for<paper_gathering_component>(es, resource_paper_id, _outward_queue);
+    tick_for<ink_gathering_component>(es, resource_ink_id, _outward_queue);
+    tick_for<metal_gathering_component>(es, resource_metal_id, _outward_queue);
+    tick_for<bricks_gathering_component>(es, resource_bricks_id, _outward_queue);
+    tick_for<gems_gathering_component>(es, resource_gems_id, _outward_queue);
+    tick_for<timber_gathering_component>(es, resource_timber_id, _outward_queue);
 }

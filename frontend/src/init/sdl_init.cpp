@@ -78,6 +78,7 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
     }
 }
 
+#ifdef __EMSCRIPTEN__
 EM_BOOL emscripten_window_resized_callback(int eventType, const void *reserved, void *userData){
     double width;
     double height;
@@ -85,7 +86,7 @@ EM_BOOL emscripten_window_resized_callback(int eventType, const void *reserved, 
     SDL_SetWindowSize(ibh::window, (int)width, (int)height);
     return true;
 }
-
+#endif
 
 void ibh::init_sdl(config &config) noexcept {
 #ifdef WINDOWS
@@ -132,6 +133,7 @@ void ibh::init_sdl(config &config) noexcept {
         exit(1);
     }
 
+#ifdef __EMSCRIPTEN__
     try {
         EmscriptenFullscreenStrategy strategy;
         strategy.scaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF;
@@ -142,6 +144,7 @@ void ibh::init_sdl(config &config) noexcept {
     } catch (std::exception const &e) {
         spdlog::info("[{}] canvas exception {}", e.what());
     }
+#endif
 
     int w;
     int h;
@@ -217,7 +220,7 @@ void ibh::init_sdl(config &config) noexcept {
 
 #ifndef __EMSCRIPTEN__
     if (glDebugMessageCallback) {
-        spdlog::debug("[{}] Register OpenGL debug callback");
+        spdlog::debug("[{}] Register OpenGL debug callback", __FUNCTION__ );
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(openglCallbackFunction, nullptr);
         GLuint unusedIds = 0;
@@ -228,7 +231,7 @@ void ibh::init_sdl(config &config) noexcept {
                               &unusedIds,
                               true);
     } else {
-        spdlog::error("[{}] glDebugMessageCallback not available");
+        spdlog::error("[{}] glDebugMessageCallback not available", __FUNCTION__ );
     }
 #else
     spdlog::error("[{}] glDebugMessageCallback not available", __FUNCTION__);
@@ -255,7 +258,7 @@ void ibh::init_sdl_image() noexcept {
     }
 }
 
-void ibh::init_sdl_mixer() noexcept {
+void ibh::init_sdl_mixer(config const &config) noexcept {
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         spdlog::error("[{}] Couldn't open audio: {}", __FUNCTION__, SDL_GetError());
         exit(1);
@@ -265,4 +268,7 @@ void ibh::init_sdl_mixer() noexcept {
         spdlog::error("[{}] Couldn't init ogg audio: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
+
+    Mix_Volume(-1, config.volume);
+    Mix_VolumeMusic(config.volume);
 }

@@ -37,6 +37,10 @@ namespace ibh {
         vector<skill_object> skills;
 
         character_class(string name, string description, vector<stat_component> stat_mods, vector<item_object> items, vector<skill_object> skills) noexcept;
+        character_class(character_class&&) noexcept = default;
+        character_class(const character_class&) = default;
+        character_class& operator=(character_class&&) noexcept = default;
+        character_class& operator=(const character_class&) = default;
     };
 
     struct character_race {
@@ -45,6 +49,10 @@ namespace ibh {
         vector<stat_component> level_stat_mods;
 
         character_race(string name, string description, vector<stat_component> level_stat_mods) noexcept;
+        character_race(character_race&&) noexcept = default;
+        character_race(const character_race&) = default;
+        character_race& operator=(character_race&&) noexcept = default;
+        character_race& operator=(const character_race&) = default;
     };
 
     struct character_select_response : message {

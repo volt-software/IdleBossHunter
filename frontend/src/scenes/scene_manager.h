@@ -24,6 +24,7 @@
 
 namespace ibh {
     class scene;
+    struct socket_component;
 
     class iscene_manager {
     public:
@@ -34,9 +35,11 @@ namespace ibh {
         virtual void force_goto_scene(unique_ptr<scene> new_scene) = 0;
         virtual config * get_config() = 0;
         virtual entt::registry& get_entity_registry() = 0;
-        virtual int get_socket() const = 0;
+        [[nodiscard]] virtual socket_component& get_socket()  const = 0;
         virtual void set_logged_in(bool logged_in) = 0;
-        virtual bool get_logged_in() const = 0;
+        [[nodiscard]] virtual bool get_logged_in() const = 0;
+        virtual void set_connected(bool connected) = 0;
+        [[nodiscard]] virtual bool get_connected() const = 0;
         virtual optional<character_object>& get_character() = 0;
     };
 }

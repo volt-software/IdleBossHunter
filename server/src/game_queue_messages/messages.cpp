@@ -50,4 +50,8 @@ namespace ibh {
 
     set_tax_message::set_tax_message(uint64_t connection_id, uint32_t tax_percentage) noexcept
             : queue_message(_type, connection_id), tax_percentage(tax_percentage) {}
+
+    set_action_message::set_action_message(uint64_t connection_id, uint32_t action_id) noexcept : queue_message(_type, connection_id), action_id(action_id) {
+
+    }
 }

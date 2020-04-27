@@ -30,8 +30,11 @@ namespace ibh {
         uint32_t value;
         string name;
 
-        skill_object(string name, uint32_t value) noexcept :
-                value(value), name(move(name)) {}
+        skill_object(string name, uint32_t value) noexcept : value(value), name(move(name)) {}
+        skill_object(skill_object&&) noexcept = default;
+        skill_object(const skill_object&) = default;
+        skill_object& operator=(skill_object&&) noexcept = default;
+        skill_object& operator=(const skill_object&) = default;
     };
 
     void write_skill_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, skill_object const &obj);

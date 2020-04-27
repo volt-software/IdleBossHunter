@@ -67,10 +67,10 @@ TEST_CASE("set tax handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
 
             company_component company{existing_company.id, existing_member.member_level, existing_company.name, ibh_flat_map<uint32_t, int64_t>{{existing_stat.stat_id, existing_stat.value}}};
-            registry.assign<company_component>(entt, move(company));
+            registry.emplace<company_component>(entt, move(company));
         }
 
         set_tax_message msg(1, 50);
@@ -123,10 +123,10 @@ TEST_CASE("set tax handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
 
             company_component company{existing_company.id, existing_member.member_level, existing_company.name, ibh_flat_map<uint32_t, int64_t>{{existing_stat.stat_id, existing_stat.value}}};
-            registry.assign<company_component>(entt, move(company));
+            registry.emplace<company_component>(entt, move(company));
         }
 
         set_tax_message msg(1, 50);

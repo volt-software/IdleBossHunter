@@ -40,6 +40,7 @@
 #include <on_leaving_scope.h>
 #include <ecs/battle_system.h>
 #include <ecs/resource_system.h>
+#include <tbb/task_scheduler_init.h>
 
 using namespace std;
 using namespace ibh;
@@ -221,6 +222,7 @@ void bench_battle() {
     entt::registry es;
     const int entity_count = 10'000;
     const int simulated_turns = 1'000;
+    es.group<battle_component>(entt::get<pc_component>);
 
     for(int64_t i = 0; i < entity_count; i++) {
         auto entt = es.create();
@@ -229,7 +231,7 @@ void bench_battle() {
         for(auto &stat : stat_name_ids) {
             stats.emplace(stat, i+1);
         }
-        es.assign<monster_definition_component>(entt, to_string(i), stats);
+        es.emplace<monster_definition_component>(entt, to_string(i), stats);
     }
 
     for(int64_t i = 0; i < entity_count; i++) {
@@ -239,7 +241,7 @@ void bench_battle() {
         for(auto &stat : stat_name_ids) {
             stats.emplace(stat, i+1);
         }
-        es.assign<monster_special_definition_component>(entt, fmt::format("{}", i), stats, false);
+        es.emplace<monster_special_definition_component>(entt, fmt::format("{}", i), stats, false);
     }
 
     for(int64_t i = 0; i < entity_count; i++) {
@@ -249,12 +251,13 @@ void bench_battle() {
         for(auto &stat : stat_name_ids) {
             stats.emplace(stat, i+1);
         }
-        es.assign<pc_component>(entt, i, i,  "pc"s + to_string(i), "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
-        es.assign<battle_component>(entt);
+        es.emplace<pc_component>(entt, i, i,  "pc"s + to_string(i), "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
+        es.emplace<battle_component>(entt);
     }
 
     battle_system s{1, &q};
 
+    tbb::task_scheduler_init anonymous;
     {
         MEASURE_TIME_OF_FUNCTION(info);
         for (int64_t i = 0; i < simulated_turns && !quit; i++) {
@@ -272,26 +275,38 @@ void bench_resource() {
     entt::registry es;
     const int entity_count = 10'000;
     const int simulated_turns = 1'000;
+    es.group<wood_gathering_component>(entt::get<pc_component>);
+    es.group<ore_gathering_component>(entt::get<pc_component>);
+    es.group<water_gathering_component>(entt::get<pc_component>);
+    es.group<plants_gathering_component>(entt::get<pc_component>);
+    es.group<clay_gathering_component>(entt::get<pc_component>);
+    es.group<gems_gathering_component>(entt::get<pc_component>);
+    es.group<paper_gathering_component>(entt::get<pc_component>);
+    es.group<ink_gathering_component>(entt::get<pc_component>);
+    es.group<metal_gathering_component>(entt::get<pc_component>);
+    es.group<bricks_gathering_component>(entt::get<pc_component>);
+    es.group<timber_gathering_component>(entt::get<pc_component>);
 
     for(int64_t i = 0; i < entity_count; i++) {
         auto entt = es.create();
         decltype(pc_component::stats) stats;
-        es.assign<pc_component>(entt, i, i,  "pc"s + to_string(i), "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
-        es.assign<wood_gathering_component>(entt);
-        es.assign<ore_gathering_component>(entt);
-        es.assign<water_gathering_component>(entt);
-        es.assign<plants_gathering_component>(entt);
-        es.assign<clay_gathering_component>(entt);
-        es.assign<gems_gathering_component>(entt);
-        es.assign<paper_gathering_component>(entt);
-        es.assign<ink_gathering_component>(entt);
-        es.assign<metal_gathering_component>(entt);
-        es.assign<bricks_gathering_component>(entt);
-        es.assign<timber_gathering_component>(entt);
+        es.emplace<pc_component>(entt, i, i,  "pc"s + to_string(i), "race", "dir", "class", "spawn", i, i, stats, ibh_flat_map<uint32_t, item_component> {}, vector<item_component>{}, ibh_flat_map<string, skill_component>{});
+        es.emplace<wood_gathering_component>(entt);
+        es.emplace<ore_gathering_component>(entt);
+        es.emplace<water_gathering_component>(entt);
+        es.emplace<plants_gathering_component>(entt);
+        es.emplace<clay_gathering_component>(entt);
+        es.emplace<gems_gathering_component>(entt);
+        es.emplace<paper_gathering_component>(entt);
+        es.emplace<ink_gathering_component>(entt);
+        es.emplace<metal_gathering_component>(entt);
+        es.emplace<bricks_gathering_component>(entt);
+        es.emplace<timber_gathering_component>(entt);
     }
 
     resource_system s{1, &q};
 
+    tbb::task_scheduler_init anonymous;
     {
         MEASURE_TIME_OF_FUNCTION(info);
         for (int64_t i = 0; i < simulated_turns && !quit; i++) {

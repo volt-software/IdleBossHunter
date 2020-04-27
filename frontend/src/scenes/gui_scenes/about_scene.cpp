@@ -23,17 +23,34 @@
 using namespace std;
 using namespace ibh;
 
+void open_url(string url) {
+#ifdef _WIN32
+    HINSTANCE res;
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+			COINIT_DISABLE_OLE1DDE);
+	res = ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
+	CoUninitialize();
+	return (res > (HINSTANCE)32);
+#else
+#ifdef __EMSCRIPTEN__
+    emscripten_run_script(fmt::format("window.open('{}', '_blank');", url));
+#else
+    system(fmt::format("xdg-open {}", url).c_str());
+#endif
+#endif
+}
+
 void about_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(ImGui::Begin("About")) {
         ImGui::Text("IdleBossHunter v0.0.1");
         ImGui::Text("Copyright 2020© by sole proprietorship Volt Software, situated in the Netherlands");
         ImGui::Text("");
         if(ImGui::Button("Discord")) {
-            emscripten_run_script("window.open('https://discord.gg/r9BtesB', '_blank');");
+            open_url("https://discord.gg/r9BtesB");
         }
         ImGui::SameLine();
         if(ImGui::Button("Github")) {
-            emscripten_run_script("window.open('https://github.com/Oipo/IdleBossHunter', '_blank');");
+            open_url("https://github.com/Oipo/IdleBossHunter");
         }
         ImGui::SameLine(ImGui::GetWindowWidth()-67);
         if (ImGui::Button("Close")) {

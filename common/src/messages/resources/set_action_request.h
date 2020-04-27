@@ -18,16 +18,29 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+#include <optional>
 #include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
-#include <game_queue_messages/messages.h>
+#include <common_components.h>
+#include "../message.h"
 
 using namespace std;
 
 namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_reject_application(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
-                                   queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    struct set_action_request : message {
+        explicit set_action_request(uint32_t resource_id) noexcept;
+
+        ~set_action_request() noexcept override = default;
+
+        [[nodiscard]]
+        string serialize() const override;
+
+        [[nodiscard]]
+        static unique_ptr<set_action_request> deserialize(rapidjson::Document const &d);
+
+        uint32_t resource_id;
+
+        static constexpr uint64_t type = generate_type<set_action_request>();
+    };
 }

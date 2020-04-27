@@ -53,6 +53,10 @@ void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
             ImGui::EndCombo();
         }
 
+        if(ImGui::SliderInt("Volume", reinterpret_cast<int *>(&config->volume), 0, 128)) {
+            enqueue_sdl_event(config->user_event_type, 10);
+        }
+
         ImGui::Checkbox("Show IMGUI demo window", &config->show_demo_window);
 
         if (ImGui::Button("Done")) {

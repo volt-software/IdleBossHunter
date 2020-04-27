@@ -148,6 +148,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
             return nullptr;
         }
 
+        classes.reserve(class_array.Size());
         for (SizeType i = 0; i < class_array.Size(); i++) {
             if (!class_array[i].IsObject() ||
                 !class_array[i].HasMember("name") ||
@@ -167,6 +168,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
                     return nullptr;
                 }
 
+                class_base_stats.reserve(race_stat_mods_array.Size());
                 for (SizeType i2 = 0; i2 < race_stat_mods_array.Size(); i2++) {
                     if (!race_stat_mods_array[i2].IsObject() ||
                         !race_stat_mods_array[i2].HasMember("stat_id") ||
@@ -186,6 +188,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
                     return nullptr;
                 }
 
+                class_items.reserve(race_items_array.Size());
                 for (SizeType i2 = 0; i2 < race_items_array.Size(); i2++) {
                     if (!race_items_array[i2].IsObject() ||
                         !race_items_array[i2].HasMember("name")) {
@@ -205,6 +208,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
                     return nullptr;
                 }
 
+                class_skills.reserve(race_skills_array.Size());
                 for (SizeType i2 = 0; i2 < race_skills_array.Size(); i2++) {
                     if (!race_skills_array[i2].IsObject() ||
                         !race_skills_array[i2].HasMember("name") ||
@@ -230,6 +234,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
             return nullptr;
         }
 
+        races.reserve(classes_array.Size());
         for (SizeType i = 0; i < classes_array.Size(); i++) {
             if (!classes_array[i].IsObject() ||
                 !classes_array[i].HasMember("name") ||
@@ -247,6 +252,7 @@ unique_ptr<character_select_response> character_select_response::deserialize(rap
                     return nullptr;
                 }
 
+                race_stat_mods.reserve(class_stat_mods_array.Size());
                 for (SizeType i2 = 0; i2 < class_stat_mods_array.Size(); i2++) {
                     if (!class_stat_mods_array[i2].IsObject() ||
                         !class_stat_mods_array[i2].HasMember("stat_id") ||

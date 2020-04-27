@@ -30,5 +30,5 @@ namespace ibh {
 
     void init_sdl(config& config) noexcept;
     void init_sdl_image() noexcept;
-    void init_sdl_mixer() noexcept;
+    void init_sdl_mixer(config const &config) noexcept;
 }

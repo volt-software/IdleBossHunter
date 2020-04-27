@@ -69,7 +69,7 @@ TEST_CASE("reject application handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         reject_application_message msg(1, company_applicant.id);
@@ -124,7 +124,7 @@ TEST_CASE("reject application handler tests") {
             pc_component pc{};
             pc.id = company_admin.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         reject_application_message msg(1, company_applicant.id);

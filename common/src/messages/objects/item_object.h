@@ -34,8 +34,11 @@ namespace ibh {
         string item_type;
         vector<stat_component> stats;
 
-
         item_object(uint32_t value, string name, string description, string item_type, vector<stat_component> stats) noexcept;
+        item_object(item_object&&) noexcept = default;
+        item_object(const item_object&) = default;
+        item_object& operator=(item_object&&) noexcept = default;
+        item_object& operator=(const item_object&) = default;
     };
 
     void write_item_object(rapidjson::Writer<rapidjson::StringBuffer> &writer, item_object const &obj);

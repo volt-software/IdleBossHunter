@@ -59,7 +59,7 @@ TEST_CASE("join company handler tests") {
             pc_component pc{};
             pc.id = company_applicant.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         join_company_message msg(1, existing_company.name);
@@ -111,7 +111,7 @@ TEST_CASE("join company handler tests") {
             pc_component pc{};
             pc.id = company_applicant.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         join_company_message msg(1, second_existing_company.name);
@@ -158,7 +158,7 @@ TEST_CASE("join company handler tests") {
             pc_component pc{};
             pc.id = company_applicant.id;
             pc.connection_id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
 
         join_company_message msg(1, existing_company.name);

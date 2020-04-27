@@ -32,7 +32,7 @@ TEST_CASE("character enter tests") {
         {
             pc_component pc{};
             pc.id = 1;
-            registry.assign<pc_component>(entt, move(pc));
+            registry.emplace<pc_component>(entt, move(pc));
         }
         moodycamel::ConcurrentQueue<outward_message> cq;
         outward_queues q(&cq);

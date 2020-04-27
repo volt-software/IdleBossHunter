@@ -1,6 +1,6 @@
 /*
-    IdleBossHunter
-    Copyright (C) 2020 Michael de Lang
+    IdleBossHunter client
+    Copyright (C) 2016  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -18,16 +18,21 @@
 
 #pragma once
 
-#include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
-#include <game_queue_messages/messages.h>
+#include <config.h>
+#include <ecs/ecs.h>
 
-using namespace std;
+#ifndef __EMSCRIPTEN__
+#include <thread>
+#include <websocketpp/config/asio_client.hpp>
+#include <websocketpp/client.hpp>
+#endif
 
 namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_set_tax(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
-                        queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    class scene_system;
+    typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
+#ifdef __EMSCRIPTEN__
+    void init_net(config& config, entt::registry &es, scene_system &ss);
+#else
+    std::thread init_net(config const &config, entt::registry &es, scene_system &ss);
+#endif
 }

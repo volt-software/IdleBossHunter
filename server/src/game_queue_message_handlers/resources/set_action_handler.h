@@ -18,16 +18,12 @@
 
 #pragma once
 
-#include <rapidjson/document.h>
-#include <database/database_pool.h>
-#include <per_socket_data.h>
-#include <concurrentqueue.h>
 #include <game_queue_messages/messages.h>
+#include <entt/entt.hpp>
+#include <database/database_transaction.h>
 
 using namespace std;
 
 namespace ibh {
-    template <class Server, class WebSocket>
-    void handle_accept_application(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
-                                   queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
+    bool handle_set_action(queue_message*, entt::registry&, outward_queues&, unique_ptr<database_transaction> const &transaction);
 }

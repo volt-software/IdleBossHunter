@@ -20,6 +20,7 @@
 #include "spdlog/spdlog.h"
 #include <scenes/gui_scenes/alpha_window_scene.h>
 #include <scenes/gui_scenes/main_menu_scene.h>
+#include <scenes/gui_scenes/connecting_scene.h>
 #include <messages/chat/message_response.h>
 #include <messages/user_access/login_response.h>
 #include <messages/user_access/character_select_response.h>
@@ -49,7 +50,7 @@ using namespace std;
 using namespace ibh;
 
 scene_system::scene_system(config *config, entt::registry &es)
-        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _es(es), _character(), _id_counter(0), _logged_in() {
+        : _config(config), _scenes(), _scenes_to_erase(), _scenes_to_add(), _es(es), _character(), _id_counter(0), _logged_in(), _connected() {
 }
 
 void scene_system::update(entt::registry &unused, TimeDelta dt) {
@@ -112,7 +113,15 @@ config * scene_system::get_config() {
     return _config;
 }
 
+void scene_system::init_connection_screen() {
+    auto connecting_menu = make_unique<connecting_scene>();
+    connecting_menu->_id = _id_counter++;
+    spdlog::info("connecting menu id {}", connecting_menu->_id);
+    _scenes.push_back(move(connecting_menu));
+}
+
 void scene_system::init_main_menu() {
+    _scenes[0]->_closed = true;
     auto main_menu = make_unique<main_menu_scene>();
     main_menu->_id = _id_counter++;
     spdlog::info("main menu id {}", main_menu->_id);
@@ -204,15 +213,15 @@ entt::registry &scene_system::get_entity_registry() {
     return _es;
 }
 
-int scene_system::get_socket() const {
+socket_component& scene_system::get_socket() const {
     auto view = _es.view<socket_component>();
     for (auto entity : view) {
-        socket_component const &socket = view.get<socket_component>(entity);
-        return socket.socket;
+        auto &socket = view.get<socket_component>(entity);
+        return socket;
     }
 
     spdlog::error("[{}] Couldn't find socket", __FUNCTION__);
-    return -1;
+    throw runtime_error("Couldn't find socket");
 }
 
 void scene_system::set_logged_in(bool logged_in) {
@@ -221,6 +230,18 @@ void scene_system::set_logged_in(bool logged_in) {
 
 bool scene_system::get_logged_in() const {
     return _logged_in;
+}
+
+void scene_system::set_connected(bool connected) {
+    _connected = connected;
+
+    if(connected) {
+        init_main_menu();
+    }
+}
+
+bool scene_system::get_connected() const {
+    return _connected;
 }
 
 optional<character_object>& scene_system::get_character() {

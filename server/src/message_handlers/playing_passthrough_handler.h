@@ -16,27 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define CATCH_CONFIG_RUNNER
+#pragma once
 
-#include <catch2/catch.hpp>
-#include <spdlog/spdlog.h>
-#include <working_directory_manipulation.h>
-#include <common_components.h>
-#include "on_leaving_scope.h"
-#include "macros.h"
+#include <rapidjson/document.h>
+#include <database/database_pool.h>
+#include <per_socket_data.h>
+#include <concurrentqueue.h>
+#include <game_queue_messages/messages.h>
 
 using namespace std;
-using namespace ibh;
 
-int main(int argc, char **argv) {
-    set_cwd(get_selfpath());
-    locale::global(locale("en_US.UTF-8"));
-    spdlog::set_level(spdlog::level::trace);
-    fill_mappers();
-
-    MEASURE_TIME_OF_FUNCTION(info);
-    int result = Catch::Session().run( argc, argv );
-    // global clean-up...
-
-    return ( result < 0xff ? result : 0xff );
+namespace ibh {
+    template <class Server, class WebSocket, class WebSocketMsgT>
+    void playing_passthrough_handler(Server *s, rapidjson::Document const &d, unique_ptr<database_transaction> const &transaction, per_socket_data<WebSocket> *user_data,
+                              queue_abstraction<unique_ptr<queue_message>> *q, ibh_flat_map<uint64_t, per_socket_data<WebSocket>> &user_connections);
 }

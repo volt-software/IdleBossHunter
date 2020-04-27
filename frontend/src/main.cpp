@@ -55,6 +55,8 @@
 #include "scenes/gui_scenes/connection_lost_scene.h"
 #include <messages/user_access/login_request.h>
 #include <common_components.h>
+#include "config_parsers.h"
+#include "networking.h"
 
 using namespace std;
 using namespace ibh;
@@ -104,9 +106,11 @@ void set_threads_config(config& config) {
     }
 }
 
-void close() noexcept
+void close(atomic<bool> &quit) noexcept
 {
+#ifdef __EMSCRIPTEN__
     emscripten_cancel_main_loop();
+#endif
     SDL_StopTextInput();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -120,6 +124,7 @@ void close() noexcept
     IMG_Quit();
 
     SDL_Quit();
+    quit = true;
 }
 
 void set_working_dir() noexcept {
@@ -137,110 +142,8 @@ void set_working_dir() noexcept {
 
 }
 
-EM_BOOL WebSocketOpen(int eventType, const EmscriptenWebSocketOpenEvent *e, void *userData)
-{
-    try {
-        spdlog::debug("open(eventType={})\n", eventType);
+//using message_router_type = ibh_flat_map<string, function<void(rapidjson::Document const &)>>;
 
-        if (userData == nullptr) {
-            spdlog::error("[{}] No registry passed!", __FUNCTION__);
-            exit(1);
-        }
-
-        entt::registry *es = static_cast<entt::registry *>(userData);
-        auto entt = es->create();
-        es->assign<socket_component>(entt, e->socket);
-    } catch (exception const &e) {
-        spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
-    }
-
-    return 0;
-}
-
-EM_BOOL WebSocketClose(int eventType, const EmscriptenWebSocketCloseEvent *e, void *userData)
-{
-    try {
-        spdlog::debug("close(eventType={}, wasClean={}, code={}, reason=%s)\n", eventType, e->wasClean, e->code, e->reason);
-
-        if (userData == nullptr) {
-            spdlog::error("[{}] No manager passed!", __FUNCTION__);
-            exit(1);
-        }
-
-        scene_system *manager = static_cast<scene_system *>(userData);
-        manager->force_goto_scene(make_unique<connection_lost_scene>());
-    } catch (exception const &e) {
-        spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
-    }
-    return 0;
-}
-
-EM_BOOL WebSocketError(int eventType, const EmscriptenWebSocketErrorEvent *e, void *userData)
-{
-    spdlog::debug("error(eventType={})", eventType);
-    return 0;
-}
-
-using message_router_type = ibh_flat_map<string, function<void(rapidjson::Document const &)>>;
-
-EM_BOOL WebSocketMessage(int eventType, const EmscriptenWebSocketMessageEvent *e, void *userData)
-{
-    try {
-        spdlog::debug("message(eventType={}, numBytes={}, isText={})", eventType, e->numBytes, e->isText);
-
-        if (userData == nullptr) {
-            spdlog::error("[{}] No manager passed!", __FUNCTION__);
-            exit(1);
-        }
-
-        if (e->isText) {
-            spdlog::trace("[{}] text data: {}", __FUNCTION__, reinterpret_cast<char *>(e->data));
-        } else {
-            spdlog::trace("[{}] binary data, ignoring", __FUNCTION__);
-            return 0;
-        }
-
-        rapidjson::Document d{};
-        d.Parse(reinterpret_cast<char *>(e->data), e->numBytes);
-
-        if (d.HasParseError() || !d.IsObject() || !d.HasMember("type") || !d["type"].IsUint64()) {
-            spdlog::warn("[{}] deserialize failed", __FUNCTION__);
-            return 0;
-        }
-
-        scene_system *manager = static_cast<scene_system *>(userData);
-        manager->handle_message(d);
-    } catch (exception const &e) {
-        spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
-    }
-
-    return 0;
-}
-
-void init_net(config& config, entt::registry &es, scene_system &ss) {
-#ifdef __EMSCRIPTEN__
-    if (!emscripten_websocket_is_supported()) {
-        spdlog::error("[{}] Websocket not supported", __FUNCTION__);
-        exit(1);
-    }
-
-    EmscriptenWebSocketCreateAttributes attr;
-    emscripten_websocket_init_create_attributes(&attr);
-    attr.url = config.server_url.c_str();
-
-    EMSCRIPTEN_WEBSOCKET_T socket = emscripten_websocket_new(&attr);
-    if (socket <= 0)
-    {
-        spdlog::error("[{}] Websocket creation failed, code {}", __FUNCTION__, socket);
-        exit(1);
-    }
-
-    emscripten_websocket_set_onopen_callback(socket, &es, WebSocketOpen);
-    emscripten_websocket_set_onclose_callback(socket, &ss, WebSocketClose);
-    emscripten_websocket_set_onerror_callback(socket, nullptr, WebSocketError);
-    emscripten_websocket_set_onmessage_callback(socket, &ss, WebSocketMessage);
-#endif
-}
 
 std::function<void()> loop;
 void main_loop() { loop(); }
@@ -256,7 +159,6 @@ int main(int argc, char* argv[]) {
     config.screen_width = 1600;
     config.screen_height = 900;
     config.server_url = "wss://www.realmofaesir.com:8080/";
-    reconfigure_logger(config);
 #else
     try {
         auto config_opt = parse_env_file();
@@ -268,21 +170,9 @@ int main(int argc, char* argv[]) {
         spdlog::error("[main] config/game_config.json file is malformed json.");
         return 1;
     }
-
-    map_layout layout;
-    try {
-        auto layout_opt = parse_map_layout_file();
-        if(!layout_opt) {
-            return 1;
-        }
-        layout = layout_opt.value();
-    } catch (const exception& e) {
-        spdlog::error("[main] config/map_layout.json file is malformed json.");
-        return 1;
-    }
+#endif
 
     reconfigure_logger(config);
-#endif
     config.music_to_play = 1;
 
 #ifdef __EMSCRIPTEN__
@@ -294,9 +184,13 @@ int main(int argc, char* argv[]) {
     scene_system ss(&config, es);
 
     init_sdl(config);
+#ifdef __EMSCRIPTEN__
     init_net(config, es, ss);
+#else
+    auto net_thread = init_net(config, es, ss);
+#endif
     init_sdl_image();
-    init_sdl_mixer();
+    init_sdl_mixer(config);
 
     set_threads_config(config);
     /*auto& io =*/ init_imgui();
@@ -309,17 +203,19 @@ int main(int argc, char* argv[]) {
     int counted_frames = 0;
     //ThreadPool thread_pool(config.threads);
 
+    atomic<bool> quit = false;
+
     Mix_Music *mus1 = Mix_LoadMUS("assets/music/8bit Stage1 Intro.ogg");
     if(mus1 == nullptr) {
         spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-        close();
+        close(quit);
         return -1;
     }
 
     Mix_Music *mus2 = Mix_LoadMUS("assets/music/8bit Stage1 Loop.ogg");
     if(mus2 == nullptr) {
         spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-        close();
+        close(quit);
         return -1;
     }
     Mix_PlayMusic(mus1, 0);
@@ -330,7 +226,7 @@ int main(int argc, char* argv[]) {
     tick_timer.start();
 
     rendering_system rs(&config, window, context);
-    ss.init_main_menu();
+    ss.init_connection_screen();
     bool previousCapture = false;
 
     loop = [&] {
@@ -363,6 +259,23 @@ int main(int argc, char* argv[]) {
                                 Mix_PlayMusic(mus1, 0);
                             }
                         }
+                        if(e.key.keysym.sym == SDLK_MINUS) {
+                            auto volume = Mix_Volume(-1,-1);
+                            volume -= 5;
+                            Mix_Volume(-1, volume);
+                            Mix_VolumeMusic(volume);
+                        }
+                        if(e.key.keysym.sym == SDLK_EQUALS) {
+                            auto volume = Mix_Volume(-1,-1);
+                            volume += 5;
+                            Mix_Volume(-1, volume);
+                            Mix_VolumeMusic(volume);
+                        }
+#ifndef __EMSCRIPTEN__
+                        if(e.key.keysym.sym == SDLK_ESCAPE) {
+                            quit.store(true, memory_order_release);
+                        }
+#endif
                         break;
                     }
                     case SDL_WINDOWEVENT: {
@@ -375,6 +288,9 @@ int main(int argc, char* argv[]) {
                         }
                         break;
                     }
+                    case SDL_QUIT:
+                        quit.store(true, memory_order_release);
+                        break;
                     default: {
                         if (e.type == config.user_event_type || e.type == SDL_USEREVENT) {
                             spdlog::info("userevent {}", e.user.code);
@@ -405,18 +321,23 @@ int main(int argc, char* argv[]) {
                                             fmt::format("assets/music/8bit Stage{} Intro.ogg", *val).c_str());
                                     if (mus1 == nullptr) {
                                         spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-                                        close();
+                                        close(quit);
                                     }
 
                                     mus2 = Mix_LoadMUS(fmt::format("assets/music/8bit Stage{} Loop.ogg", *val).c_str());
                                     if (mus2 == nullptr) {
                                         spdlog::error("Couldn't load mus1, {}", Mix_GetError());
-                                        close();
+                                        close(quit);
                                     }
                                     Mix_PlayMusic(mus1, 0);
                                     config.music_to_play = *val;
                                     delete val;
+                                    break;
                                 }
+                                case 10:
+                                    Mix_Volume(-1, config.volume);
+                                    Mix_VolumeMusic(config.volume);
+                                    break;
                                 default:
                                     break;
                             }
@@ -460,7 +381,7 @@ int main(int argc, char* argv[]) {
     emscripten_cancel_main_loop();
     emscripten_set_main_loop(main_loop, 0, 1);
 #else
-    while (1) main_loop();
+    while (!quit.load(memory_order_acquire)) { main_loop(); }
 #endif
 
     spdlog::info("quitting");
@@ -468,7 +389,14 @@ int main(int argc, char* argv[]) {
     Mix_FreeMusic(mus1);
     Mix_FreeMusic(mus2);
 
-    close();
+#ifndef __EMSCRIPTEN__
+    if(ss.get_socket().running) {
+        ss.get_socket().socket->stop();
+    }
+    net_thread.join();
+#endif
+
+    close(quit);
 
     return 0;
 }

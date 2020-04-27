@@ -46,12 +46,15 @@ namespace ibh {
         void force_goto_scene(unique_ptr<scene> new_scene) override;
         config * get_config() override;
         entt::registry& get_entity_registry() override;
-        int get_socket() const override;
+        [[nodiscard]] socket_component& get_socket() const override;
         void set_logged_in(bool logged_in) override;
-        bool get_logged_in() const override;
+        [[nodiscard]] bool get_logged_in() const override;
+        void set_connected(bool connected) override;
+        [[nodiscard]] bool get_connected() const override;
         optional<character_object>& get_character() override;
 
         // scene_system
+        void init_connection_screen();
         void init_main_menu();
 
         // message handling
@@ -67,6 +70,7 @@ namespace ibh {
 
         unsigned int _id_counter;
         bool _logged_in;
+        bool _connected;
         mutex _m;
     };
 }

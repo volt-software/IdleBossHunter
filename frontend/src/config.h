@@ -27,7 +27,6 @@ namespace ibh {
         // to be filled by .env
         string debug_level;
         string server_url;
-        bool debug_roa_library;
         uint32_t tick_length;
         bool log_fps;
         uint32_t screen_width;
@@ -35,6 +34,7 @@ namespace ibh {
         bool disable_vsync;
         bool auto_fullscreen;
         int threads;
+        uint32_t volume;
 
         //to be filled by code
         uint32_t refresh_rate;

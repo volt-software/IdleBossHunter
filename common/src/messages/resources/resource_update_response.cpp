@@ -23,8 +23,8 @@
 using namespace ibh;
 using namespace rapidjson;
 
-resource_update_response::resource_update_response(uint32_t resource_id, uint64_t resource, uint64_t resource_xp, uint64_t resource_level) noexcept :
-        resource_id(resource_id), resource(resource), resource_xp(resource_xp), resource_level(resource_level) {
+resource_update_response::resource_update_response(vector<resource> resources) noexcept :
+        resources(move(resources)) {
 
 }
 
@@ -37,24 +37,34 @@ string resource_update_response::serialize() const {
     writer.String(KEY_STRING("type"));
     writer.Uint64(type);
 
-    writer.String(KEY_STRING("resource_id"));
-    writer.Uint(resource_id);
+    writer.String(KEY_STRING("resources"));
 
-    writer.String(KEY_STRING("resource"));
-    writer.Uint64(resource);
+    writer.StartArray();
+    for(auto &resource : resources) {
+        writer.StartObject();
 
-    writer.String(KEY_STRING("resource_xp"));
-    writer.Uint64(resource_xp);
+        writer.String(KEY_STRING("resource_id"));
+        writer.Uint(resource.resource_id);
 
-    writer.String(KEY_STRING("resource_level"));
-    writer.Uint64(resource_level);
+        writer.String(KEY_STRING("resource_amt"));
+        writer.Uint64(resource.resource_amt);
+
+        writer.String(KEY_STRING("resource_xp"));
+        writer.Uint64(resource.resource_xp);
+
+        writer.String(KEY_STRING("resource_level"));
+        writer.Uint64(resource.resource_level);
+
+        writer.EndObject();
+    }
+    writer.EndArray();
 
     writer.EndObject();
     return sb.GetString();
 }
 
 unique_ptr<resource_update_response> resource_update_response::deserialize(rapidjson::Document const &d) {
-    if (!d.HasMember("type") || !d.HasMember("resource_id") || !d.HasMember("resource") || !d.HasMember("resource_xp") || !d.HasMember("resource_level")) {
+    if (!d.HasMember("type") || !d.HasMember("resources")) {
         spdlog::warn("[resource_update_response] deserialize failed");
         return nullptr;
     }
@@ -64,5 +74,28 @@ unique_ptr<resource_update_response> resource_update_response::deserialize(rapid
         return nullptr;
     }
 
-    return make_unique<resource_update_response>(d["resource_id"].GetUint(), d["resource"].GetUint64(), d["resource_xp"].GetUint64(), d["resource_level"].GetUint64());
+    vector<resource> resources;
+    {
+        auto &resources_array = d["resources"];
+        if (!resources_array.IsArray()) {
+            spdlog::warn("[resource_update_response] deserialize failed1");
+            return nullptr;
+        }
+
+        resources.reserve(resources_array.Size());
+        for (SizeType i = 0; i < resources_array.Size(); i++) {
+            if (!resources_array[i].IsObject() ||
+                !resources_array[i].HasMember("resource_id") ||
+                !resources_array[i].HasMember("resource_amt") ||
+                !resources_array[i].HasMember("resource_xp") ||
+                !resources_array[i].HasMember("resource_level")) {
+                spdlog::warn("[resource_update_response] deserialize failed12");
+                return nullptr;
+            }
+
+            resources.emplace_back(resources_array[i]["resource_id"].GetUint(), resources_array[i]["resource_amt"].GetUint64(), resources_array[i]["resource_xp"].GetUint64(), resources_array[i]["resource_level"].GetUint64());
+        }
+    }
+
+    return make_unique<resource_update_response>(move(resources));
 }

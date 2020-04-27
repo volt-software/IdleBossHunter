@@ -16,7 +16,7 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external/)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE -DASIO_CONCURRENCY_HINT_DEFAULT=1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXXH_INLINE_ALL -DXXH_CPU_LITTLE_ENDIAN=1 -DRAPIDJSON_SSE42 -DSPDLOG_COMPILED_LIB -DCATCH_CONFIG_FAST_COMPILE -DSPDLOG_NO_EXCEPTIONS -DASIO_STANDALONE -DASIO_CONCURRENCY_HINT_DEFAULT=1 -DENTT_NO_ETO=1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-variable -Wno-long-long -Wno-unused-parameter -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -pedantic -Wformat -Wformat-security ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -maes -mpclmul -mpopcnt -msse4.1 -msse4.2 -mrdrnd -mf16c -mfsgsbase -mfxsr -mxsave -mxsaveopt -fstack-protector-strong -fstack-clash-protection -fcf-protection -fPIE")
@@ -27,7 +27,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG")
 
 option(USE_SANITIZERS "Compile with sanitizers, slowing down the build and the runtime" OFF)
 IF(USE_SANITIZERS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined ") #-fsanitize=undefined -fsanitize=address -fsanitize=thread ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer ") #-fsanitize=undefined -fsanitize=address -fsanitize=thread ")
 ENDIF()
 
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-O1 -Wl,-z,defs -Wl,-z,now -Wl,-z,relro -Wl,-pie -Wl,-z,noexecstack")

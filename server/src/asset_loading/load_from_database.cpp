@@ -81,7 +81,7 @@ void ibh::load_from_database(entt::registry &registry, const shared_ptr<database
 
         spdlog::trace("[{}] loaded character id {} name {} no. of items {} no. of stats {}", __FUNCTION__, character.id, character.name, items.size(), stats.size());
         auto new_entity = registry.create();
-        registry.assign<pc_component>(new_entity, pc_component{character.id, 0, character.name, character.race, "",
+        registry.emplace<pc_component>(new_entity, pc_component{character.id, 0, character.name, character.race, "",
                                                                character._class, "", character.level,
                                                                character.skill_points, stats,
                                                                ibh_flat_map<uint32_t, item_component>{}, (items),

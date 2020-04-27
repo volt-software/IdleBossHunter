@@ -29,7 +29,6 @@
 #include "random_helper.h"
 #include "on_leaving_scope.h"
 #include "macros.h"
-#include <tbb/task_scheduler_init.h>
 
 using namespace std;
 using namespace ibh;
@@ -336,8 +335,7 @@ void battle_system::do_tick(entt::registry &es) {
     _tick_count = 0;
 
     MEASURE_TIME_OF_FUNCTION(info);
-    auto pc_group = es.group<pc_component>(entt::get<battle_component>);
-    tbb::task_scheduler_init anonymous;
+    auto pc_group = es.group<battle_component>(entt::get<pc_component>);
     for_each(execution::par_unseq, begin(pc_group), end(pc_group), [&es, &outward_queue = _outward_queue, &pc_group](auto entity){
         auto [pc, bc] = pc_group.template get<pc_component, battle_component>(entity);
         simulate_battle(pc, bc, es, outward_queue);

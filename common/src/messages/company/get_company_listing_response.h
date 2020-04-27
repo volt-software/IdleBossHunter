@@ -26,7 +26,6 @@
 using namespace std;
 
 namespace ibh {
-
     struct get_company_listing_response : message {
         explicit get_company_listing_response(string error, vector<company_object> companies) noexcept;
 

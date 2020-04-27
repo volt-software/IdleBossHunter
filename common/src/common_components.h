@@ -29,7 +29,11 @@ namespace ibh {
         uint64_t stat_id;
         int64_t value;
 
-        stat_component(uint64_t stat_id, int64_t value) : stat_id(stat_id), value(value) {}
+        stat_component(uint64_t stat_id, int64_t value) noexcept : stat_id(stat_id), value(value) {}
+        stat_component(stat_component&&) noexcept = default;
+        stat_component(const stat_component&) noexcept = default;
+        stat_component& operator=(stat_component&&) noexcept = default;
+        stat_component& operator=(const stat_component&) noexcept = default;
     };
 
     extern string const stat_str;
