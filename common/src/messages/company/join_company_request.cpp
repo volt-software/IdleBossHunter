@@ -28,6 +28,8 @@ join_company_request::join_company_request(string company_name) noexcept : compa
 }
 
 string join_company_request::serialize() const {
+    spdlog::trace("[join_company_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

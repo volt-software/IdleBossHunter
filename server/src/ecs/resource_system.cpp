@@ -40,6 +40,7 @@ void simulate_resource(uint32_t resource_id, pc_component &pc, outward_queues &o
     if(resource_amt == end(pc.stats)) {
         pc.stats.emplace(resource_id, 1);
         resource_amt = pc.stats.find(resource_id);
+        resource_level = pc.stats.find(resource_id + 600u);
     } else {
         resource_amt->second++;
     }
@@ -48,6 +49,8 @@ void simulate_resource(uint32_t resource_id, pc_component &pc, outward_queues &o
     if(resource_xp == end(pc.stats)) {
         pc.stats.emplace(resource_id + 300u, 1);
         resource_xp = pc.stats.find(resource_id + 300u);
+        resource_amt = pc.stats.find(resource_id);
+        resource_level = pc.stats.find(resource_id + 600u);
     } else {
         resource_xp->second++;
 
@@ -81,7 +84,7 @@ void ibh::resource_system::do_tick(entt::registry &es) {
 
     _tick_count = 0;
 
-    MEASURE_TIME_OF_FUNCTION(info);
+    MEASURE_TIME(info, "resource_system::do_tick");
     tick_for<wood_gathering_component>(es, resource_wood_id, _outward_queue);
     tick_for<ore_gathering_component>(es, resource_ore_id, _outward_queue);
     tick_for<water_gathering_component>(es, resource_water_id, _outward_queue);

@@ -29,6 +29,8 @@ set_motd_request::set_motd_request(string motd) noexcept
 }
 
 string set_motd_request::serialize() const {
+    spdlog::trace("[set_motd_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

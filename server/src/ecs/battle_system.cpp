@@ -68,12 +68,23 @@ int64_t battle_turn(pc_component &pc, ibh_flat_map<uint32_t, int64_t> &attacker,
 }
 
 void set_hp_mp(pc_component &pc, ibh_flat_map<uint32_t, int64_t> &stats) {
+
+    // initialize first, to prevent iterator invalidation
+    if(stats.find(stat_max_hp_id) == end(stats)) {
+        auto &hp = get_stat(stats, stat_hp_id);
+        get_stat_or_initialize_default(stats, stat_max_hp_id, hp);
+    }
+    if(stats.find(stat_max_mp_id) == end(stats)) {
+        auto &mp = get_stat(stats, stat_mp_id);
+        get_stat_or_initialize_default(stats, stat_max_mp_id, mp);
+    }
+
     auto &hp = get_stat(stats, stat_hp_id);
     auto &mp = get_stat(stats, stat_mp_id);
     auto &str = get_stat(stats, stat_str_id);
     auto &vit = get_stat(stats, stat_vit_id);
-    auto &max_hp = get_stat_or_initialize_default(stats, stat_max_hp_id, hp);
-    auto &max_mp = get_stat_or_initialize_default(stats, stat_max_mp_id, mp);
+    auto &max_hp = get_stat(stats, stat_max_hp_id);
+    auto &max_mp = get_stat(stats, stat_max_mp_id);
 
     hp = str * 10 + vit * 2;
     max_hp = hp;
@@ -334,7 +345,7 @@ void battle_system::do_tick(entt::registry &es) {
 
     _tick_count = 0;
 
-    MEASURE_TIME_OF_FUNCTION(info);
+    MEASURE_TIME(info, "battle_system::do_tick");
     auto pc_group = es.group<battle_component>(entt::get<pc_component>);
     for_each(execution::par_unseq, begin(pc_group), end(pc_group), [&es, &outward_queue = _outward_queue, &pc_group](auto entity){
         auto [pc, bc] = pc_group.template get<pc_component, battle_component>(entity);

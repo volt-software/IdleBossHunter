@@ -29,6 +29,8 @@ user_entered_game_response::user_entered_game_response(account_object user) noex
 }
 
 string user_entered_game_response::serialize() const {
+    spdlog::trace("[user_entered_game_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

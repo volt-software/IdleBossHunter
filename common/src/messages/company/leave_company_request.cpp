@@ -26,6 +26,8 @@ using namespace rapidjson;
 leave_company_request::leave_company_request() noexcept = default;
 
 string leave_company_request::serialize() const {
+    spdlog::trace("[leave_company_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -29,6 +29,8 @@ battle_update_response::battle_update_response(uint64_t mob_turns, uint64_t play
 }
 
 string battle_update_response::serialize() const {
+    spdlog::trace("[battle_update_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

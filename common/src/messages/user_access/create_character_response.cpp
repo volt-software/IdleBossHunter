@@ -28,6 +28,8 @@ create_character_response::create_character_response(character_object character)
 }
 
 string create_character_response::serialize() const {
+    spdlog::trace("[create_character_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

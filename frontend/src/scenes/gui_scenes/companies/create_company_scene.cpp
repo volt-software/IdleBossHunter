@@ -26,7 +26,7 @@
 using namespace std;
 using namespace ibh;
 
-create_company_scene::create_company_scene() : scene(generate_type<create_company_scene>()), _error(), _waiting_for_reply(true) {
+create_company_scene::create_company_scene() : scene(generate_type<create_company_scene>()), _error(), _waiting_for_reply() {
 }
 
 void create_company_scene::update(iscene_manager *manager, TimeDelta dt) {

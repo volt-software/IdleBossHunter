@@ -94,6 +94,7 @@ void login_menu_scene::handle_message(iscene_manager *manager, uint64_t type, me
 
             manager->add(make_unique<show_characters_scene>(manager, resp_msg->characters));
             manager->add(make_unique<chat_scene>(resp_msg->online_users));
+            manager->set_logged_in(true);
 
             _waiting_for_reply = false;
             _closed = true;

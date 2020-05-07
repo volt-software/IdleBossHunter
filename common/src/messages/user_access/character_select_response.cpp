@@ -39,6 +39,8 @@ character_select_response::character_select_response(vector<character_race> race
 }
 
 string character_select_response::serialize() const {
+    spdlog::trace("[character_select_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

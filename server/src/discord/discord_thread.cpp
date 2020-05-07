@@ -50,7 +50,7 @@ namespace ibh {
     string discord_session_id{};
 
     // defined in uws_thread
-    context_ptr on_tls_init(config &config, websocketpp::connection_hdl hdl);
+    context_ptr on_tls_init(config const &config, websocketpp::connection_hdl hdl);
 
     void send_to_discord(client *c, const string &msg) {
         if(!discord_init_done) {

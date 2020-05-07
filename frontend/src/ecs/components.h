@@ -35,10 +35,6 @@ namespace ibh {
         uint64_t user_id;
     };
 
-    struct atlas_component {
-        texture_atlas *atlas;
-    };
-
     struct character_component {
         character_component(uint64_t map_id) noexcept : map_id(map_id) {}
 
@@ -111,7 +107,14 @@ namespace ibh {
         int socket;
 #else
         explicit socket_component(bool running, websocketpp::connection_hdl hdl, client *socket) : running(running), hdl(move(hdl)), socket(socket) {}
-        bool running;
+        socket_component(socket_component&& other) noexcept : running(other.running.load()), hdl(move(other.hdl)), socket(other.socket) {}
+        socket_component& operator=(socket_component&& other) noexcept {
+            running = other.running.load();
+            hdl = move(other.hdl);
+            socket = other.socket;
+            return *this;
+        }
+        std::atomic<bool> running;
         websocketpp::connection_hdl hdl;
         client *socket;
 #endif

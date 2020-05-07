@@ -28,6 +28,8 @@ increase_bonus_response::increase_bonus_response(string error) noexcept : error(
 }
 
 string increase_bonus_response::serialize() const {
+    spdlog::trace("[increase_bonus_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

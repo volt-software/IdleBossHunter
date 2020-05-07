@@ -28,6 +28,8 @@ new_battle_response::new_battle_response(string mob_name, uint64_t mob_level, ui
 }
 
 string new_battle_response::serialize() const {
+    spdlog::trace("[new_battle_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

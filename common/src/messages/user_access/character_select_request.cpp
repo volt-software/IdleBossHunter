@@ -26,6 +26,8 @@ using namespace rapidjson;
 character_select_request::character_select_request() noexcept = default;
 
 string character_select_request::serialize() const {
+    spdlog::trace("[character_select_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

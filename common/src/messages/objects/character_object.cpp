@@ -89,28 +89,33 @@ bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vecto
        !value.HasMember("slot") || !value.HasMember("stats") ||
        !value.HasMember("xp") || !value.HasMember("skill_points") ||
        !value.HasMember("items") || !value.HasMember("skills")) {
+        spdlog::warn("[read_character_object_into_vector] deserialize failed1");
         return false;
     }
 
     auto &stats_array = value["stats"];
     if(!stats_array.IsArray()) {
+        spdlog::warn("[read_character_object_into_vector] deserialize failed2");
         return false;
     }
 
     auto &items_array = value["items"];
     if(!items_array.IsArray()) {
+        spdlog::warn("[read_character_object_into_vector] deserialize failed3");
         return false;
     }
 
     auto &skills_array = value["skills"];
     if(!skills_array.IsArray()) {
+        spdlog::warn("[read_character_object_into_vector] deserialize failed4");
         return false;
     }
 
     vector<stat_component> stats;
     stats.reserve(stats_array.Size());
     for(rapidjson::SizeType i = 0; i < stats_array.Size(); i++) {
-        if(!stats_array[i].IsObject() || !stats_array[i].HasMember("name") || !stats_array[i].HasMember("value")) {
+        if(!stats_array[i].IsObject() || !stats_array[i].HasMember("stat_id") || !stats_array[i].HasMember("value")) {
+            spdlog::warn("[read_character_object_into_vector] deserialize failed5");
             return false;
         }
 
@@ -121,6 +126,7 @@ bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vecto
     items.reserve(items_array.Size());
     for(rapidjson::SizeType i = 0; i < items_array.Size(); i++) {
         if(!read_item_object_into_vector(items_array[i], items)) {
+            spdlog::warn("[read_character_object_into_vector] deserialize failed6");
             return false;
         }
     }
@@ -129,6 +135,7 @@ bool ibh::read_character_object_into_vector(rapidjson::Value const &value, vecto
     skills.reserve(skills_array.Size());
     for(rapidjson::SizeType i = 0; i < skills_array.Size(); i++) {
         if(!read_skill_object_into_vector(skills_array[i], skills)) {
+            spdlog::warn("[read_character_object_into_vector] deserialize failed7");
             return false;
         }
     }

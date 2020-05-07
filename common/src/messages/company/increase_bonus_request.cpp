@@ -28,6 +28,8 @@ increase_bonus_request::increase_bonus_request(uint32_t bonus_type) noexcept : b
 }
 
 string increase_bonus_request::serialize() const {
+    spdlog::trace("[increase_bonus_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

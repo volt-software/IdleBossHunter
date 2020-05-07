@@ -29,6 +29,8 @@ create_character_request::create_character_request(uint32_t slot, string name, s
 }
 
 string create_character_request::serialize() const {
+    spdlog::trace("[create_character_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

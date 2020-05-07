@@ -29,6 +29,8 @@ set_action_response::set_action_response(string error) noexcept :
 }
 
 string set_action_response::serialize() const {
+    spdlog::trace("[set_action_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

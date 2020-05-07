@@ -29,6 +29,8 @@ resource_update_response::resource_update_response(vector<resource> resources) n
 }
 
 string resource_update_response::serialize() const {
+    spdlog::trace("[resource_update_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

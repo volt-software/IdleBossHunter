@@ -113,6 +113,7 @@
 #include <GL/gl3w.h>    // Needs to be initialized with gl3wInit() in user's code
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
 #include <GL/glew.h>    // Needs to be initialized with glewInit() in user's code
+
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
 #include <glad/glad.h>  // Needs to be initialized with gladLoadGL() in user's code
 #else
@@ -206,8 +207,9 @@ void    ImGui_ImplOpenGL3_Shutdown()
 
 void    ImGui_ImplOpenGL3_NewFrame()
 {
-    if (!g_ShaderHandle)
+    if (!g_ShaderHandle) {
         ImGui_ImplOpenGL3_CreateDeviceObjects();
+    }
 }
 
 static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_width, int fb_height, GLuint vertex_array_object)

@@ -29,6 +29,8 @@ generic_error_response::generic_error_response(string error, string pretty_error
 }
 
 string generic_error_response::serialize() const {
+    spdlog::trace("[login_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

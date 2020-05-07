@@ -29,6 +29,8 @@ set_action_request::set_action_request(uint32_t resource_id) noexcept :
 }
 
 string set_action_request::serialize() const {
+    spdlog::trace("[set_action_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

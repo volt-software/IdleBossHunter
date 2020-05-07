@@ -28,6 +28,8 @@ accept_application_request::accept_application_request(uint64_t applicant_id) no
 }
 
 string accept_application_request::serialize() const {
+    spdlog::trace("[accept_application_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

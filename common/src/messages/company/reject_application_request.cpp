@@ -28,6 +28,8 @@ reject_application_request::reject_application_request(uint64_t applicant_id) no
 }
 
 string reject_application_request::serialize() const {
+    spdlog::trace("[reject_application_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

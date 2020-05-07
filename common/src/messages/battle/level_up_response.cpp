@@ -28,6 +28,8 @@ level_up_response::level_up_response(ibh_flat_map<uint64_t, stat_component> adde
 }
 
 string level_up_response::serialize() const {
+    spdlog::trace("[level_up_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -32,7 +32,7 @@
 #include "spdlog/spdlog.h"
 #include <SDL.h>
 #include <algorithm>
-#include "battle_scene.h"
+#include "scenes/gui_scenes/resources/battle_log_scene.h"
 
 using namespace std;
 using namespace ibh;
@@ -54,13 +54,14 @@ void show_characters_scene::update(iscene_manager *manager, TimeDelta dt) {
             ImGui::Text("%s", _error.c_str());
         }
 
-        ImGui::ListBoxHeader("Characters", _characters.size(), 4);
-        for(auto& character : _characters) {
-            if(ImGui::Selectable(fmt::format("{} {}", character.name, character.level).c_str(), static_cast<uint32_t>(_selected_play_slot) == character.slot)) {
-                _selected_play_slot = character.slot;
+        if(ImGui::ListBoxHeader("Characters", _characters.size(), 4)) {
+            for (auto &character : _characters) {
+                if (ImGui::Selectable(fmt::format("{} {}", character.name, character.level).c_str(), static_cast<uint32_t>(_selected_play_slot) == character.slot)) {
+                    _selected_play_slot = character.slot;
+                }
             }
+            ImGui::ListBoxFooter();
         }
-        ImGui::ListBoxFooter();
 
         if (ImGui::Button("Create Character")) {
             _show_create = true;
@@ -262,7 +263,7 @@ void show_characters_scene::handle_message(iscene_manager *manager, uint64_t typ
 
             if(resp_msg->slot == static_cast<uint32_t>(_selected_play_slot)) {
                 manager->get_character() = *std::find_if(begin(_characters), end(_characters), [slot = _selected_play_slot](auto const &c){ return c.slot == static_cast<uint32_t>(slot); });
-                manager->add(make_unique<battle_scene>());
+                manager->add(make_unique<battle_log_scene>());
                 _waiting_for_reply = false;
                 _closed = true;
             } else {

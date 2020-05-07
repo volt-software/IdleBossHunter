@@ -33,6 +33,8 @@ namespace ibh {
 
         void update(entt::registry &es, TimeDelta dt) override;
         void end_rendering();
+        // separate, because it sleeps until vsync
+        void swap_window();
     private:
         config *_config;
         SDL_Window *_window;

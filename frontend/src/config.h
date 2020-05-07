@@ -31,6 +31,7 @@ namespace ibh {
         bool log_fps{};
         uint32_t screen_width{};
         uint32_t screen_height{};
+        bool adaptive_vsync{};
         bool disable_vsync{};
         bool auto_fullscreen{};
         int threads{};
@@ -41,5 +42,6 @@ namespace ibh {
         uint32_t user_event_type{};
         uint32_t music_to_play{};
         bool show_demo_window{};
+        bool borderless{};
     };
 }

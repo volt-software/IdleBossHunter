@@ -20,6 +20,7 @@
 #include <spdlog/spdlog.h>
 #include <atomic>
 #include <functional>
+#include <numeric>
 #include <csignal>
 #include <chrono>
 #include <filesystem>
@@ -40,7 +41,7 @@
 #include <game_queue_message_handlers/company/leave_company_handler.h>
 #include <game_queue_message_handlers/company/reject_application_handler.h>
 #include <game_queue_message_handlers/company/set_tax_handler.h>
-#include <range/v3/all.hpp>
+#include <game_queue_message_handlers/resources/set_action_handler.h>
 #include <tbb/task_scheduler_init.h>
 #include <asset_loading/load_character_select.h>
 
@@ -184,6 +185,9 @@ int main() {
     game_queue_message_router.emplace(reject_application_message::_type, handle_reject_application);
     game_queue_message_router.emplace(set_tax_message::_type, handle_set_tax);
 
+    // resources
+    game_queue_message_router.emplace(set_action_message::_type, handle_set_action);
+
     tbb::task_scheduler_init anonymous;
 
     while (!quit.load(memory_order_acquire)) {
@@ -198,7 +202,12 @@ int main() {
             while (game_loop_queue.try_dequeue(game_loop_ctok, msg)) {
                 spdlog::trace("[{}] got game loop msg with type {}", __FUNCTION__, msg->type);
                 auto transaction = pool->create_transaction();
-                if(game_queue_message_router[msg->type](msg.get(), es, outward_queue_abstraction, transaction)) {
+                auto handler = game_queue_message_router.find(msg->type);
+                if(handler == end(game_queue_message_router)) {
+                    spdlog::error("[[}] missing game_queue_message_router handler for type {}", __FUNCTION__, msg->type);
+                    continue;
+                }
+                if(handler->second(msg.get(), es, outward_queue_abstraction, transaction)) {
                     transaction->commit();
                 }
             }

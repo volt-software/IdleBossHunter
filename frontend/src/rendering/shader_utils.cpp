@@ -1,6 +1,6 @@
 /*
     IdleBossHunter client
-    Copyright (C) 2016  Michael de Lang
+    Copyright (C) 2020  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by

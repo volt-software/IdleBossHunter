@@ -29,6 +29,8 @@ generic_ok_response::generic_ok_response(string message) noexcept
 }
 
 string generic_ok_response::serialize() const {
+    spdlog::trace("[login_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -27,6 +27,8 @@ login_response::login_response(vector<character_object> players, vector<account_
 }
 
 string login_response::serialize() const {
+    spdlog::trace("[login_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 
@@ -76,7 +78,7 @@ string login_response::serialize() const {
 
 unique_ptr<login_response> login_response::deserialize(rapidjson::Document const &d) {
     if (!d.HasMember("type") || !d.HasMember("characters") || !d.HasMember("username") || !d.HasMember("email") || !d.HasMember("motd")) {
-        spdlog::warn("[login_response] deserialize failed");
+        spdlog::warn("[login_response] deserialize failed1");
         return nullptr;
     }
 
@@ -88,21 +90,21 @@ unique_ptr<login_response> login_response::deserialize(rapidjson::Document const
     vector<character_object> players;
     auto &players_array = d["characters"];
     if(!players_array.IsArray()) {
-        spdlog::warn("[login_response] deserialize failed");
+        spdlog::warn("[login_response] deserialize failed2");
         return nullptr;
     }
 
     vector<account_object> online_users;
     auto &online_users_array = d["online_users"];
     if(!online_users_array.IsArray()) {
-        spdlog::warn("[login_response] deserialize failed");
+        spdlog::warn("[login_response] deserialize failed3");
         return nullptr;
     }
 
     online_users.reserve(online_users_array.Size());
     for(SizeType i = 0; i < online_users_array.Size(); i++) {
         if(!read_account_object_into_vector(online_users_array[i], online_users)) {
-            spdlog::warn("[login_response] deserialize failed");
+            spdlog::warn("[login_response] deserialize failed4");
             return nullptr;
         }
     }
@@ -110,7 +112,7 @@ unique_ptr<login_response> login_response::deserialize(rapidjson::Document const
     players.reserve(players_array.Size());
     for(SizeType i = 0; i < players_array.Size(); i++) {
         if(!read_character_object_into_vector(players_array[i], players)) {
-            spdlog::warn("[login_response] deserialize failed");
+            spdlog::warn("[login_response] deserialize failed5");
             return nullptr;
         }
     }

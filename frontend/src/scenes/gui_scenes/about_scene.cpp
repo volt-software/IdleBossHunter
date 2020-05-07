@@ -33,7 +33,7 @@ void open_url(string url) {
 	return (res > (HINSTANCE)32);
 #else
 #ifdef __EMSCRIPTEN__
-    emscripten_run_script(fmt::format("window.open('{}', '_blank');", url));
+    emscripten_run_script(fmt::format("window.open('{}', '_blank');", url).c_str());
 #else
     system(fmt::format("xdg-open {}", url).c_str());
 #endif

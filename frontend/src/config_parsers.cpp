@@ -61,6 +61,7 @@ optional<config> ibh::parse_env_file() {
     PARSE_MEMBER("VOLUME", volume, GetUint());
     PARSE_MEMBER("LOG_FPS", log_fps, GetBool());
     PARSE_MEMBER("DISABLE_VSYNC", disable_vsync, GetBool());
+    PARSE_MEMBER("ADAPTIVE_VSYNC", adaptive_vsync, GetBool());
     PARSE_MEMBER("AUTO_FULLSCREEN", auto_fullscreen, GetBool());
 
     return config;

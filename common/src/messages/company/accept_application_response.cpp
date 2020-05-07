@@ -28,6 +28,8 @@ accept_application_response::accept_application_response(string error) noexcept 
 }
 
 string accept_application_response::serialize() const {
+    spdlog::trace("[accept_application_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -29,6 +29,8 @@ battle_finished_response::battle_finished_response(bool mob_died, bool player_di
 }
 
 string battle_finished_response::serialize() const {
+    spdlog::trace("[battle_finished_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -44,29 +44,31 @@ void companies_overview_scene::update(iscene_manager *manager, TimeDelta dt) {
         if(_waiting_for_companies) {
             ImGui::Text("Waiting for server answer...");
         } else {
-            ImGui::ListBoxHeader("Companies", _companies.size(), 4);
-            for (auto &company : _companies) {
-                if (ImGui::Selectable(fmt::format("{}", company.name).c_str(), _selected_company == company.name)) {
-                    _selected_company = company.name;
+            if(ImGui::ListBoxHeader("Companies", _companies.size(), 4)) {
+                for (auto &company : _companies) {
+                    if (ImGui::Selectable(fmt::format("{}", company.name).c_str(), _selected_company == company.name)) {
+                        _selected_company = company.name;
+                    }
                 }
+                ImGui::ListBoxFooter();
             }
-            ImGui::ListBoxFooter();
 
             ImGui::SameLine();
 
-            ImGui::ListBoxHeader("Company Members", _companies.size(), 4);
-            for (auto &company : _companies) {
-                if (company.name != _selected_company) {
-                    continue;
-                }
+            if(ImGui::ListBoxHeader("Company Members", _companies.size(), 4)) {
+                for (auto &company : _companies) {
+                    if (company.name != _selected_company) {
+                        continue;
+                    }
 
-                for (auto &member : company.members) {
-                    ImGui::Selectable(fmt::format("{}", member).c_str());
-                }
+                    for (auto &member : company.members) {
+                        ImGui::Selectable(fmt::format("{}", member).c_str());
+                    }
 
-                break;
+                    break;
+                }
+                ImGui::ListBoxFooter();
             }
-            ImGui::ListBoxFooter();
 
             ImGui::SameLine();
 

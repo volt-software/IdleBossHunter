@@ -42,16 +42,18 @@ namespace ibh {
 
         // iscene_manager
         void remove(scene *old_scene) override;
+        void remove_by_type(uint64_t type) override;
         void add(unique_ptr<scene> scene) override;
+        void open_or_close(unique_ptr<scene> scene) override;
         void force_goto_scene(unique_ptr<scene> new_scene) override;
-        config * get_config() override;
-        entt::registry& get_entity_registry() override;
+        [[nodiscard]] config * get_config() override;
+        [[nodiscard]] entt::registry& get_entity_registry() override;
         [[nodiscard]] socket_component& get_socket() const override;
         void set_logged_in(bool logged_in) override;
         [[nodiscard]] bool get_logged_in() const override;
         void set_connected(bool connected) override;
         [[nodiscard]] bool get_connected() const override;
-        optional<character_object>& get_character() override;
+        [[nodiscard]] optional<character_object>& get_character() override;
 
         // scene_system
         void init_connection_screen();
@@ -68,7 +70,7 @@ namespace ibh {
         entt::registry &_es;
         optional<character_object> _character;
 
-        unsigned int _id_counter;
+        atomic<unsigned int> _id_counter;
         bool _logged_in;
         bool _connected;
         mutex _m;

@@ -28,6 +28,8 @@ get_company_applications_response::get_company_applications_response(string erro
 }
 
 string get_company_applications_response::serialize() const {
+    spdlog::trace("[get_company_applications_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

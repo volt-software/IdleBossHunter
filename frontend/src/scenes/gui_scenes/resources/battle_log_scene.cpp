@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "battle_scene.h"
+#include "battle_log_scene.h"
 #include <rendering/imgui/imgui.h>
 #include "spdlog/spdlog.h"
 
@@ -29,7 +29,7 @@
 using namespace std;
 using namespace ibh;
 
-void battle_scene::update(iscene_manager *manager, TimeDelta dt) {
+void battle_log_scene::update(iscene_manager *manager, TimeDelta dt) {
     if(_first_frame) {
         ImGui::SetNextWindowSize(ImVec2{550.0F, 280.0F}, ImGuiCond_Once);
     }
@@ -57,7 +57,7 @@ void battle_scene::update(iscene_manager *manager, TimeDelta dt) {
     ImGui::End();
 }
 
-void battle_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
+void battle_log_scene::handle_message(iscene_manager *manager, uint64_t type, message const *msg) {
     switch (type) {
         case battle_finished_response::type: {
             auto resp_msg = dynamic_cast<battle_finished_response const*>(msg);

@@ -59,6 +59,12 @@ void settings_menu_scene::update(iscene_manager *manager, TimeDelta dt) {
 
         ImGui::Checkbox("Show IMGUI demo window", &config->show_demo_window);
 
+#ifndef __EMSCRIPTEN__
+        if(ImGui::Checkbox("Borderless window", &config->borderless)) {
+            enqueue_sdl_event(config->user_event_type, 4, new bool(config->borderless));
+        }
+#endif
+
         if (ImGui::Button("Done")) {
             _closed = true;
         }

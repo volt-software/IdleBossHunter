@@ -1,6 +1,6 @@
 /*
     IdleBossHunter client
-    Copyright (C) 2016  Michael de Lang
+    Copyright (C) 2020  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,6 @@
 #endif
 
 #include <ecs/systems/scene_system.h>
-#include <scenes/gui_scenes/connection_lost_scene.h>
 
 using namespace std;
 
@@ -62,8 +61,8 @@ EM_BOOL WebSocketClose(int eventType, const EmscriptenWebSocketCloseEvent *e, vo
             exit(1);
         }
 
-        scene_system *manager = static_cast<scene_system *>(userData);
-        manager->force_goto_scene(make_unique<connection_lost_scene>());
+        auto *manager = static_cast<ibh::scene_system *>(userData);
+        manager->set_connected(false);
     } catch (exception const &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
     }
@@ -102,7 +101,7 @@ EM_BOOL WebSocketMessage(int eventType, const EmscriptenWebSocketMessageEvent *e
             return 0;
         }
 
-        scene_system *manager = static_cast<scene_system *>(userData);
+        auto *manager = static_cast<ibh::scene_system *>(userData);
         manager->handle_message(d);
     } catch (exception const &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
@@ -112,7 +111,7 @@ EM_BOOL WebSocketMessage(int eventType, const EmscriptenWebSocketMessageEvent *e
 }
 
 
-void init_net(config const &config, entt::registry &es, scene_system &ss) {
+void ibh::init_net(ibh::config const &config, entt::registry &es, ibh::scene_system &ss) {
     if (!emscripten_websocket_is_supported()) {
         spdlog::error("[{}] Websocket not supported", __FUNCTION__);
         exit(1);
@@ -130,7 +129,7 @@ void init_net(config const &config, entt::registry &es, scene_system &ss) {
     }
 
     auto entt = es.create();
-    es.emplace<socket_component>(entt, socket);
+    es.emplace<ibh::socket_component>(entt, socket);
 
     emscripten_websocket_set_onopen_callback(socket, nullptr, WebSocketOpen);
     emscripten_websocket_set_onclose_callback(socket, &ss, WebSocketClose);
@@ -214,14 +213,16 @@ void on_message(ibh::client *c, ibh::scene_system *manager, websocketpp::connect
 void on_close(ibh::client *c, ibh::scene_system *manager, websocketpp::connection_hdl hdl) {
     try {
         ibh::client::connection_ptr con = c->get_con_from_hdl(hdl);
-        spdlog::debug("close(reason=%s)", con->get_ec().message());
+        spdlog::debug("close(reason={})", con->get_ec().message());
 
         if (manager == nullptr) {
             spdlog::error("[{}] No manager passed!", __FUNCTION__);
             exit(1);
         }
 
-        manager->force_goto_scene(make_unique<ibh::connection_lost_scene>());
+        auto &socket = manager->get_socket();
+        socket.running = false;
+        manager->set_connected(false);
     } catch (exception const &e) {
         spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
     }
@@ -232,10 +233,12 @@ void on_fail(ibh::client *c, websocketpp::connection_hdl hdl) {
     spdlog::error("[{}] fail connection {} {}", __FUNCTION__, con->get_ec().value(), con->get_ec().message());
 }
 
-thread ibh::init_net(config const &config, entt::registry &es, scene_system &manager) {
-    atomic<bool> init_done = false;
+atomic<bool> init_net_done = false;
 
-    auto t = thread([&config, &init_done, &es, ss = &manager] {
+thread ibh::init_net(config const &config, entt::registry &es, scene_system &manager) {
+
+
+    auto t = thread([&config, &es, ss = &manager] {
         client socket_client;
         auto entt = es.create();
         auto &socket = es.emplace<socket_component>(entt, false, websocketpp::connection_hdl {}, &socket_client);
@@ -260,13 +263,13 @@ thread ibh::init_net(config const &config, entt::registry &es, scene_system &man
 
             if (ec) {
                 spdlog::error("[websocket++] initialization error: {}", ec.message());
-                init_done.store(true, memory_order_release);
+                init_net_done.store(true, memory_order_release);
                 return;
             }
 
             socket_client.connect(con);
             socket.running = true;
-            init_done.store(true, memory_order_release);
+            init_net_done.store(true, memory_order_release);
             socket_client.run();
         } catch (websocketpp::exception const &e) {
             socket.running = false;
@@ -275,10 +278,10 @@ thread ibh::init_net(config const &config, entt::registry &es, scene_system &man
             socket.running = false;
             spdlog::error("[websocket++] regular exception {}", e.what());
         }
-        init_done.store(true, memory_order_release);
+        init_net_done.store(true, memory_order_release);
     });
 
-    while (!init_done.load(memory_order_acquire)) {
+    while (!init_net_done.load(memory_order_acquire)) {
         this_thread::sleep_for(chrono::milliseconds(1));
     }
 

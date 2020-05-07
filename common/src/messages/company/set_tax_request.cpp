@@ -28,6 +28,8 @@ set_tax_request::set_tax_request(uint32_t rate) noexcept : rate(rate) {
 }
 
 string set_tax_request::serialize() const {
+    spdlog::trace("[set_tax_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

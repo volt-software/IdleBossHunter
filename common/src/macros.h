@@ -26,3 +26,10 @@
                                     }); \
                                     static_assert(true, "") // force usage of semicolon
 
+#define MEASURE_TIME(level, name)   auto start = chrono::system_clock::now(); \
+                                    auto time_scope_guard = on_leaving_scope([start] { \
+                                        auto end = chrono::system_clock::now(); \
+                                        spdlog::level("[{}] finished in {:n} µs", name, chrono::duration_cast<chrono::microseconds>(end-start).count()); \
+                                    }); \
+                                    static_assert(true, "") // force usage of semicolon
+

@@ -30,6 +30,8 @@ get_company_listing_response::get_company_listing_response(string error, vector<
 }
 
 string get_company_listing_response::serialize() const {
+    spdlog::trace("[get_company_listing_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

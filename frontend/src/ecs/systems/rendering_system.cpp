@@ -22,22 +22,16 @@
 #include <rendering/imgui/imgui.h>
 #include <rendering/imgui/imgui_impl_sdl.h>
 #include <rendering/imgui/imgui_impl_opengl3.h>
-#include "../components.h"
-#include "../../rendering/sprite.h"
-#include "../../rendering/texture_atlas.h"
+#include <on_leaving_scope.h>
+#include <macros.h>
 
 using namespace std;
 using namespace ibh;
 
 void rendering_system::update(entt::registry &es, TimeDelta dt) {
+    //MEASURE_TIME(trace, "rendering_system_update");
     SDL_GL_MakeCurrent(_window, _context);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    auto view = es.view<atlas_component>();
-    for(auto entity : view) {
-        atlas_component const &atlas_comp = view.get(entity);
-        atlas_comp.atlas->render();
-    }
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(_window);
@@ -48,8 +42,14 @@ void rendering_system::update(entt::registry &es, TimeDelta dt) {
 }
 
 void rendering_system::end_rendering() {
+    //MEASURE_TIME(trace, "rendering_system_end_rendering");
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
 
+void rendering_system::swap_window() {
+    //MEASURE_TIME(trace, "rendering_system_swap_window");
     SDL_GL_SwapWindow(_window);
+    glFlush();
+    glFinish();
 }

@@ -29,6 +29,8 @@ register_request::register_request(string username, string password, string emai
 }
 
 string register_request::serialize() const {
+    spdlog::trace("[register_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

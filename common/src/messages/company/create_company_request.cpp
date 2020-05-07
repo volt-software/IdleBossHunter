@@ -28,6 +28,8 @@ create_company_request::create_company_request(string name, uint16_t company_typ
 }
 
 string create_company_request::serialize() const {
+    spdlog::trace("[create_company_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

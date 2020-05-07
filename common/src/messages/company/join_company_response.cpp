@@ -28,6 +28,8 @@ join_company_response::join_company_response(string error) noexcept : error(move
 }
 
 string join_company_response::serialize() const {
+    spdlog::trace("[join_company_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -29,6 +29,8 @@ delete_character_response::delete_character_response(uint32_t slot) noexcept
 }
 
 string delete_character_response::serialize() const {
+    spdlog::trace("[delete_character_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

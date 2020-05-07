@@ -29,6 +29,8 @@ delete_character_request::delete_character_request(uint32_t slot) noexcept
 }
 
 string delete_character_request::serialize() const {
+    spdlog::trace("[delete_character_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

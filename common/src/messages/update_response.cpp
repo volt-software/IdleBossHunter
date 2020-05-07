@@ -28,6 +28,8 @@ update_response::update_response() noexcept {
 }
 
 string update_response::serialize() const {
+    spdlog::trace("[login_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

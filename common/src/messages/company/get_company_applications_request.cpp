@@ -26,6 +26,8 @@ using namespace rapidjson;
 get_company_applications_request::get_company_applications_request() noexcept = default;
 
 string get_company_applications_request::serialize() const {
+    spdlog::trace("[get_company_applications_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

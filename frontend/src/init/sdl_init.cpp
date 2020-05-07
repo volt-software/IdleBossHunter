@@ -172,7 +172,16 @@ void ibh::init_sdl(config &config) noexcept {
         exit(1);
     }
 
-    if (SDL_GL_SetSwapInterval(config.disable_vsync ? 0 : 1) < 0) {
+    bool set_regular_vsync = true;
+    if(config.adaptive_vsync) {
+        if (SDL_GL_SetSwapInterval(-1) < 0) {
+            spdlog::warn("[{}] Couldn't set adaptive vsync: {}", __FUNCTION__, SDL_GetError());
+        } else {
+            set_regular_vsync = false;
+        }
+    }
+
+    if (set_regular_vsync && SDL_GL_SetSwapInterval(config.disable_vsync ? 0 : 1) < 0) {
         spdlog::error("[{}] Couldn't set vsync: {}", __FUNCTION__, SDL_GetError());
         exit(1);
     }
@@ -213,10 +222,10 @@ void ibh::init_sdl(config &config) noexcept {
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_SCISSOR_TEST);
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_SCISSOR_TEST);
 
 #ifndef __EMSCRIPTEN__
     if (glDebugMessageCallback) {

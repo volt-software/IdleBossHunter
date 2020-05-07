@@ -28,6 +28,8 @@ leave_company_response::leave_company_response(string error) noexcept : error(mo
 }
 
 string leave_company_response::serialize() const {
+    spdlog::trace("[leave_company_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

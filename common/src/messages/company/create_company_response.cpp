@@ -28,6 +28,8 @@ create_company_response::create_company_response(string error) noexcept : error(
 }
 
 string create_company_response::serialize() const {
+    spdlog::trace("[create_company_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

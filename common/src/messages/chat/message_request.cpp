@@ -28,6 +28,8 @@ message_request::message_request(string content) noexcept : content(move(content
 }
 
 string message_request::serialize() const {
+    spdlog::trace("[message_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

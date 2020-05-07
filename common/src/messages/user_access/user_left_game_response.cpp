@@ -29,6 +29,8 @@ user_left_game_response::user_left_game_response(string username) noexcept
 }
 
 string user_left_game_response::serialize() const {
+    spdlog::trace("[user_left_game_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

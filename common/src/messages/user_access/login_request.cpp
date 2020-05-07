@@ -28,6 +28,8 @@ login_request::login_request(string username, string password) noexcept : userna
 }
 
 string login_request::serialize() const {
+    spdlog::trace("[login_request] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

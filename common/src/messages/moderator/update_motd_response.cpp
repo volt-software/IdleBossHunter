@@ -29,6 +29,8 @@ update_motd_response::update_motd_response(string motd) noexcept
 }
 
 string update_motd_response::serialize() const {
+    spdlog::trace("[update_motd_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

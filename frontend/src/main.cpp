@@ -1,6 +1,6 @@
 /*
     IdleBossHunter client
-    Copyright (C) 2016  Michael de Lang
+    Copyright (C) 2020  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -290,8 +290,6 @@ int main(int argc, char* argv[]) {
                                                     0.0F, -1.0F, 1.0F);
 #ifndef __EMSCRIPTEN__
                             glViewport(0, 0, config.screen_width, config.screen_height);
-                            glMatrixMode(GL_PROJECTION);
-                            gluOrtho2D(0, config.screen_height, config.screen_width, 0);
 #endif
                         }
                         break;
@@ -304,16 +302,22 @@ int main(int argc, char* argv[]) {
                             spdlog::info("userevent {}", e.user.code);
                             switch (e.user.code) {
                                 case 0: {
+                                    config.screen_width = 1280;
+                                    config.screen_height = 720;
                                     projection = glm::ortho(0.0F, 1280.F, 720.F, 0.0F, -1.0F, 1.0F);
                                     SDL_SetWindowSize(window, 1280, 720);
                                     break;
                                 }
                                 case 1: {
+                                    config.screen_width = 1600;
+                                    config.screen_height = 900;
                                     projection = glm::ortho(0.0F, 1600.F, 900.F, 0.0F, -1.0F, 1.0F);
                                     SDL_SetWindowSize(window, 1600, 900);
                                     break;
                                 }
                                 case 2: {
+                                    config.screen_width = 1920;
+                                    config.screen_height = 1080;
                                     projection = glm::ortho(0.0F, 1920.F, 1080.F, 0.0F, -1.0F, 1.0F);
                                     SDL_SetWindowSize(window, 1920, 1080);
                                     break;
@@ -339,6 +343,12 @@ int main(int argc, char* argv[]) {
                                     }
                                     Mix_PlayMusic(mus1, 0);
                                     config.music_to_play = *val;
+                                    delete val;
+                                    break;
+                                }
+                                case 4: {
+                                    bool *val = static_cast<bool *>(e.user.data1);
+                                    SDL_SetWindowBordered(window, *val ? SDL_FALSE : SDL_TRUE);
                                     delete val;
                                     break;
                                 }
@@ -369,6 +379,8 @@ int main(int argc, char* argv[]) {
                 frame_times.push_back(bench_timer.get_ticks());
             }
 
+            rs.swap_window();
+
             ++counted_frames;
 
             auto fps_ticks = fps_timer.get_ticks();
@@ -382,7 +394,7 @@ int main(int argc, char* argv[]) {
                 counted_frames = 0;
             }
         } catch (exception const &e) {
-            spdlog::error("[{}] exception {}", __FUNCTION__, e.what());
+            spdlog::error("[main] exception {}", e.what());
         }
     };
 
@@ -399,10 +411,12 @@ int main(int argc, char* argv[]) {
     Mix_FreeMusic(mus2);
 
 #ifndef __EMSCRIPTEN__
-    if(ss.get_socket().running) {
+    if(ss.get_socket().running && !ss.get_socket().socket->stopped()) {
         ss.get_socket().socket->stop();
     }
-    net_thread.join();
+    if(net_thread.joinable()) {
+        net_thread.join();
+    }
 #endif
 
     close(quit);

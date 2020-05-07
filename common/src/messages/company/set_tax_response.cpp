@@ -28,6 +28,8 @@ set_tax_response::set_tax_response(string error) noexcept : error(move(error)) {
 }
 
 string set_tax_response::serialize() const {
+    spdlog::trace("[set_tax_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

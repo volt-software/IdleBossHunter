@@ -22,6 +22,7 @@
 #include <scenes/gui_scenes/main_menu_scene.h>
 #include <scenes/gui_scenes/connecting_scene.h>
 #include <scenes/gui_scenes/background_scene.h>
+#include <scenes/gui_scenes/connection_lost_scene.h>
 #include <messages/chat/message_response.h>
 #include <messages/user_access/login_response.h>
 #include <messages/user_access/character_select_response.h>
@@ -45,6 +46,8 @@
 #include <messages/company/leave_company_response.h>
 #include <messages/company/reject_application_response.h>
 #include <messages/company/set_tax_response.h>
+#include <on_leaving_scope.h>
+#include <macros.h>
 
 
 using namespace std;
@@ -55,6 +58,7 @@ scene_system::scene_system(config *config, entt::registry &es)
 }
 
 void scene_system::update(entt::registry &unused, TimeDelta dt) {
+    //MEASURE_TIME(trace, "scene_system");
     scoped_lock sg(_m);
     for(auto const & scene : _scenes) {
         scene->update(this, dt);
@@ -90,9 +94,32 @@ void scene_system::remove(scene *old_scene) {
     // do not delete pointer
 }
 
+void scene_system::remove_by_type(uint64_t type) {
+    for(auto const & scene : _scenes) {
+        if(scene->_type != type) {
+            continue;
+        }
+
+        _scenes_to_erase.push_back(scene->_id);
+    }
+
+}
+
 void scene_system::add(unique_ptr<scene> new_scene) {
     for(auto const &scene : _scenes) {
         if(scene->_type == new_scene->_type) {
+            return;
+        }
+    }
+
+    new_scene->_id = _id_counter++;
+    _scenes_to_add.emplace_back(move(new_scene));
+}
+
+void scene_system::open_or_close(unique_ptr<scene> new_scene) {
+    for(auto const &scene : _scenes) {
+        if(scene->_type == new_scene->_type) {
+            scene->_closed = true;
             return;
         }
     }
@@ -208,6 +235,7 @@ void scene_system::handle_message(rapidjson::Document const &d) {
     auto msg = deserialize_message(type, d);
 
     if(!msg) {
+        spdlog::error("[{}] login_reponse type: {}", __FUNCTION__, login_response::type);
         spdlog::error("[{}] No message for type {}", __FUNCTION__, type);
         return;
     }
@@ -248,6 +276,8 @@ void scene_system::set_connected(bool connected) {
 
     if(connected) {
         init_main_menu();
+    } else {
+        add(make_unique<connection_lost_scene>());
     }
 }
 

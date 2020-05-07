@@ -28,6 +28,8 @@ message_response::message_response(string user, string content, string source, u
 }
 
 string message_response::serialize() const {
+    spdlog::trace("[message_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

@@ -36,6 +36,8 @@ using namespace ibh;
 int main(int argc, char **argv) {
     spdlog::set_level(spdlog::level::debug);
 
+    string test = fmt::format("This is a test {} ${msgType['type']}", 42);
+
     set_cwd(get_selfpath());
     locale::global(locale("en_US.UTF-8"));
 

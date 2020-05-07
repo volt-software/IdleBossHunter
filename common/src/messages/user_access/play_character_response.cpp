@@ -28,6 +28,8 @@ play_character_response::play_character_response(uint32_t slot) noexcept : slot(
 }
 
 string play_character_response::serialize() const {
+    spdlog::trace("[play_character_response] type {}", type);
+
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
 

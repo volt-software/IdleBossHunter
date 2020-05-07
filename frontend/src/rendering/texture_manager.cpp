@@ -1,6 +1,6 @@
 /*
     IdleBossHunter client
-    Copyright (C) 2016  Michael de Lang
+    Copyright (C) 2020  Michael de Lang
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -105,10 +105,10 @@ texture ibh::create_texture_from_image(string const & image) {
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    SDL_FreeSurface(surface);
-
     texture tex = texture(texture_id, 1, surface->w, surface->h);
     auto succeeded = texture_cache.emplace(image, tex).second;
+
+    SDL_FreeSurface(surface);
 
     if(!succeeded) {
         spdlog::error("[{}] Couldn't insert texture into cache {}", __FUNCTION__, image);
